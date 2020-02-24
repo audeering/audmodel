@@ -29,8 +29,8 @@ class Lookup:
         if version is None:
             version = Lookup.latest_version(name, private=private)
         elif not Lookup.exists(name, version, private=private):
-            raise RuntimeError(f"A lookup table for '{name}' and "
-                               f"'{version}' does not exist yet.")
+            raise RuntimeError(f"Lookup table '{name}-{version}' "
+                               f"does not exist yet.")
 
         self.version = version
         self.url = _url_table(self.group_id, self.repository, version)
@@ -44,7 +44,7 @@ class Lookup:
         df = self.table
 
         if self.contains(params):
-            raise RuntimeError(f"An entry for '{params}' already exists.")
+            raise RuntimeError(f"Entry for '{params}' already exists.")
 
         uid = _uid()
         s = pd.Series(params, name=uid)
@@ -58,6 +58,15 @@ class Lookup:
         _upload(df, self.group_id, self.repository, self.version)
 
         return uid
+
+    def clear(self) -> None:
+
+        df = self.table
+        for uid in df.index:
+            url = _url_entry(self.group_id, self.repository, uid, self.version)
+            audfactory.artifactory_path(url).parent.parent.rmdir()
+        df.drop(index=df.index, inplace=True)
+        _upload(df, self.group_id, self.repository, self.version)
 
     def contains(self, params: typing.Dict[str, typing.Any]) -> bool:
         try:
@@ -76,9 +85,9 @@ class Lookup:
             if row.equals(s):
                 return str(uid)
 
-        raise RuntimeError(f"An entry for '{params}' does not exist.")
+        raise RuntimeError(f"Entry for '{params}' does not exist.")
 
-    def remove(self, params: typing.Dict[str, typing.Any]) -> None:
+    def remove(self, params: typing.Dict[str, typing.Any]) -> str:
 
         df = self.table
         uid = self.find(params)
@@ -88,13 +97,15 @@ class Lookup:
         df.drop(index=uid, inplace=True)
         _upload(df, self.group_id, self.repository, self.version)
 
+        return uid
+
     @staticmethod
     def create(name: str,
                columns: typing.Sequence[str],
                version: str,
                *,
                private: bool = False,
-               force: bool = False) -> None:
+               force: bool = False) -> str:
 
         group_id = f'{config.GROUP_ID}.{name}'
         repository = config.REPOSITORY_PRIVATE if private \
@@ -105,6 +116,27 @@ class Lookup:
                                              name=config.LOOKUP_TABLE_INDEX),
                               columns=sorted(columns))
             _upload(df, group_id, repository, version)
+        else:
+            raise RuntimeError(f"Lookup table '{name}-{version}' "
+                               f"exists already.")
+
+        return _url_table(group_id, repository, version)
+
+    @staticmethod
+    def delete(name: str,
+               version: str,
+               *,
+               private: bool = False,
+               force: bool = True):
+        lu = Lookup(name, version, private=private)
+        if not lu.table.empty:
+            if not force:
+                raise RuntimeError(
+                    f"Cannot remove lookup table '{name}-{version}' "
+                    f"if it is not empty.")
+            lu.clear()
+
+        audfactory.artifactory_path(lu.url).parent.rmdir()
 
     @staticmethod
     def exists(name: str,

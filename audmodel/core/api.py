@@ -16,14 +16,19 @@ def create_lookup_table(name: str,
                         version: str,
                         *,
                         private: bool = False,
+                        force: bool = False) -> str:
+    return Lookup.create(name, columns, version, private=private, force=force)
+
+
+def delete_lookup_table(name: str,
+                        version: str,
+                        *,
+                        private: bool = False,
                         force: bool = False) -> None:
-    Lookup.create(name, columns, version, private=private, force=force)
+    Lookup.delete(name, version, private=private, force=force)
 
 
 def get_default_cache_root() -> str:
-    r"""Get default cache path.
-
-    """
     return os.environ.get('AUDMODEL_CACHE_ROOT') or config.AUDMODEL_CACHE_ROOT
 
 
@@ -32,6 +37,20 @@ def get_lookup_table(name: str,
                      *,
                      private: bool = False) -> pd.DataFrame:
     return Lookup(name, version, private=private).table
+
+
+def get_model_id(name: str,
+                 params: typing.Dict[str, typing.Any],
+                 version: str = None,
+                 *,
+                 private: bool = False) -> str:
+    return Lookup(name, version, private=private).find(params)
+
+
+def latest_version(name: str,
+                   *,
+                   private: bool = False) -> str:
+    return Lookup.latest_version(name, private=private)
 
 
 def load(name: str,
@@ -109,10 +128,14 @@ def publish(root: str,
 
 
 def remove(name: str,
-           version: str = None,
+           params: typing.Dict[str, typing.Any],
+           version: str,
            *,
-           private: bool = False):
-    lu = Lookup(name, version, private=private)
-    for _, row in lu.table.iterrows():
-        lu.remove(row.to_dict())
-    audfactory.artifactory_path(lu.url).parent.rmdir()
+           private: bool = False) -> str:
+    return Lookup(name, version, private=private).remove(params)
+
+
+def versions(name: str,
+             *,
+             private: bool = False) -> typing.Sequence[str]:
+    return Lookup.versions(name, private=private)
