@@ -7,7 +7,7 @@ The format is based on `Keep a Changelog`_,
 and this project adheres to `Semantic Versioning`_.
 
 
-Version 0.1.0 (xxxx-xx-xx)
+Version 0.1.0 (2020-02-24)
 --------------------------
 
 * Added: initial release
