@@ -11,20 +11,27 @@ from .config import config
 
 @pytest.mark.usefixtures('create')
 @pytest.mark.parametrize(
-    'name,params,version',
+    'name,params,version,uid',
     [
         (
             config.NAME,
             config.DEFAULT_PARAMS[0],
             config.DEFAULT_VERSION,
+            None,
+        ),
+        pytest.param(
+            config.NAME,
+            None,
+            None,
+            '1234',
+            marks=pytest.mark.xfail(raises=RuntimeError)
         ),
     ]
 )
-def test_load_by_id(name, params, version):
+def test_load_by_id(name, params, version, uid):
     root = os.path.join(tempfile._get_default_tempdir(), 'audmodel')
-    uid = audmodel.get_model_id(name, params, version)
+    uid = uid or audmodel.get_model_id(name, params, version)
     model_root = audmodel.load_by_id(name, uid, root=root)
-    assert model_root == os.path.join(root, config.NAME, version, uid)
     x = [os.path.basename(file) for file in
          audeer.list_file_names(config.ROOT)]
     y = [os.path.basename(file) for file in

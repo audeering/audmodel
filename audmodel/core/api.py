@@ -4,7 +4,6 @@ import os
 import pandas as pd
 
 import audeer
-import audfactory
 
 from .config import config
 from .lookup import Lookup
@@ -20,16 +19,16 @@ def create_lookup_table(name: str,
     return Lookup.create(name, columns, version, private=private, force=force)
 
 
+def get_default_cache_root() -> str:
+    return os.environ.get('AUDMODEL_CACHE_ROOT') or config.AUDMODEL_CACHE_ROOT
+
+
 def delete_lookup_table(name: str,
                         version: str,
                         *,
                         private: bool = False,
                         force: bool = False) -> None:
     Lookup.delete(name, version, private=private, force=force)
-
-
-def get_default_cache_root() -> str:
-    return os.environ.get('AUDMODEL_CACHE_ROOT') or config.AUDMODEL_CACHE_ROOT
 
 
 def get_lookup_table(name: str,

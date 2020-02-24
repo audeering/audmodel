@@ -161,15 +161,12 @@ class Lookup:
     def latest_version(name: str,
                        *,
                        private: bool = False) -> str:
-        r"""Returns latest version."""
         return Lookup.versions(name, private=private)[-1]
 
     @staticmethod
     def versions(name: str,
                  *,
                  private: bool = False) -> list:
-        r"""Returns a list of available versions.
-        """
         group_id = f'{config.GROUP_ID}.{name}'
         repository = config.REPOSITORY_PRIVATE if private \
             else config.REPOSITORY_PUBLIC
