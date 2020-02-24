@@ -4,6 +4,7 @@ from .core.api import (
     load,
     load_by_id,
     publish,
+    remove,
 )
 
 

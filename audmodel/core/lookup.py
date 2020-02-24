@@ -31,7 +31,9 @@ class Lookup:
         elif not Lookup.exists(name, version, private=private):
             raise RuntimeError(f"A lookup table for '{name}' and "
                                f"'{version}' does not exist yet.")
+
         self.version = version
+        self.url = _url_table(self.group_id, self.repository, version)
 
     @property
     def table(self) -> pd.DataFrame:
@@ -70,35 +72,26 @@ class Lookup:
 
         s = pd.Series(params)
         s.sort_index(inplace=True)
-        for idx, row in df.iterrows():
+        for uid, row in df.iterrows():
             if row.equals(s):
-                return str(idx)
+                return str(uid)
 
         raise RuntimeError(f"An entry for '{params}' does not exist.")
 
-    def validate(self,
-                 *,
-                 repair=False) -> dict:
+    def remove(self, params: typing.Dict[str, typing.Any]) -> None:
 
-        missing = {}
         df = self.table
-
-        for idx in df.index:
-            url = _url_entry(idx, self.version)
-            path = audfactory.artifactory_path(url)
-            if not path.exists():
-                missing[idx] = url
-
-        if missing and repair:
-            df.drop(index=missing.keys(), inplace=True)
-            _upload(df, self.group_id, self.repository, self.version)
-
-        return missing
+        uid = self.find(params)
+        url = _url_entry(self.group_id, self.repository,
+                         uid, self.version)
+        audfactory.artifactory_path(url).parent.parent.rmdir()
+        df.drop(index=uid, inplace=True)
+        _upload(df, self.group_id, self.repository, self.version)
 
     @staticmethod
     def create(name: str,
-               version: str,
                columns: typing.Sequence[str],
+               version: str,
                *,
                private: bool = False,
                force: bool = False) -> None:

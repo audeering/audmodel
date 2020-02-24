@@ -4,6 +4,7 @@ import os
 import pandas as pd
 
 import audeer
+import audfactory
 
 from .config import config
 from .lookup import Lookup
@@ -11,12 +12,12 @@ from . import utils
 
 
 def create_lookup_table(name: str,
-                        version: str,
                         columns: typing.Sequence[str],
+                        version: str,
                         *,
                         private: bool = False,
                         force: bool = False) -> None:
-    Lookup.create(name, version, columns, private=private, force=force)
+    Lookup.create(name, columns, version, private=private, force=force)
 
 
 def get_default_cache_root() -> str:
@@ -94,7 +95,7 @@ def publish(root: str,
 
     if not Lookup.exists(name, version, private=private):
         if create:
-            create_lookup_table(name, version, list(params.keys()),
+            create_lookup_table(name, list(params.keys()), version,
                                 private=private)
         else:
             raise RuntimeError(f"A lookup table for '{name}' and "
@@ -105,3 +106,13 @@ def publish(root: str,
     url = utils.upload_folder(root, lu.group_id, lu.repository,
                               uid, version, force=force)
     return url
+
+
+def remove(name: str,
+           version: str = None,
+           *,
+           private: bool = False):
+    lu = Lookup(name, version, private=private)
+    for _, row in lu.table.iterrows():
+        lu.remove(row.to_dict())
+    audfactory.artifactory_path(lu.url).parent.rmdir()
