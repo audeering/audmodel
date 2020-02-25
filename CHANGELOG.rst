@@ -7,6 +7,16 @@ The format is based on `Keep a Changelog`_,
 and this project adheres to `Semantic Versioning`_.
 
 
+Version 0.2.0 (2020-02-25)
+--------------------------
+
+* Added: unit tests with full code coverage
+* Added: :func:`audmodel.delete_lookup_table`
+* Added: :func:`audmodel.get_default_cache_root`
+* Added: :func:`audmodel.latest_version`
+* Added: :func:`audmodel.versions`
+
+
 Version 0.1.0 (2020-02-24)
 --------------------------
 
