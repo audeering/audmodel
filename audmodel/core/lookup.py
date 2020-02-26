@@ -159,20 +159,35 @@ class Lookup:
 
     @staticmethod
     def latest_version(name: str,
+                       params: typing.Dict[str, typing.Any] = None,
                        *,
-                       private: bool = False) -> str:
-        return Lookup.versions(name, private=private)[-1]
+                       private: bool = False) -> typing.Optional[str]:
+        versions = Lookup.versions(name, params=params, private=private)
+        if len(versions) > 0:
+            return versions[-1]
+        else:
+            return None
 
     @staticmethod
     def versions(name: str,
+                 params: typing.Dict[str, typing.Any] = None,
                  *,
                  private: bool = False) -> list:
         group_id = f'{config.GROUP_ID}.{name}'
         repository = config.REPOSITORY_PRIVATE if private \
             else config.REPOSITORY_PUBLIC
-        return audfactory.versions(group_id,
-                                   config.LOOKUP_TABLE_NAME,
-                                   repository=repository)
+        versions = audfactory.versions(group_id,
+                                       config.LOOKUP_TABLE_NAME,
+                                       repository=repository)
+        if params is not None:
+            filtered_versions = []
+            for version in versions:
+                lu = Lookup(name, version, private=private)
+                if lu.contains(params):
+                    filtered_versions.append(version)
+            versions = filtered_versions
+
+        return versions
 
 
 def _download(group_id: str,

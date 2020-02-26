@@ -4,7 +4,7 @@ import os
 class config:
 
     ROOT = os.path.dirname(os.path.realpath(__file__))
-    NAME = 'audfactory'
+    NAME = 'audmodel'
     DEFAULT_COLUMNS = ['property1', 'property2', 'property3']
     DEFAULT_PARAMS = [
         {

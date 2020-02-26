@@ -47,9 +47,10 @@ def get_model_id(name: str,
 
 
 def latest_version(name: str,
+                   params: typing.Dict[str, typing.Any] = None,
                    *,
-                   private: bool = False) -> str:
-    return Lookup.latest_version(name, private=private)
+                   private: bool = False) -> typing.Optional[str]:
+    return Lookup.latest_version(name, params, private=private)
 
 
 def load(name: str,
@@ -135,6 +136,7 @@ def remove(name: str,
 
 
 def versions(name: str,
+             params: typing.Dict[str, typing.Any] = None,
              *,
              private: bool = False) -> typing.Sequence[str]:
-    return Lookup.versions(name, private=private)
+    return Lookup.versions(name, params, private=private)

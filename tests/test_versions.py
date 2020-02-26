@@ -7,15 +7,28 @@ from .config import config
 
 @pytest.mark.usefixtures('create')
 @pytest.mark.parametrize(
-    'name',
+    'name,params,expected_version',
     [
-        config.NAME,
+        (
+            config.NAME,
+            None,
+            config.DEFAULT_VERSION,
+        ),
+        (
+            config.NAME,
+            config.DEFAULT_PARAMS[0],
+            config.DEFAULT_VERSION,
+        ),
+        (
+            config.NAME,
+            {'bad': 'params'},
+            None,
+        ),
     ]
 )
-def test_load(name):
-    versions = audmodel.versions(name)
-    print(versions)
-    latest = audmodel.latest_version(name)
-    print(latest)
-    assert latest in versions
-    assert config.DEFAULT_VERSION == latest
+def test_versions(name, params, expected_version):
+    versions = audmodel.versions(name, params)
+    latest = audmodel.latest_version(name, params)
+    if len(versions) > 0:
+        assert latest in versions
+    assert expected_version == latest
