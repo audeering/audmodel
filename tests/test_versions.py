@@ -2,7 +2,7 @@ import pytest
 
 import audmodel
 
-from .config import config
+from .default import default
 
 
 @pytest.mark.usefixtures('create')
@@ -10,17 +10,17 @@ from .config import config
     'name,params,expected_version',
     [
         (
-            config.NAME,
+            default.NAME,
             None,
-            config.DEFAULT_VERSION,
+            default.VERSION,
         ),
         (
-            config.NAME,
-            config.DEFAULT_PARAMS[0],
-            config.DEFAULT_VERSION,
+            default.NAME,
+            default.PARAMS[0],
+            default.VERSION,
         ),
         (
-            config.NAME,
+            default.NAME,
             {'bad': 'params'},
             None,
         ),

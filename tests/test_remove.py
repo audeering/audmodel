@@ -1,7 +1,7 @@
 import pytest
 import audmodel
 
-from .config import config
+from .default import default
 
 
 @pytest.mark.usefixtures('create')
@@ -9,14 +9,14 @@ from .config import config
     'name,params,version',
     [
         (
-            config.NAME,
-            config.DEFAULT_PARAMS[0],
-            config.DEFAULT_VERSION,
+            default.NAME,
+            default.PARAMS[0],
+            default.VERSION,
         ),
         pytest.param(
-            config.NAME,
-            config.DEFAULT_PARAMS[0],
-            config.DEFAULT_VERSION,
+            default.NAME,
+            default.PARAMS[0],
+            default.VERSION,
             marks=pytest.mark.xfail(raises=RuntimeError)
         ),
     ]

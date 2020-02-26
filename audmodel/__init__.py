@@ -11,6 +11,7 @@ from .core.api import (
     remove,
     versions,
 )
+from .core import config
 
 
 # Disencourage from audmodel import *

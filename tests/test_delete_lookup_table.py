@@ -2,7 +2,7 @@ import pytest
 
 import audmodel
 
-from .config import config
+from .default import default
 
 
 @pytest.mark.usefixtures('create')
@@ -10,14 +10,14 @@ from .config import config
     'name,version,force',
     [
         pytest.param(  # table does not exist
-            config.NAME,
-            config.DEFAULT_VERSION,
+            default.NAME,
+            default.VERSION,
             False,
             marks=pytest.mark.xfail(raises=RuntimeError),
         ),
         (
-            config.NAME,
-            config.DEFAULT_VERSION,
+            default.NAME,
+            default.VERSION,
             True
         ),
     ]

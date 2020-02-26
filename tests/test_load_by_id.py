@@ -6,7 +6,7 @@ import shutil
 import audmodel
 import audeer
 
-from .config import config
+from .default import default
 
 
 @pytest.mark.usefixtures('create')
@@ -14,13 +14,13 @@ from .config import config
     'name,params,version,uid',
     [
         (
-            config.NAME,
-            config.DEFAULT_PARAMS[0],
-            config.DEFAULT_VERSION,
+            default.NAME,
+            default.PARAMS[0],
+            default.VERSION,
             None,
         ),
         pytest.param(
-            config.NAME,
+            default.NAME,
             None,
             None,
             '1234',
@@ -33,7 +33,7 @@ def test_load_by_id(name, params, version, uid):
     uid = uid or audmodel.get_model_id(name, params, version)
     model_root = audmodel.load_by_id(name, uid, root=root)
     x = [os.path.basename(file) for file in
-         audeer.list_file_names(config.ROOT)]
+         audeer.list_file_names(default.ROOT)]
     y = [os.path.basename(file) for file in
          audeer.list_file_names(model_root)]
     assert x == y

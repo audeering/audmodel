@@ -6,7 +6,7 @@ import shutil
 import audmodel
 import audeer
 
-from .config import config
+from .default import default
 
 
 @pytest.mark.usefixtures('create')
@@ -14,36 +14,36 @@ from .config import config
     'name,params,version',
     [
         (
-            config.NAME,
-            config.DEFAULT_PARAMS[0],
-            config.DEFAULT_VERSION
+            default.NAME,
+            default.PARAMS[0],
+            default.VERSION
         ),
         (
-            config.NAME,
-            config.DEFAULT_PARAMS[1],
+            default.NAME,
+            default.PARAMS[1],
             None
         ),
         pytest.param(  # bad parameters
-            config.NAME,
+            default.NAME,
             {
                 key: value * 2 for key, value in
-                config.DEFAULT_PARAMS[0].items()
+                default.PARAMS[0].items()
             },
-            config.DEFAULT_VERSION,
+            default.VERSION,
             marks=pytest.mark.xfail(raises=RuntimeError),
         ),
         pytest.param(  # bad version
-            config.NAME,
-            config.DEFAULT_PARAMS[0],
+            default.NAME,
+            default.PARAMS[0],
             '2.0.0',
             marks=pytest.mark.xfail(raises=RuntimeError),
         ),
         pytest.param(  # invalid columns
-            config.NAME,
+            default.NAME,
             {
                 'bad': 'column'
             },
-            config.DEFAULT_VERSION,
+            default.VERSION,
             marks=pytest.mark.xfail(raises=RuntimeError),
         ),
     ]
@@ -53,9 +53,9 @@ def test_load(name, params, version):
     model_root = audmodel.load(name, params, version, root=root)
     version = version or audmodel.latest_version(name)
     uid = os.path.basename(model_root)
-    assert model_root == os.path.join(root, config.NAME, version, uid)
+    assert model_root == os.path.join(root, default.NAME, version, uid)
     x = [os.path.basename(file) for file in
-         audeer.list_file_names(config.ROOT)]
+         audeer.list_file_names(default.ROOT)]
     y = [os.path.basename(file) for file in
          audeer.list_file_names(model_root)]
     assert x == y

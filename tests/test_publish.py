@@ -5,55 +5,55 @@ import pandas as pd
 import audfactory
 import audmodel
 
-from .config import config
+from .default import default
 
 
 @pytest.mark.parametrize(
     'root,name,params,version,create',
     [
         pytest.param(
-            config.ROOT,
-            config.NAME,
-            config.DEFAULT_PARAMS[0],
-            config.DEFAULT_VERSION,
+            default.ROOT,
+            default.NAME,
+            default.PARAMS[0],
+            default.VERSION,
             False,
             marks=pytest.mark.xfail(raises=RuntimeError)
         ),
         (
-            config.ROOT,
-            config.NAME,
-            config.DEFAULT_PARAMS[0],
-            config.DEFAULT_VERSION,
+            default.ROOT,
+            default.NAME,
+            default.PARAMS[0],
+            default.VERSION,
             True,
         ),
         (
-            config.ROOT,
-            config.NAME,
-            config.DEFAULT_PARAMS[1],
-            config.DEFAULT_VERSION,
+            default.ROOT,
+            default.NAME,
+            default.PARAMS[1],
+            default.VERSION,
             False,
         ),
         pytest.param(
-            config.ROOT,
-            config.NAME,
-            config.DEFAULT_PARAMS[1],
-            config.DEFAULT_VERSION,
+            default.ROOT,
+            default.NAME,
+            default.PARAMS[1],
+            default.VERSION,
             False,
             marks=pytest.mark.xfail(raises=RuntimeError)
         ),
         pytest.param(
-            config.ROOT,
-            config.NAME,
+            default.ROOT,
+            default.NAME,
             {'bad': 'params'},
-            config.DEFAULT_VERSION,
+            default.VERSION,
             False,
             marks=pytest.mark.xfail(raises=RuntimeError)
         ),
         pytest.param(
             './invalid-folder',
-            config.NAME,
-            config.DEFAULT_PARAMS[2],
-            config.DEFAULT_VERSION,
+            default.NAME,
+            default.PARAMS[2],
+            default.VERSION,
             False,
             marks=pytest.mark.xfail(raises=FileNotFoundError)
         ),

@@ -2,39 +2,39 @@ import pytest
 
 import audmodel
 
-from .config import config
+from .default import default
 
 
 @pytest.mark.parametrize(
     'name,columns,version,force',
     [
         (
-            config.NAME,
+            default.NAME,
             [],
             '1.0.0',
             False,
         ),
         pytest.param(  # columns do not match
-            config.NAME,
+            default.NAME,
             ['property1', 'property2', 'property3'],
             '1.0.0',
             False,
             marks=pytest.mark.xfail(raises=RuntimeError),
         ),
         (
-            config.NAME,
+            default.NAME,
             ['property1', 'property2', 'property3'],
             '2.0.0',
             False,
         ),
         (
-            config.NAME,
+            default.NAME,
             ['property1', 'property2', 'property3'],
             '2.0.0',
             True,
         ),
         pytest.param(  # model exists
-            config.NAME,
+            default.NAME,
             ['property1', 'property2', 'property3'],
             '2.0.0',
             False,
