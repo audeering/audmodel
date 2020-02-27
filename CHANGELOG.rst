@@ -7,6 +7,16 @@ The format is based on `Keep a Changelog`_,
 and this project adheres to `Semantic Versioning`_.
 
 
+Version 0.3.0 (2020-02-27)
+--------------------------
+
+* Added: Sphinx documentation
+* Added: Jupyter tutorial
+* Changed: request (latest) version(s) for specific parameters (see
+  :func:`audmodel.version` and :func:`audmodel.latest_version`)
+* Changed: running tests in parallel
+
+
 Version 0.2.0 (2020-02-25)
 --------------------------
 
