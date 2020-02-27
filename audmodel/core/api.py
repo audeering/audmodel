@@ -16,6 +16,22 @@ def create_lookup_table(name: str,
                         *,
                         private: bool = False,
                         force: bool = False) -> str:
+    r"""Create lookup table and return url.
+
+    .. note:: The columns of the lookup table should correspond to
+        the names of the parameters you plan to tag your models with.
+
+    Args:
+        name: model name
+        columns: columns of the table
+        version: version string
+        private: repository is private
+        force: create the lookup table even if it exists
+
+    Raises:
+        RuntimeError: if table exists already
+
+    """
     return Lookup.create(name, columns, version, private=private, force=force)
 
 
@@ -33,11 +49,18 @@ def delete_lookup_table(name: str,
                         force: bool = False) -> None:
     r"""Delete a lookup table.
 
+    .. note:: Unless ``force`` is set, the operation will fail if the lookup
+        table is not empty. Use :meth:`audmodel.remove` to remove entries
+        first.
+
     Args:
         name: model name
         version: version string
         private: repository is private
         force: delete lookup table even if it is not empty
+
+    Raises:
+        RuntimeError: if table is not empty
 
     """
     Lookup.delete(name, version, private=private, force=force)
@@ -53,6 +76,9 @@ def get_lookup_table(name: str,
         name: model name
         version: version string
         private: repository is private
+
+    Raises:
+        RuntimeError: if table does not exist
 
     """
     return Lookup(name, version, private=private).table
@@ -71,6 +97,9 @@ def get_model_id(name: str,
         version: version string
         private: repository is private
 
+    Raises:
+        RuntimeError: if model does not exist
+
     """
     if version is None:
         version = latest_version(name, params, private=private)
@@ -88,8 +117,6 @@ def latest_version(name: str,
         params: dictionary with parameters
         private: repository is private
 
-    Returns:
-
     """
     return Lookup.latest_version(name, params, private=private)
 
@@ -103,6 +130,11 @@ def load(name: str,
          root: str = None) -> str:
     r"""Download a model and return folder.
 
+    .. note:: If ``root`` is not set, the model is downloaded to the default
+        cache folder (see :meth:`audmodel.get_default_cache_root`). If the
+        model already exists in the cache, the download is skipped (unless
+        ``force`` is set).
+
     Args:
         name: model name
         params: dictionary with parameters
@@ -110,6 +142,9 @@ def load(name: str,
         private: repository is private
         force: download model even if it exists already
         root: store model within this folder
+
+    Raises:
+        RuntimeError: if model does not exist
 
     """
     if version is None:
@@ -138,6 +173,11 @@ def load_by_id(name: str,
                root: str = None) -> str:
     r"""Download a model by id and return model folder.
 
+    .. note:: If ``root`` is not set, the model is downloaded to the default
+        cache folder (see :meth:`audmodel.get_default_cache_root`). If the
+        model already exists in the cache, the download is skipped (unless
+        ``force`` is set).
+
     Args:
         name: name of model
         uid: unique model identifier
@@ -145,7 +185,8 @@ def load_by_id(name: str,
         force: download model even if it exists already
         root: store model within this folder
 
-    Returns:
+    Raises:
+        RuntimeError: if model does not exist
 
     """
     group_id = f'{config.GROUP_ID}.{name}'
@@ -177,7 +218,11 @@ def publish(root: str,
             create: bool = True,
             private: bool = False,
             force: bool = False) -> str:
-    r"""Publish a model and return url.
+    r"""Zip model, publish as a new artifact and return url.
+
+    .. note:: Assigns a unique id and adds an entry in the lookup table.
+        If the lookup table does not exist it will be created. If an entry
+        already exists, the operation will fail.
 
     Args:
         root: folder with model files
@@ -187,6 +232,9 @@ def publish(root: str,
         create: create lookup table if it does not exist
         private: repository is private
         force: publish model even if it exists already
+
+    Raises:
+        RuntimeError: if an artifact exists already
 
     """
     if not Lookup.exists(name, version, private=private):
@@ -216,6 +264,9 @@ def remove(name: str,
         params: dictionary with parameters
         version: version string
         private: repository is private
+
+    Raises:
+        RuntimeError: if model does not exist
 
     """
     return Lookup(name, version, private=private).remove(params)
