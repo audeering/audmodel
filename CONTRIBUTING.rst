@@ -43,6 +43,20 @@ To create the HTML pages, use::
 
 The generated files will be available in the directory ``build/sphinx/html/``.
 
+.. Note::
+
+    During the default building of the documentation
+    Jupyter notebooks are not executed to save time.
+
+To execute the notebooks as well, copy and paste
+the following into your terminal and press the enter key::
+
+    python -m sphinx -W docs/ \
+        -D nbsphinx_execute='always' \
+        -d build/sphinx/doctrees \
+        build/sphinx/html \
+        -b html
+
 It is also possible to automatically check if all links are still valid::
 
     python -m sphinx docs/ build/sphinx/linkcheck -b linkcheck

@@ -1,7 +1,7 @@
 stages:
   - token
   - test
-  #- doc
+  - doc
   - pypi
 
 variables:
@@ -25,7 +25,7 @@ generate-token:
 .pytest:
   before_script:
     - apt-get update
-    - apt-get install -y curl jq pandoc
+    - apt-get install -y curl jq pandoc graphviz
     - username=${GITLAB_USER_LOGIN}
     - api_key=$(cat token.json | jq -r '.access_token')
     - export ARTIFACTORY_USERNAME=${username}
@@ -55,35 +55,34 @@ python-3.8:
   stage: test
   image: docker.audeering.com/python:3.8
 
-#docs:
-#  extends: .pytest
-#  stage: test
-#  image: docker.audeering.com/python:3.6
-#  script:
-#    - pip install -r requirements.txt
-#    - pip install -r docs/requirements.txt
-#    - python -m sphinx -W docs/ build/html -b html
-#    - python -m sphinx -W docs/ build/linkcheck -b linkcheck
-#  artifacts:
-#    paths:
-#      - build/
+docs:
+  extends: .pytest
+  stage: test
+  image: docker.audeering.com/python:3.6
+  script:
+    - pip install -r requirements.txt
+    - pip install -r docs/requirements.txt
+    - python -m sphinx -W docs/ -D nbsphinx_execute='always' -d build/doctrees build/html -b html
+    - python -m sphinx -W docs/ build/linkcheck -b linkcheck
+  artifacts:
+    paths:
+      - build/
 
-#pages:
-#  stage: doc
-#  image: docker.audeering.com/alpine
-#  variables:
-#    GIT_STRATEGY: none  # disable git fetch
-#  script:
-#    - cp -r build/html public
-#  dependencies:
-#    - docs
-#  artifacts:
-#    paths:
-#      - public
-#  only:
-#    refs:
-#      - tags
-
+pages:
+  stage: doc
+  image: docker.audeering.com/alpine
+  variables:
+    GIT_STRATEGY: none  # disable git fetch
+  script:
+    - cp -r build/html public
+  dependencies:
+    - docs
+  artifacts:
+    paths:
+      - public
+  only:
+    refs:
+      - tags
 
 pypi:
   extends: .pytest

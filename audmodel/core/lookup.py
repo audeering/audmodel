@@ -127,7 +127,7 @@ class Lookup:
                version: str,
                *,
                private: bool = False,
-               force: bool = True):
+               force: bool = True) -> None:
         lu = Lookup(name, version, private=private)
         if not lu.table.empty:
             if not force:

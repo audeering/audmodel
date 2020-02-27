@@ -13,6 +13,10 @@ from .default import default
             default.NAME,
             default.VERSION,
         ),
+        (
+            default.NAME,
+            None,
+        ),
         pytest.param(  # table does not exist
             default.NAME,
             '2.0.0',

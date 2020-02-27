@@ -1,0 +1,8 @@
+graphviz
+audeer
+sphinx
+sphinx-audeering-theme
+sphinx-autodoc-typehints
+nbsphinx
+jupyter
+jupyter_contrib_nbextensions
