@@ -7,9 +7,9 @@ that need improvement, please create an issue_.
 Contributions are always welcome!
 
 .. _issue:
-    https://gitlab.audeering.com/jwagner/audmodel/issues/new?issue%5BD=
+    https://gitlab.audeering.com/tools/audmodel/issues/new?issue%5BD=
 .. _merge request:
-    https://gitlab.audeering.com/jwagner/audmodel/merge_requests/new
+    https://gitlab.audeering.com/tools/audmodel/merge_requests/new
 
 Development Installation
 ------------------------
@@ -17,12 +17,12 @@ Development Installation
 Instead of pip-installing the latest release from PyPI, you should get the
 newest development version from Gitlab_::
 
-    git clone git@srv-app-01.audeering.local:jwagner/audmodel.git
+    git clone git@srv-app-01.audeering.local:tools/audmodel.git
     cd audmodel
     # Use virutal environment
     pip install -r requirements.txt
 
-.. _Gitlab: https://gitlab.audeering.com/jwagner/audmodel
+.. _Gitlab: https://gitlab.audeering.com/tools/audmodel
 
 This way, your installation always stays up-to-date, even if you pull new
 changes from the Gitlab repository.
