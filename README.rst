@@ -8,4 +8,4 @@ Library to publish and load models to and from Artifactory_.
     https://artifactory.audeering.com
 
 For documentation see:
-http://jwagner.pp.audeering.com/audmodel/
+http://tools.pp.audeering.com/audmodel/
