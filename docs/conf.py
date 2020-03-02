@@ -54,7 +54,7 @@ nbsphinx_execute = 'never'
 # This is processed by Jinja2 and inserted before each Jupyter notebook
 nbsphinx_prolog = r"""
 {% set docname = env.doc2path(env.docname, base='docs') %}
-{% set base_url = "https://gitlab.audeering.com/tools/audata/raw" %}
+{% set base_url = "https://gitlab.audeering.com/tools/audmodel/raw" %}
 
 .. role:: raw-html(raw)
     :format: html
