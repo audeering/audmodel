@@ -1,5 +1,5 @@
 class config:
-    r"""Get/set defaults for the :mod:`smilemmodel` module."""
+    r"""Get/set defaults for the :mod:`audmodel` module."""
 
     AUDMODEL_CACHE_ROOT = '~/audmodel'
 
