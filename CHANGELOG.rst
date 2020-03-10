@@ -7,6 +7,13 @@ The format is based on `Keep a Changelog`_,
 and this project adheres to `Semantic Versioning`_.
 
 
+Version 0.3.2 (2020-03-10)
+--------------------------
+
+* Changed: :class:`audmodel.config` now member of :mod:`audmodel`
+* Fixed: url of tutorial notebook
+
+
 Version 0.3.1 (2020-02-27)
 --------------------------
 
