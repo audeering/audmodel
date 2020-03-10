@@ -3,6 +3,12 @@ audmodel
 
 .. automodule:: audmodel
 
+config
+------
+
+.. autoclass:: config
+    :members:
+
 create_lookup_table
 -------------------
 

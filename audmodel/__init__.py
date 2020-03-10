@@ -1,4 +1,5 @@
-from .core.api import (
+from audmodel.core.config import config
+from audmodel.core.api import (
     create_lookup_table,
     delete_lookup_table,
     get_default_cache_root,
@@ -11,7 +12,6 @@ from .core.api import (
     remove,
     versions,
 )
-from .core import config
 
 
 # Disencourage from audmodel import *
