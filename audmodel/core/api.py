@@ -15,7 +15,8 @@ def create_lookup_table(name: str,
                         version: str,
                         *,
                         private: bool = False,
-                        force: bool = False) -> str:
+                        force: bool = False,
+                        verbose: bool = False) -> str:
     r"""Create lookup table and return url.
 
     .. note:: The columns of the lookup table should correspond to
@@ -27,12 +28,14 @@ def create_lookup_table(name: str,
         version: version string
         private: repository is private
         force: create the lookup table even if it exists
+        verbose: show debug messages
 
     Raises:
         RuntimeError: if table exists already
 
     """
-    return Lookup.create(name, columns, version, private=private, force=force)
+    return Lookup.create(name, columns, version, private=private,
+                         force=force, verbose=verbose)
 
 
 def get_default_cache_root() -> str:
@@ -69,26 +72,29 @@ def delete_lookup_table(name: str,
 def get_lookup_table(name: str,
                      version: str = None,
                      *,
-                     private: bool = False) -> pd.DataFrame:
+                     private: bool = False,
+                     verbose: bool = False) -> pd.DataFrame:
     r"""Return lookup table.
 
     Args:
         name: model name
         version: version string
         private: repository is private
+        verbose: show debug messages
 
     Raises:
         RuntimeError: if table does not exist
 
     """
-    return Lookup(name, version, private=private).table
+    return Lookup(name, version, private=private, verbose=verbose).table
 
 
 def get_model_id(name: str,
                  params: typing.Dict[str, typing.Any],
                  version: str = None,
                  *,
-                 private: bool = False) -> str:
+                 private: bool = False,
+                 verbose: bool = False) -> str:
     r"""Return unique model id.
 
     Args:
@@ -96,6 +102,7 @@ def get_model_id(name: str,
         params: dictionary with parameters
         version: version string
         private: repository is private
+        verbose: show debug messages
 
     Raises:
         RuntimeError: if model does not exist
@@ -103,7 +110,7 @@ def get_model_id(name: str,
     """
     if version is None:
         version = latest_version(name, params, private=private)
-    return Lookup(name, version, private=private).find(params)
+    return Lookup(name, version, private=private, verbose=verbose).find(params)
 
 
 def latest_version(name: str,
@@ -127,7 +134,8 @@ def load(name: str,
          *,
          private: bool = False,
          force: bool = False,
-         root: str = None) -> str:
+         root: str = None,
+         verbose: bool = False) -> str:
     r"""Download a model and return folder.
 
     .. note:: If ``root`` is not set, the model is downloaded to the default
@@ -142,6 +150,7 @@ def load(name: str,
         private: repository is private
         force: download model even if it exists already
         root: store model within this folder
+        verbose: show debug messages
 
     Raises:
         RuntimeError: if model does not exist
@@ -152,16 +161,12 @@ def load(name: str,
     group_id = f'{config.GROUP_ID}.{name}'
     repository = config.REPOSITORY_PRIVATE if private \
         else config.REPOSITORY_PUBLIC
-    lu = Lookup(name, version, private=private)
+    lu = Lookup(name, version, private=private, verbose=verbose)
     uid = lu.find(params)
     root = audeer.safe_path(root or get_default_cache_root())
     root = os.path.join(root, name, lu.version)
-    root = utils.download_folder(root,
-                                 group_id,
-                                 repository,
-                                 uid,
-                                 lu.version,
-                                 force=force)
+    root = utils.download_folder(root, group_id, repository, uid,
+                                 lu.version, force=force, verbose=verbose)
     return root
 
 
@@ -170,7 +175,8 @@ def load_by_id(name: str,
                *,
                private: bool = False,
                force: bool = False,
-               root: str = None) -> str:
+               root: str = None,
+               verbose: bool = False) -> str:
     r"""Download a model by id and return model folder.
 
     .. note:: If ``root`` is not set, the model is downloaded to the default
@@ -184,6 +190,7 @@ def load_by_id(name: str,
         private: repository is private
         force: download model even if it exists already
         root: store model within this folder
+        verbose: show debug messages
 
     Raises:
         RuntimeError: if model does not exist
@@ -204,7 +211,8 @@ def load_by_id(name: str,
                                          repository,
                                          uid,
                                          lu.version,
-                                         force=force)
+                                         force=force,
+                                         verbose=verbose)
             return root
 
     raise RuntimeError(f"A model with id '{uid}' does not exist")
@@ -217,7 +225,8 @@ def publish(root: str,
             *,
             create: bool = True,
             private: bool = False,
-            force: bool = False) -> str:
+            force: bool = False,
+            verbose: bool = False) -> str:
     r"""Zip model, publish as a new artifact and return url.
 
     .. note:: Assigns a unique id and adds an entry in the lookup table.
@@ -232,6 +241,7 @@ def publish(root: str,
         create: create lookup table if it does not exist
         private: repository is private
         force: publish model even if it exists already
+        verbose: show debug messages
 
     Raises:
         RuntimeError: if an artifact exists already
@@ -240,15 +250,15 @@ def publish(root: str,
     if not Lookup.exists(name, version, private=private):
         if create:
             create_lookup_table(name, list(params.keys()), version,
-                                private=private)
+                                private=private, verbose=verbose)
         else:
             raise RuntimeError(f"A lookup table for '{name}' and "
                                f"'{version}' does not exist yet.")
 
-    lu = Lookup(name, version, private=private)
+    lu = Lookup(name, version, private=private, verbose=verbose)
     uid = lu.append(params)
     url = utils.upload_folder(root, lu.group_id, lu.repository,
-                              uid, version, force=force)
+                              uid, version, force=force, verbose=verbose)
     return url
 
 
@@ -256,7 +266,8 @@ def remove(name: str,
            params: typing.Dict[str, typing.Any],
            version: str,
            *,
-           private: bool = False) -> str:
+           private: bool = False,
+           verbose: bool = False) -> str:
     r"""Remove a model and return its unique model identifier.
 
     Args:
@@ -264,12 +275,14 @@ def remove(name: str,
         params: dictionary with parameters
         version: version string
         private: repository is private
+        verbose: show debug messages
 
     Raises:
         RuntimeError: if model does not exist
 
     """
-    return Lookup(name, version, private=private).remove(params)
+    return Lookup(name, version, private=private,
+                  verbose=verbose).remove(params)
 
 
 def versions(name: str,

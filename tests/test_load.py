@@ -11,17 +11,19 @@ from .default import default
 
 @pytest.mark.usefixtures('create')
 @pytest.mark.parametrize(
-    'name,params,version',
+    'name,params,version,verbose',
     [
         (
             default.NAME,
             default.PARAMS[0],
-            default.VERSION
+            default.VERSION,
+            True,
         ),
         (
             default.NAME,
             default.PARAMS[1],
-            None
+            None,
+            False,
         ),
         pytest.param(  # bad parameters
             default.NAME,
@@ -30,12 +32,14 @@ from .default import default
                 default.PARAMS[0].items()
             },
             default.VERSION,
+            False,
             marks=pytest.mark.xfail(raises=RuntimeError),
         ),
         pytest.param(  # bad version
             default.NAME,
             default.PARAMS[0],
             '2.0.0',
+            False,
             marks=pytest.mark.xfail(raises=RuntimeError),
         ),
         pytest.param(  # invalid columns
@@ -44,13 +48,15 @@ from .default import default
                 'bad': 'column'
             },
             default.VERSION,
+            False,
             marks=pytest.mark.xfail(raises=RuntimeError),
         ),
     ]
 )
-def test_load(name, params, version):
+def test_load(name, params, version, verbose):
     root = os.path.join(tempfile._get_default_tempdir(), 'audmodel')
-    model_root = audmodel.load(name, params, version, root=root)
+    model_root = audmodel.load(name, params, version,
+                               root=root, verbose=verbose)
     version = version or audmodel.latest_version(name)
     uid = os.path.basename(model_root)
     assert model_root == os.path.join(root, default.NAME, version, uid)

@@ -13,7 +13,8 @@ def download_folder(root: str,
                     name: str,
                     version: str,
                     *,
-                    force: bool = False) -> str:
+                    force: bool = False,
+                    verbose: bool = False) -> str:
 
     server_url = audfactory.server_url(group_id,
                                        name=name,
@@ -26,8 +27,8 @@ def download_folder(root: str,
 
     if force or not os.path.exists(dst_root):
         audeer.mkdir(dst_root)
-        audfactory.download_artifact(url, src_path)
-        unzip(src_path, dst_root)
+        audfactory.download_artifact(url, src_path, verbose=verbose)
+        unzip(src_path, dst_root, verbose=verbose)
         os.remove(src_path)
 
     return dst_root
@@ -44,10 +45,22 @@ def scan_files(root: str,
             yield sub_dir, entry.name
 
 
-def unzip(src_path: str, dst_root: str) -> None:
+def unzip(src_path: str, dst_root: str, *, verbose: bool = False) -> None:
 
     with zipfile.ZipFile(src_path, 'r') as zf:
-        zf.extractall(dst_root)
+        if verbose:
+            members = zf.infolist()
+            with audeer.progress_bar(members,
+                                     total=len(members),
+                                     desc='') as pbar:
+                for member in pbar:
+                    desc = audeer.format_display_message(f'Unzip '
+                                                         f'{member.filename}',
+                                                         pbar=True)
+                    pbar.set_description_str(desc, refresh=True)
+                    zf.extract(member, dst_root)
+        else:
+            zf.extractall(dst_root)
 
 
 def upload_folder(root: str,
@@ -56,7 +69,8 @@ def upload_folder(root: str,
                   name: str,
                   version: str,
                   *,
-                  force: bool = False) -> str:
+                  force: bool = False,
+                  verbose: bool = False) -> str:
 
     root = audeer.safe_path(root)
     if not os.path.isdir(root):
@@ -72,20 +86,33 @@ def upload_folder(root: str,
     if force or not audfactory.artifactory_path(url).exists():
         src_path = os.path.join(tempfile._get_default_tempdir(),
                                 f'{name}-{version}.zip')
-        zip_folder(root, src_path)
+        zip_folder(root, src_path, verbose=verbose)
         audfactory.upload_artifact(src_path,
                                    repository,
                                    group_id,
                                    name,
-                                   version)
+                                   version,
+                                   verbose=verbose)
         os.remove(src_path)
 
     return url
 
 
-def zip_folder(src_root: str, dst_path: str) -> None:
+def zip_folder(src_root: str, dst_path: str, *, verbose: bool = False) -> None:
 
     with zipfile.ZipFile(dst_path, 'w', zipfile.ZIP_DEFLATED) as zf:
-        for base, file in scan_files(src_root):
-            zf.write(os.path.join(src_root, base, file),
-                     arcname=os.path.join(base, file))
+        files = list(scan_files(src_root))
+        if verbose:
+            with audeer.progress_bar(files,
+                                     total=len(files),
+                                     desc='') as pbar:
+                for base, file in pbar:
+                    path = os.path.join(src_root, base, file)
+                    desc = audeer.format_display_message(f'Zip {path}',
+                                                         pbar=True)
+                    pbar.set_description_str(desc, refresh=True)
+                    zf.write(path, arcname=os.path.join(base, file))
+        else:
+            for base, file in files:
+                zf.write(os.path.join(src_root, base, file),
+                         arcname=os.path.join(base, file))

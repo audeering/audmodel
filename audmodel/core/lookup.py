@@ -20,11 +20,13 @@ class Lookup:
                  name: str,
                  version: str = None,
                  *,
-                 private: bool = False):
+                 private: bool = False,
+                 verbose: bool = False):
 
         self.group_id = f'{config.GROUP_ID}.{name}'
         self.repository = config.REPOSITORY_PRIVATE if private \
             else config.REPOSITORY_PUBLIC
+        self.verbose = verbose
 
         if version is None:
             version = Lookup.latest_version(name, private=private)
@@ -37,7 +39,8 @@ class Lookup:
 
     @property
     def table(self) -> pd.DataFrame:
-        return _download(self.group_id, self.repository, self.version)
+        return _download(self.group_id, self.repository, self.version,
+                         self.verbose)
 
     def append(self, params: typing.Dict[str, typing.Any]) -> str:
 
@@ -55,7 +58,7 @@ class Lookup:
                                f"not match parameters '{params}'.")
 
         df = df.append(s)
-        _upload(df, self.group_id, self.repository, self.version)
+        _upload(df, self.group_id, self.repository, self.version, self.verbose)
 
         return uid
 
@@ -66,7 +69,7 @@ class Lookup:
             url = _url_entry(self.group_id, self.repository, uid, self.version)
             audfactory.artifactory_path(url).parent.parent.rmdir()
         df.drop(index=df.index, inplace=True)
-        _upload(df, self.group_id, self.repository, self.version)
+        _upload(df, self.group_id, self.repository, self.version, self.verbose)
 
     def contains(self, params: typing.Dict[str, typing.Any]) -> bool:
         try:
@@ -95,7 +98,7 @@ class Lookup:
                          uid, self.version)
         audfactory.artifactory_path(url).parent.parent.rmdir()
         df.drop(index=uid, inplace=True)
-        _upload(df, self.group_id, self.repository, self.version)
+        _upload(df, self.group_id, self.repository, self.version, self.verbose)
 
         return uid
 
@@ -105,7 +108,8 @@ class Lookup:
                version: str,
                *,
                private: bool = False,
-               force: bool = False) -> str:
+               force: bool = False,
+               verbose: bool = False) -> str:
 
         group_id = f'{config.GROUP_ID}.{name}'
         repository = config.REPOSITORY_PRIVATE if private \
@@ -115,7 +119,7 @@ class Lookup:
             df = pd.DataFrame(index=pd.Index([],
                                              name=config.LOOKUP_TABLE_INDEX),
                               columns=sorted(columns))
-            _upload(df, group_id, repository, version)
+            _upload(df, group_id, repository, version, verbose)
         else:
             raise RuntimeError(f"Lookup table '{name}-{version}' "
                                f"exists already.")
@@ -192,10 +196,11 @@ class Lookup:
 
 def _download(group_id: str,
               repository: str,
-              version: str) -> pd.DataFrame:
+              version: str,
+              verbose: bool) -> pd.DataFrame:
     path = _path(version)
     url = _url_table(group_id, repository, version)
-    path = audfactory.download_artifact(url, path)
+    path = audfactory.download_artifact(url, path, verbose=verbose)
     df = pd.read_csv(path, index_col=config.LOOKUP_TABLE_INDEX)
     os.remove(path)
     return df
@@ -212,14 +217,16 @@ def _path(version: str) -> str:
 def _upload(df: pd.DataFrame,
             group_id: str,
             repository: str,
-            version: str) -> None:
+            version: str,
+            verbose: bool) -> None:
     path = _path(version)
     df.to_csv(path)
     audfactory.upload_artifact(path,
                                repository,
                                group_id,
                                config.LOOKUP_TABLE_NAME,
-                               version=version)
+                               version=version,
+                               verbose=verbose)
     os.remove(path)
 
 
