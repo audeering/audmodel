@@ -7,6 +7,13 @@ The format is based on `Keep a Changelog`_,
 and this project adheres to `Semantic Versioning`_.
 
 
+Version 0.3.3 (2020-03-18)
+--------------------------
+
+* Added: verbose flag
+* Added: publish models under a subgroup
+
+
 Version 0.3.2 (2020-03-10)
 --------------------------
 
