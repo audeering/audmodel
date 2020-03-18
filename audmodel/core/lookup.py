@@ -20,17 +20,18 @@ class Lookup:
                  name: str,
                  version: str = None,
                  *,
+                 subgroup: str = None,
                  private: bool = False,
                  verbose: bool = False):
 
-        self.group_id = f'{config.GROUP_ID}.{name}'
-        self.repository = config.REPOSITORY_PRIVATE if private \
-            else config.REPOSITORY_PUBLIC
+        self.group_id, self.repository = Lookup.server(name, subgroup, private)
         self.verbose = verbose
 
         if version is None:
-            version = Lookup.latest_version(name, private=private)
-        elif not Lookup.exists(name, version, private=private):
+            version = Lookup.latest_version(name, subgroup=subgroup,
+                                            private=private)
+        elif not Lookup.exists(name, version, subgroup=subgroup,
+                               private=private):
             raise RuntimeError(f"Lookup table '{name}-{version}' "
                                f"does not exist yet.")
 
@@ -107,15 +108,15 @@ class Lookup:
                columns: typing.Sequence[str],
                version: str,
                *,
+               subgroup: str = None,
                private: bool = False,
                force: bool = False,
                verbose: bool = False) -> str:
 
-        group_id = f'{config.GROUP_ID}.{name}'
-        repository = config.REPOSITORY_PRIVATE if private \
-            else config.REPOSITORY_PUBLIC
+        group_id, repository = Lookup.server(name, subgroup, private)
 
-        if force or not Lookup.exists(name, version, private=private):
+        if force or not Lookup.exists(name, version, subgroup=subgroup,
+                                      private=private):
             df = pd.DataFrame(index=pd.Index([],
                                              name=config.LOOKUP_TABLE_INDEX),
                               columns=sorted(columns))
@@ -130,9 +131,10 @@ class Lookup:
     def delete(name: str,
                version: str,
                *,
+               subgroup: str = None,
                private: bool = False,
                force: bool = True) -> None:
-        lu = Lookup(name, version, private=private)
+        lu = Lookup(name, version, subgroup=subgroup, private=private)
         if not lu.table.empty:
             if not force:
                 raise RuntimeError(
@@ -146,11 +148,10 @@ class Lookup:
     def exists(name: str,
                version: str,
                *,
+               subgroup: str = None,
                private: bool = False) -> bool:
 
-        group_id = f'{config.GROUP_ID}.{name}'
-        repository = config.REPOSITORY_PRIVATE if private \
-            else config.REPOSITORY_PUBLIC
+        group_id, repository = Lookup.server(name, subgroup, private)
 
         try:
             versions = audfactory.versions(group_id,
@@ -165,28 +166,36 @@ class Lookup:
     def latest_version(name: str,
                        params: typing.Dict[str, typing.Any] = None,
                        *,
+                       subgroup: str = None,
                        private: bool = False) -> typing.Optional[str]:
-        versions = Lookup.versions(name, params=params, private=private)
+        versions = Lookup.versions(name, subgroup=subgroup,
+                                   params=params, private=private)
         if len(versions) > 0:
             return versions[-1]
         else:
             return None
 
     @staticmethod
+    def server(name: str, subgroup: str, private: bool) -> (str, str):
+        group_id = f'{config.GROUP_ID}.{subgroup}.{name}' \
+            if subgroup is not None else f'{config.GROUP_ID}.{name}'
+        repository = config.REPOSITORY_PRIVATE if private \
+            else config.REPOSITORY_PUBLIC
+        return group_id, repository
+
+    @staticmethod
     def versions(name: str,
                  params: typing.Dict[str, typing.Any] = None,
                  *,
+                 subgroup: str = None,
                  private: bool = False) -> list:
-        group_id = f'{config.GROUP_ID}.{name}'
-        repository = config.REPOSITORY_PRIVATE if private \
-            else config.REPOSITORY_PUBLIC
-        versions = audfactory.versions(group_id,
-                                       config.LOOKUP_TABLE_NAME,
+        group_id, repository = Lookup.server(name, subgroup, private)
+        versions = audfactory.versions(group_id, config.LOOKUP_TABLE_NAME,
                                        repository=repository)
         if params is not None:
             filtered_versions = []
             for version in versions:
-                lu = Lookup(name, version, private=private)
+                lu = Lookup(name, version, subgroup=subgroup, private=private)
                 if lu.contains(params):
                     filtered_versions.append(version)
             versions = filtered_versions

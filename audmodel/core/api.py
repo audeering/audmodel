@@ -4,6 +4,7 @@ import os
 import pandas as pd
 
 import audeer
+import audfactory
 
 from .config import config
 from .lookup import Lookup
@@ -14,6 +15,7 @@ def create_lookup_table(name: str,
                         columns: typing.Sequence[str],
                         version: str,
                         *,
+                        subgroup: str = None,
                         private: bool = False,
                         force: bool = False,
                         verbose: bool = False) -> str:
@@ -26,6 +28,11 @@ def create_lookup_table(name: str,
         name: model name
         columns: columns of the table
         version: version string
+        subgroup: extend group id to
+            :attr:`audmodel.config.GROUP_ID`.<subgroup>. You can increase
+            the depth by using dot-notation, e.g. setting
+            ``subgroup=foo.bar`` will result in
+            `com.audeering.models.foo.bar`
         private: repository is private
         force: create the lookup table even if it exists
         verbose: show debug messages
@@ -34,8 +41,8 @@ def create_lookup_table(name: str,
         RuntimeError: if table exists already
 
     """
-    return Lookup.create(name, columns, version, private=private,
-                         force=force, verbose=verbose)
+    return Lookup.create(name, columns, version, subgroup=subgroup,
+                         private=private, force=force, verbose=verbose)
 
 
 def get_default_cache_root() -> str:
@@ -48,6 +55,7 @@ def get_default_cache_root() -> str:
 def delete_lookup_table(name: str,
                         version: str,
                         *,
+                        subgroup: str = None,
                         private: bool = False,
                         force: bool = False) -> None:
     r"""Delete a lookup table.
@@ -59,6 +67,11 @@ def delete_lookup_table(name: str,
     Args:
         name: model name
         version: version string
+        subgroup: extend group id to
+            :attr:`audmodel.config.GROUP_ID`.<subgroup>. You can increase
+            the depth by using dot-notation, e.g. setting
+            ``subgroup=foo.bar`` will result in
+            `com.audeering.models.foo.bar`
         private: repository is private
         force: delete lookup table even if it is not empty
 
@@ -66,12 +79,14 @@ def delete_lookup_table(name: str,
         RuntimeError: if table is not empty
 
     """
-    Lookup.delete(name, version, private=private, force=force)
+    Lookup.delete(name, version, subgroup=subgroup,
+                  private=private, force=force)
 
 
 def get_lookup_table(name: str,
                      version: str = None,
                      *,
+                     subgroup: str = None,
                      private: bool = False,
                      verbose: bool = False) -> pd.DataFrame:
     r"""Return lookup table.
@@ -79,6 +94,11 @@ def get_lookup_table(name: str,
     Args:
         name: model name
         version: version string
+        subgroup: extend group id to
+            :attr:`audmodel.config.GROUP_ID`.<subgroup>. You can increase
+            the depth by using dot-notation, e.g. setting
+            ``subgroup=foo.bar`` will result in
+            `com.audeering.models.foo.bar`
         private: repository is private
         verbose: show debug messages
 
@@ -86,13 +106,15 @@ def get_lookup_table(name: str,
         RuntimeError: if table does not exist
 
     """
-    return Lookup(name, version, private=private, verbose=verbose).table
+    return Lookup(name, version, subgroup=subgroup,
+                  private=private, verbose=verbose).table
 
 
 def get_model_id(name: str,
                  params: typing.Dict[str, typing.Any],
                  version: str = None,
                  *,
+                 subgroup: str = None,
                  private: bool = False,
                  verbose: bool = False) -> str:
     r"""Return unique model id.
@@ -101,6 +123,11 @@ def get_model_id(name: str,
         name: model name
         params: dictionary with parameters
         version: version string
+        subgroup: extend group id to
+            :attr:`audmodel.config.GROUP_ID`.<subgroup>. You can increase
+            the depth by using dot-notation, e.g. setting
+            ``subgroup=foo.bar`` will result in
+            `com.audeering.models.foo.bar`
         private: repository is private
         verbose: show debug messages
 
@@ -109,29 +136,39 @@ def get_model_id(name: str,
 
     """
     if version is None:
-        version = latest_version(name, params, private=private)
-    return Lookup(name, version, private=private, verbose=verbose).find(params)
+        version = latest_version(name, params,
+                                 subgroup=subgroup, private=private)
+    return Lookup(name, version, subgroup=subgroup,
+                  private=private, verbose=verbose).find(params)
 
 
 def latest_version(name: str,
                    params: typing.Dict[str, typing.Any] = None,
                    *,
+                   subgroup: str = None,
                    private: bool = False) -> str:
     r"""Return latest version.
 
     Args:
         name: model name
         params: dictionary with parameters
+        subgroup: extend group id to
+            :attr:`audmodel.config.GROUP_ID`.<subgroup>. You can increase
+            the depth by using dot-notation, e.g. setting
+            ``subgroup=foo.bar`` will result in
+            `com.audeering.models.foo.bar`
         private: repository is private
 
     """
-    return Lookup.latest_version(name, params, private=private)
+    return Lookup.latest_version(name, params,
+                                 subgroup=subgroup, private=private)
 
 
 def load(name: str,
          params: typing.Dict[str, typing.Any],
          version: str = None,
          *,
+         subgroup: str = None,
          private: bool = False,
          force: bool = False,
          root: str = None,
@@ -147,6 +184,11 @@ def load(name: str,
         name: model name
         params: dictionary with parameters
         version: version string
+        subgroup: extend group id to
+            :attr:`audmodel.config.GROUP_ID`.<subgroup>. You can increase
+            the depth by using dot-notation, e.g. setting
+            ``subgroup=foo.bar`` will result in
+            `com.audeering.models.foo.bar`
         private: repository is private
         force: download model even if it exists already
         root: store model within this folder
@@ -157,14 +199,15 @@ def load(name: str,
 
     """
     if version is None:
-        version = latest_version(name, params, private=private)
-    group_id = f'{config.GROUP_ID}.{name}'
-    repository = config.REPOSITORY_PRIVATE if private \
-        else config.REPOSITORY_PUBLIC
-    lu = Lookup(name, version, private=private, verbose=verbose)
+        version = latest_version(name, params,
+                                 subgroup=subgroup, private=private)
+    group_id, repository = Lookup.server(name, subgroup, private)
+    lu = Lookup(name, version, subgroup=subgroup,
+                private=private, verbose=verbose)
     uid = lu.find(params)
     root = audeer.safe_path(root or get_default_cache_root())
-    root = os.path.join(root, name, lu.version)
+    root = os.path.join(root, audfactory.group_id_to_path(group_id),
+                        lu.version)
     root = utils.download_folder(root, group_id, repository, uid,
                                  lu.version, force=force, verbose=verbose)
     return root
@@ -173,6 +216,7 @@ def load(name: str,
 def load_by_id(name: str,
                uid: str,
                *,
+               subgroup: str = None,
                private: bool = False,
                force: bool = False,
                root: str = None,
@@ -187,6 +231,11 @@ def load_by_id(name: str,
     Args:
         name: name of model
         uid: unique model identifier
+        subgroup: extend group id to
+            :attr:`audmodel.config.GROUP_ID`.<subgroup>. You can increase
+            the depth by using dot-notation, e.g. setting
+            ``subgroup=foo.bar`` will result in
+            `com.audeering.models.foo.bar`
         private: repository is private
         force: download model even if it exists already
         root: store model within this folder
@@ -196,22 +245,17 @@ def load_by_id(name: str,
         RuntimeError: if model does not exist
 
     """
-    group_id = f'{config.GROUP_ID}.{name}'
-    repository = config.REPOSITORY_PRIVATE if private \
-        else config.REPOSITORY_PUBLIC
+    group_id, repository = Lookup.server(name, subgroup, private)
 
-    versions = Lookup.versions(name, private=private)
+    versions = Lookup.versions(name, subgroup=subgroup, private=private)
     for version in versions:
-        lu = Lookup(name, version, private=private)
+        lu = Lookup(name, version, subgroup=subgroup, private=private)
         if uid in lu.table.index.to_list():
             root = audeer.safe_path(root or get_default_cache_root())
-            root = os.path.join(root, name, lu.version)
-            root = utils.download_folder(root,
-                                         group_id,
-                                         repository,
-                                         uid,
-                                         lu.version,
-                                         force=force,
+            root = os.path.join(root, audfactory.group_id_to_path(group_id),
+                                lu.version)
+            root = utils.download_folder(root, group_id, repository, uid,
+                                         lu.version, force=force,
                                          verbose=verbose)
             return root
 
@@ -223,8 +267,9 @@ def publish(root: str,
             params: typing.Dict[str, typing.Any],
             version: str,
             *,
-            create: bool = True,
+            subgroup: str = None,
             private: bool = False,
+            create: bool = True,
             force: bool = False,
             verbose: bool = False) -> str:
     r"""Zip model, publish as a new artifact and return url.
@@ -238,8 +283,13 @@ def publish(root: str,
         name: model name
         params: dictionary with parameters
         version: version string
-        create: create lookup table if it does not exist
+        subgroup: extend group id to
+            :attr:`audmodel.config.GROUP_ID`.<subgroup>. You can increase
+            the depth by using dot-notation, e.g. setting
+            ``subgroup=foo.bar`` will result in
+            `com.audeering.models.foo.bar`
         private: repository is private
+        create: create lookup table if it does not exist
         force: publish model even if it exists already
         verbose: show debug messages
 
@@ -247,15 +297,17 @@ def publish(root: str,
         RuntimeError: if an artifact exists already
 
     """
-    if not Lookup.exists(name, version, private=private):
+    if not Lookup.exists(name, version, subgroup=subgroup, private=private):
         if create:
             create_lookup_table(name, list(params.keys()), version,
-                                private=private, verbose=verbose)
+                                subgroup=subgroup, private=private,
+                                verbose=verbose)
         else:
             raise RuntimeError(f"A lookup table for '{name}' and "
                                f"'{version}' does not exist yet.")
 
-    lu = Lookup(name, version, private=private, verbose=verbose)
+    lu = Lookup(name, version, subgroup=subgroup,
+                private=private, verbose=verbose)
     uid = lu.append(params)
     url = utils.upload_folder(root, lu.group_id, lu.repository,
                               uid, version, force=force, verbose=verbose)
@@ -266,6 +318,7 @@ def remove(name: str,
            params: typing.Dict[str, typing.Any],
            version: str,
            *,
+           subgroup: str = None,
            private: bool = False,
            verbose: bool = False) -> str:
     r"""Remove a model and return its unique model identifier.
@@ -274,6 +327,11 @@ def remove(name: str,
         name: model name
         params: dictionary with parameters
         version: version string
+        subgroup: extend group id to
+            :attr:`audmodel.config.GROUP_ID`.<subgroup>. You can increase
+            the depth by using dot-notation, e.g. setting
+            ``subgroup=foo.bar`` will result in
+            `com.audeering.models.foo.bar`
         private: repository is private
         verbose: show debug messages
 
@@ -281,20 +339,26 @@ def remove(name: str,
         RuntimeError: if model does not exist
 
     """
-    return Lookup(name, version, private=private,
-                  verbose=verbose).remove(params)
+    return Lookup(name, version, subgroup=subgroup,
+                  private=private, verbose=verbose).remove(params)
 
 
 def versions(name: str,
              params: typing.Dict[str, typing.Any] = None,
              *,
+             subgroup: str = None,
              private: bool = False) -> typing.Sequence[str]:
     r"""Return a list of available versions.
 
     Args:
         name: model name
         params: dictionary with parameters
+        subgroup: extend group id to
+            :attr:`audmodel.config.GROUP_ID`.<subgroup>. You can increase
+            the depth by using dot-notation, e.g. setting
+            ``subgroup=foo.bar`` will result in
+            `com.audeering.models.foo.bar`
         private: repository is private
 
     """
-    return Lookup.versions(name, params, private=private)
+    return Lookup.versions(name, params, subgroup=subgroup, private=private)

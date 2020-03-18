@@ -1,22 +1,31 @@
+import os
 import pytest
 import uuid
 
 import audfactory
 import audmodel
 
-from .default import default
 
-
-# create a unique group id to not interrupt
-# with other tests running in parallel
-audmodel.config.GROUP_ID += '.audmodel.' + str(uuid.uuid1())
+pytest.SUBGROUP = f'audmodel.{str(uuid.uuid1())}'
+pytest.ROOT = os.path.dirname(os.path.realpath(__file__))
+pytest.NAME = 'audmodel'
+pytest.COLUMNS = ['property1', 'property2', 'property3']
+pytest.PARAMS = [
+    {
+        'property1': 'foo',
+        'property2': 'bar',
+        'property3': idx,
+    } for idx in range(3)
+]
+pytest.VERSION = '1.0.0'
 
 
 def cleanup():
+    group_id = f'{audmodel.config.GROUP_ID}.{pytest.SUBGROUP}'
+    repository = f'{audmodel.config.REPOSITORY_PUBLIC}'
     path = audfactory.artifactory_path(
-        audfactory.server_url(audmodel.config.GROUP_ID,
-                              name=default.NAME,
-                              repository='models-public-local')).parent
+        audfactory.server_url(group_id, name=pytest.NAME,
+                              repository=repository)).parent
     if path.exists():
         path.rmdir()
 
@@ -35,7 +44,8 @@ def cleanup_test():
 
 @pytest.fixture(scope='module')
 def create():
-    for params in default.PARAMS:
-        audmodel.publish(default.ROOT, default.NAME, params,
-                         default.VERSION, create=True)
+    for params in pytest.PARAMS:
+        audmodel.publish(pytest.ROOT, pytest.NAME, params,
+                         pytest.VERSION, subgroup=pytest.SUBGROUP,
+                         create=True)
     yield
