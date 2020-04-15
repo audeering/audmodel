@@ -19,6 +19,7 @@
     :hidden:
 
     api-audmodel
+    api-interface
     genindex
 
 .. toctree::

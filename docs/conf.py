@@ -42,6 +42,8 @@ linkcheck_ignore = [
 ]
 # Ignore package dependencies during building the docs
 autodoc_mock_imports = [
+    'audiofile',
+    'audsp',
     'numpy',
     'pandas',
     'tqdm',

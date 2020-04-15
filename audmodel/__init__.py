@@ -1,3 +1,4 @@
+from audmodel import interface
 from audmodel.core.config import config
 from audmodel.core.api import (
     create_lookup_table,
