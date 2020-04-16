@@ -7,6 +7,12 @@ The format is based on `Keep a Changelog`_,
 and this project adheres to `Semantic Versioning`_.
 
 
+Version 0.4.0 (2020-04-16)
+--------------------------
+
+* Added: :class:`audmodel.interface.Generic`
+
+
 Version 0.3.3 (2020-03-18)
 --------------------------
 
