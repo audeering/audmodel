@@ -59,7 +59,7 @@ class Generic:
             start: pd.Timedelta = None,
             end: pd.Timedelta = None,
             channel: int = None,
-    ) -> (np.ndarray, int):
+    ) -> typing.Tuple[np.ndarray, int]:
         """Load audio using audiofile."""
 
         if start is not None:
