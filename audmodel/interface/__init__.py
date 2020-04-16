@@ -4,7 +4,6 @@ The idea is that all our models provide a common set
 of methods to apply them to signals or files:
 
 * :func:`process_signal`
-* :func:`process_index`
 * :func:`process_file`
 * :func:`process_files`
 * :func:`process_folder`
