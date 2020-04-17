@@ -79,6 +79,31 @@ class Lookup:
             return False
         return True
 
+    def extend(self,
+               params: typing.Union[
+                   str,
+                   typing.Sequence[str],
+                   typing.Dict[str, typing.Any],
+               ]) \
+            -> pd.DataFrame:
+
+        if isinstance(params, str):
+            params = [params]
+        if isinstance(params, (tuple, list)):
+            params = {param: None for param in params}
+
+        df = self.table
+
+        for param, value in params.items():
+            if param not in df.columns:
+                df[param] = value
+
+        df = df.reindex(sorted(df.columns), axis=1)
+
+        _upload(df, self.group_id, self.repository, self.version, self.verbose)
+
+        return df
+
     def find(self, params: typing.Dict[str, typing.Any]) -> str:
 
         df = self.table
@@ -105,7 +130,7 @@ class Lookup:
 
     @staticmethod
     def create(name: str,
-               columns: typing.Sequence[str],
+               params: typing.Sequence[str],
                version: str,
                *,
                subgroup: str = None,
@@ -119,7 +144,7 @@ class Lookup:
                                       private=private):
             df = pd.DataFrame(index=pd.Index([],
                                              name=config.LOOKUP_TABLE_INDEX),
-                              columns=sorted(columns))
+                              columns=sorted(params))
             _upload(df, group_id, repository, version, verbose)
         else:
             raise RuntimeError(f"Lookup table '{name}-{version}' "

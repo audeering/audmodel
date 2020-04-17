@@ -12,7 +12,7 @@ from . import utils
 
 
 def create_lookup_table(name: str,
-                        columns: typing.Sequence[str],
+                        params: typing.Sequence[str],
                         version: str,
                         *,
                         subgroup: str = None,
@@ -21,12 +21,9 @@ def create_lookup_table(name: str,
                         verbose: bool = False) -> str:
     r"""Create lookup table and return url.
 
-    .. note:: The columns of the lookup table should correspond to
-        the names of the parameters you plan to tag your models with.
-
     Args:
         name: model name
-        columns: columns of the table
+        params: list with model parameters
         version: version string
         subgroup: extend group id to
             :attr:`audmodel.config.GROUP_ID`.<subgroup>. You can increase
@@ -41,7 +38,7 @@ def create_lookup_table(name: str,
         RuntimeError: if table exists already
 
     """
-    return Lookup.create(name, columns, version, subgroup=subgroup,
+    return Lookup.create(name, params, version, subgroup=subgroup,
                          private=private, force=force, verbose=verbose)
 
 
@@ -81,6 +78,39 @@ def delete_lookup_table(name: str,
     """
     Lookup.delete(name, version, subgroup=subgroup,
                   private=private, force=force)
+
+
+def extend_params(name: str,
+                  version: str,
+                  new_params: typing.Union[
+                      str,
+                      typing.Sequence[str],
+                      typing.Dict[str, typing.Any],
+                  ],
+                  *,
+                  subgroup: str = None,
+                  private: bool = False,
+                  verbose: bool = False) -> pd.DataFrame:
+    r"""Extend table with new parameters and return it.
+
+    Args:
+        name: model name
+        version: version string
+        new_params: a dictionary with parameters (keys) and default values.
+            If a list of parameter names is given instead, the default value
+            will be `None`
+        subgroup: extend group id to
+            :attr:`audmodel.config.GROUP_ID`.<subgroup>. You can increase
+            the depth by using dot-notation, e.g. setting
+            ``subgroup=foo.bar`` will result in
+            `com.audeering.models.foo.bar`
+        private: repository is private
+        verbose: show debug messages
+
+    """
+    lu = Lookup(name, version, subgroup=subgroup,
+                private=private, verbose=verbose)
+    return lu.extend(new_params)
 
 
 def get_lookup_table(name: str,
@@ -140,6 +170,33 @@ def get_model_id(name: str,
                                  subgroup=subgroup, private=private)
     return Lookup(name, version, subgroup=subgroup,
                   private=private, verbose=verbose).find(params)
+
+
+def get_params(name: str,
+               version: str = None,
+               *,
+               subgroup: str = None,
+               private: bool = False,
+               verbose: bool = False) -> typing.List[str]:
+    r"""Return list of parameters.
+
+    Args:
+        name: model name
+        version: version string
+        subgroup: extend group id to
+            :attr:`audmodel.config.GROUP_ID`.<subgroup>. You can increase
+            the depth by using dot-notation, e.g. setting
+            ``subgroup=foo.bar`` will result in
+            `com.audeering.models.foo.bar`
+        private: repository is private
+        verbose: show debug messages
+
+    Raises:
+        RuntimeError: if table does not exist
+
+    """
+    return list(get_lookup_table(name, version, subgroup=subgroup,
+                                 private=private, verbose=verbose).columns)
 
 
 def latest_version(name: str,

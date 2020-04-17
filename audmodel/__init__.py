@@ -3,9 +3,11 @@ from audmodel.core.config import config
 from audmodel.core.api import (
     create_lookup_table,
     delete_lookup_table,
+    extend_params,
     get_default_cache_root,
     get_lookup_table,
     get_model_id,
+    get_params,
     latest_version,
     load,
     load_by_id,

@@ -19,6 +19,11 @@ delete_lookup_table
 
 .. autofunction::  delete_lookup_table
 
+extend_params
+-------------
+
+.. autofunction::  extend_params
+
 get_default_cache_root
 ----------------------
 
@@ -33,6 +38,11 @@ get_model_id
 ------------
 
 .. autofunction:: get_model_id
+
+get_params
+----------
+
+.. autofunction:: get_params
 
 latest_version
 --------------
