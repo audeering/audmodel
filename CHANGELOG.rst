@@ -7,6 +7,13 @@ The format is based on `Keep a Changelog`_,
 and this project adheres to `Semantic Versioning`_.
 
 
+Version 0.4.1 (2020-04-20)
+--------------------------
+
+* Added: :meth:`audmodel.extend_params` and :meth:`audmodel.get_params`
+* Fixed: return tpye of :meth:`audmodel.interface.Generic.read_audio`
+
+
 Version 0.4.0 (2020-04-16)
 --------------------------
 
