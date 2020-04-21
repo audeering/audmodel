@@ -95,6 +95,8 @@ class Generic:
             self,
             file: str,
             *,
+            start: pd.Timedelta = None,
+            end: pd.Timedelta = None,
             channel: int = None,
     ) -> typing.Any:
         r"""Process the content of an audio file.
@@ -102,9 +104,11 @@ class Generic:
         Args:
             file: file path
             channel: channel number
+            start: start processing at this position
+            end: end processing at this position
 
         Returns:
-            output of process function
+            Output of process function
 
         Raises:
             RuntimeError: if sampling rates of model and signal do not match
@@ -113,6 +117,8 @@ class Generic:
         signal, sampling_rate = self.read_audio(
             file,
             channel=channel,
+            start=start,
+            end=end,
         )
         return self.process_signal(
             signal,
@@ -124,7 +130,7 @@ class Generic:
             files: typing.Sequence[str],
             *,
             channel: int = None,
-    ) -> typing.Dict[str, typing.Any]:
+    ) -> pd.Series:
         r"""Process a list of files.
 
         Args:
@@ -138,18 +144,18 @@ class Generic:
             RuntimeError: if sampling rates of model and signal do not match
 
         """
-        result = {}
+        data = [None] * len(files)
         with audeer.progress_bar(
                 files,
                 total=len(files),
                 desc='',
                 disable=not self.verbose,
         ) as pbar:
-            for file in pbar:
+            for idx, file in enumerate(pbar):
                 desc = audeer.format_display_message(file, pbar=True)
                 pbar.set_description(desc, refresh=True)
-                result[file] = self.process_file(file, channel=channel)
-        return result
+                data[idx] = self.process_file(file, channel=channel)
+        return pd.Series(data, index=pd.Index(files, name='file'))
 
     def process_folder(
             self,
@@ -157,14 +163,14 @@ class Generic:
             *,
             filetype: str = 'wav',
             channel: int = None,
-    ) -> typing.Dict[str, typing.Any]:
+    ) -> pd.Series:
         r"""Process files in a folder.
 
         .. note:: At the moment does not scan in sub-folders!
 
         Args:
             root: root folder
-            file_ext: file extension
+            filetype: file extension
             channel: channel number
 
         Returns:
@@ -177,19 +183,59 @@ class Generic:
         files = audeer.list_file_names(root, filetype=filetype)
         return self.process_files(files, channel=channel)
 
+    def process_index(
+            self,
+            index: pd.MultiIndex,
+            *,
+            channel: int = None) -> pd.Series:
+        r"""Process from a segmented index.
+
+        .. note:: The index has to provide segment information conform to the
+            Unified Format.
+
+        Args:
+            index: index with segment information
+            channel: channel number (default 0)
+
+        Returns:
+            Series with predictions in the Unified Format
+
+        Raises:
+            RuntimeError: if sampling rates of model and signal do not match
+
+        """
+        if not index.names == ('file', 'start', 'end'):
+            raise ValueError('Not a segmented index conform to Unified Format')
+
+        y = [None] * len(index)
+
+        with audeer.progress_bar(index, total=len(index),
+                                 desc=f'Process',
+                                 disable=not self.verbose) as pbar:
+            for idx, (file, start, end) in enumerate(pbar):
+                y[idx] = self.process_file(file, channel=channel, start=start,
+                                           end=end)
+
+        return pd.Series(y, index=index)
+
     def process_signal(
             self,
             signal: np.ndarray,
             sampling_rate: int,
+            *,
+            start: pd.Timedelta = None,
+            end: pd.Timedelta = None,
     ) -> typing.Any:
         r"""Process audio signal and return result.
 
         Args:
             signal: signal values
             sampling_rate: sampling rate in Hz
+            start: start processing at this position
+            end: end processing at this position
 
         Returns:
-            output of process function
+            Output of process function
 
         Raises:
             RuntimeError: if sampling rates of model and signal do not match
@@ -197,21 +243,39 @@ class Generic:
         """
         # Enforce 2D signals
         signal = np.atleast_2d(signal)
+
+        # Resample signal
         if (
                 self.sampling_rate is not None
                 and sampling_rate != self.sampling_rate
         ):
             if self.resample is not None:
                 signal = self.resample(signal, sampling_rate)
+                signal = np.atleast_2d(signal)
             else:
                 raise RuntimeError(
                     f'Signal sampling rate of {sampling_rate} Hz '
                     f'does not match requested model sampling rate of '
                     f'{self.sampling_rate} Hz.'
                 )
+
+        # Find start and end index
+        max_i = signal.shape[-1]
+        if start is not None:
+            start_i = int(round(start.total_seconds() * sampling_rate))
+            start_i = max(start_i, max_i)
+        else:
+            start_i = 0
+        if end is not None and not pd.isna(end):
+            end_i = int(round(end.total_seconds() * sampling_rate))
+            end_i = max(end_i, max_i)
+        else:
+            end_i = max_i
+
+        # Process signal
         if self.process_func is not None:
             return self.process_func(
-                signal,
+                signal[:, start_i:end_i],
                 sampling_rate,
                 **self.process_func_kwargs,
             )

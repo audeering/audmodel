@@ -90,22 +90,31 @@ def test_folder(tmpdir):
         verbose=False,
     )
     sampling_rate = 8000
-    signal = np.ones((1, 8000))
     path = str(tmpdir.mkdir('wav'))
     files = [f'{path}/file{n}.wav' for n in range(3)]
     for file in files:
+        signal = np.random.uniform(-1.0, 1.0, (1, sampling_rate))
         af.write(file, signal, sampling_rate)
-    model.process_folder(path)
+    result = model.process_folder(path)
+    for idx in range(3):
+        signal, sampling_rate = audmodel.interface.Generic.read_audio(
+            files[idx]
+        )
+        np.testing.assert_equal(result[idx], signal)
+        np.testing.assert_equal(result[files[idx]], signal)
 
 
 @pytest.mark.parametrize(
-    'process_func,process_func_kwargs,signal,sampling_rate,expected_signal',
+    'process_func,process_func_kwargs,signal,sampling_rate,'
+    'start,end,expected_signal',
     [
         (
             None,
             {},
             np.array([1., 2., 3.]),
             44100,
+            None,
+            None,
             np.array([1., 2., 3.]),
         ),
         (
@@ -113,6 +122,8 @@ def test_folder(tmpdir):
             {},
             np.array([1., 2., 3.]),
             44100,
+            None,
+            None,
             3.0,
         ),
         (
@@ -120,6 +131,35 @@ def test_folder(tmpdir):
             {},
             np.array([1., 2., 3.]),
             3,
+            None,
+            None,
+            1.0,
+        ),
+        (
+            signal_duration,
+            {},
+            np.array([1., 2., 3.]),
+            1,
+            pd.to_timedelta('2s'),
+            None,
+            1.0,
+        ),
+        (
+            signal_duration,
+            {},
+            np.array([1., 2., 3.]),
+            1,
+            None,
+            pd.to_timedelta('1s'),
+            1.0,
+        ),
+        (
+            signal_duration,
+            {},
+            np.array([1., 2., 3.]),
+            1,
+            pd.to_timedelta('1s'),
+            pd.to_timedelta('2s'),
             1.0,
         ),
         (
@@ -127,6 +167,8 @@ def test_folder(tmpdir):
             {},
             np.array([1., 1., 1.]),
             44100,
+            None,
+            None,
             np.array([[1.1, 1.1, 1.1]]),
         ),
         (
@@ -134,6 +176,8 @@ def test_folder(tmpdir):
             {'subtract': False},
             np.array([1., 1., 1.]),
             44100,
+            None,
+            None,
             np.array([[1.1, 1.1, 1.1]]),
         ),
         (
@@ -141,6 +185,8 @@ def test_folder(tmpdir):
             {'subtract': True},
             np.array([1., 1., 1.]),
             44100,
+            None,
+            None,
             np.array([[0.9, 0.9, 0.9]]),
         ),
     ],
@@ -150,6 +196,8 @@ def test_process_func(
         process_func_kwargs,
         signal,
         sampling_rate,
+        start,
+        end,
         expected_signal,
 ):
     model = audmodel.interface.Generic(
@@ -159,15 +207,52 @@ def test_process_func(
         verbose=False,
         **process_func_kwargs,
     )
-    predicted_signal = model.process_signal(signal, sampling_rate)
+    predicted_signal = model.process_signal(signal, sampling_rate,
+                                            start=start, end=end)
     np.array_equal(predicted_signal, expected_signal)
 
 
+def test_index(tmpdir):
+
+    model = audmodel.interface.Generic(
+        process_func=lambda signal, sampling_rate: signal,
+        sampling_rate=None,
+        resample=False,
+        verbose=False,
+    )
+    sampling_rate = 8000
+    signal = np.random.uniform(-1.0, 1.0, (1, 3 * sampling_rate))
+    path = str(tmpdir.mkdir('wav'))
+    file = f'{path}/file.wav'
+    af.write(file, signal, sampling_rate)
+
+    # valid index
+    index = pd.MultiIndex.from_arrays(
+        [
+            [file] * 3,
+            pd.timedelta_range('0s', '2s', 3),
+            pd.timedelta_range('1s', '3s', 3),
+        ],
+        names=('file', 'start', 'end')
+    )
+    result = model.process_index(index)
+    for (file, start, end), value in result.items():
+        signal, sampling_rate = audmodel.interface.Generic.read_audio(
+            file, start=start, end=end
+        )
+        np.testing.assert_equal(signal, value)
+
+    # bad index
+    index = pd.MultiIndex(levels=[[], [], []],
+                          codes=[[], [], []],
+                          names=['no', 'unified', 'format'])
+    try:
+        model.process_index(index)
+    except ValueError:
+        assert True
+
+
 def test_read_audio(tmpdir):
-    # Currently the start and end options
-    # of audmodel.interface.Generic.read_audio() are not covered
-    # by the interface usage
-    # as they are only need for process_index()
     sampling_rate = 8000
     signal = np.ones((1, 8000))
     path = str(tmpdir.mkdir('wav'))
