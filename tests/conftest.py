@@ -45,7 +45,7 @@ def cleanup_test():
 @pytest.fixture(scope='module')
 def create():
     for params in pytest.PARAMS:
-        audmodel.publish(pytest.ROOT, pytest.NAME, params,
-                         pytest.VERSION, subgroup=pytest.SUBGROUP,
-                         create=True)
+        pytest.UID = audmodel.publish(pytest.ROOT, pytest.NAME, params,
+                                      pytest.VERSION, subgroup=pytest.SUBGROUP,
+                                      create=True)
     yield

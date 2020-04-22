@@ -172,6 +172,26 @@ def get_model_id(name: str,
                   private=private, verbose=verbose).find(params)
 
 
+def get_model_url(name: str,
+                  uid: str,
+                  *,
+                  subgroup: str = None,
+                  private: bool = False,
+                  verbose: bool = False) -> str:
+    group_id, repository = Lookup.server(name, subgroup, private)
+    versions = Lookup.versions(name, subgroup=subgroup, private=private)
+    for version in versions:
+        lu = Lookup(name, version, subgroup=subgroup, private=private)
+        if uid in lu.table.index.to_list():
+            server_url = audfactory.server_url(group_id,
+                                               name=uid,
+                                               repository=repository,
+                                               version=version)
+            return f'{server_url}/{uid}-{version}.zip'
+
+    raise RuntimeError(f"A model with id '{uid}' does not exist")
+
+
 def get_params(name: str,
                version: str = None,
                *,
@@ -329,7 +349,7 @@ def publish(root: str,
             create: bool = True,
             force: bool = False,
             verbose: bool = False) -> str:
-    r"""Zip model, publish as a new artifact and return url.
+    r"""Zip model, publish as a new artifact and returns the model's unique id.
 
     .. note:: Assigns a unique id and adds an entry in the lookup table.
         If the lookup table does not exist it will be created. If an entry
@@ -366,9 +386,9 @@ def publish(root: str,
     lu = Lookup(name, version, subgroup=subgroup,
                 private=private, verbose=verbose)
     uid = lu.append(params)
-    url = utils.upload_folder(root, lu.group_id, lu.repository,
-                              uid, version, force=force, verbose=verbose)
-    return url
+    utils.upload_folder(root, lu.group_id, lu.repository,
+                        uid, version, force=force, verbose=verbose)
+    return uid
 
 
 def remove(name: str,

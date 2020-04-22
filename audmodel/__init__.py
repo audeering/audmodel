@@ -7,6 +7,7 @@ from audmodel.core.api import (
     get_default_cache_root,
     get_lookup_table,
     get_model_id,
+    get_model_url,
     get_params,
     latest_version,
     load,

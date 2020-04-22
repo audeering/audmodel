@@ -61,12 +61,13 @@ import audmodel
     ),
 ])
 def test_publish(root, name, params, version, create, verbose):
-    url = audmodel.publish(root, name, params, version,
+    uid = audmodel.publish(root, name, params, version,
                            subgroup=pytest.SUBGROUP, create=create,
                            verbose=verbose)
-    assert audfactory.artifactory_path(url).exists()
-    uid = audmodel.get_model_id(name, params, version,
-                                subgroup=pytest.SUBGROUP, verbose=verbose)
+    assert uid == audmodel.get_model_id(name, params, version,
+                                        subgroup=pytest.SUBGROUP,
+                                        verbose=verbose)
+
     df = audmodel.get_lookup_table(name, version,
                                    subgroup=pytest.SUBGROUP, verbose=verbose)
     pd.testing.assert_series_equal(df.loc[uid], pd.Series(params, name=uid))
