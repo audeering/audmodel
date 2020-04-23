@@ -3,10 +3,10 @@ audmodel.interface
 
 .. automodule:: audmodel.interface
 
-Generic
+Process
 -------
 
-.. autoclass:: Generic
+.. autoclass:: Process
     :members:
 
 Segment

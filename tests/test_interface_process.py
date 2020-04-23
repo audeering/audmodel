@@ -26,7 +26,7 @@ def signal_modification(signal, sampling_rate, subtract=False):
 
 
 @pytest.mark.parametrize(
-    'model_process_func,signal,selected_channel,expected_output',
+    'process_func,signal,selected_channel,expected_output',
     [
         (
             signal_max,
@@ -63,14 +63,14 @@ def signal_modification(signal, sampling_rate, subtract=False):
 )
 def test_channel(
         tmpdir,
-        model_process_func,
+        process_func,
         signal,
         selected_channel,
         expected_output,
 ):
     sampling_rate = 8000
-    model = audmodel.interface.Generic(
-        process_func=model_process_func,
+    model = audmodel.interface.Process(
+        process_func=process_func,
         sampling_rate=sampling_rate,
         resample=False,
         verbose=False,
@@ -83,7 +83,7 @@ def test_channel(
 
 
 def test_folder(tmpdir):
-    model = audmodel.interface.Generic(
+    model = audmodel.interface.Process(
         process_func=lambda signal, sampling_rate: signal,
         sampling_rate=None,
         resample=False,
@@ -97,7 +97,7 @@ def test_folder(tmpdir):
         af.write(file, signal, sampling_rate)
     result = model.process_folder(path)
     for idx in range(3):
-        signal, sampling_rate = audmodel.interface.Generic.read_audio(
+        signal, sampling_rate = audmodel.interface.Process.read_audio(
             files[idx]
         )
         np.testing.assert_equal(result[idx], signal)
@@ -200,7 +200,7 @@ def test_process_func(
         end,
         expected_signal,
 ):
-    model = audmodel.interface.Generic(
+    model = audmodel.interface.Process(
         process_func=process_func,
         sampling_rate=None,
         resample=False,
@@ -214,7 +214,7 @@ def test_process_func(
 
 def test_index(tmpdir):
 
-    model = audmodel.interface.Generic(
+    model = audmodel.interface.Process(
         process_func=lambda signal, sampling_rate: signal,
         sampling_rate=None,
         resample=False,
@@ -235,9 +235,9 @@ def test_index(tmpdir):
         ],
         names=('file', 'start', 'end')
     )
-    result = model.process_index(index)
+    result = model.process_unified_format_index(index)
     for (file, start, end), value in result.items():
-        signal, sampling_rate = audmodel.interface.Generic.read_audio(
+        signal, sampling_rate = audmodel.interface.Process.read_audio(
             file, start=start, end=end
         )
         np.testing.assert_equal(signal, value)
@@ -247,7 +247,7 @@ def test_index(tmpdir):
                           codes=[[], [], []],
                           names=['no', 'unified', 'format'])
     try:
-        model.process_index(index)
+        model.process_unified_format_index(index)
     except ValueError:
         assert True
 
@@ -258,7 +258,7 @@ def test_read_audio(tmpdir):
     path = str(tmpdir.mkdir('wav'))
     file = os.path.join(path, 'file.wav')
     af.write(file, signal, sampling_rate)
-    s, sr = audmodel.interface.Generic.read_audio(
+    s, sr = audmodel.interface.Process.read_audio(
         file,
         start=pd.Timedelta('00:00:00.1'),
         end=pd.Timedelta('00:00:00.2'),
@@ -304,7 +304,7 @@ def test_sampling_rate_mismatch(
         model_sampling_rate,
         resample,
 ):
-    model = audmodel.interface.Generic(
+    model = audmodel.interface.Process(
         process_func=lambda signal, sampling_rate: signal,
         sampling_rate=model_sampling_rate,
         resample=resample,

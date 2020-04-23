@@ -8,8 +8,8 @@ import audeer
 import audsp
 
 
-class Generic:
-    r"""Generic model interface.
+class Process:
+    r"""Processing interface.
 
     Args:
         process_func: processing function,
@@ -182,15 +182,16 @@ class Generic:
         files = audeer.list_file_names(root, filetype=filetype)
         return self.process_files(files, channel=channel)
 
-    def process_index(
+    def process_unified_format_index(
             self,
             index: pd.MultiIndex,
             *,
             channel: int = None) -> pd.Series:
-        r"""Process from a segmented index.
+        r"""Process from a segmented index conform to the `Unified Format`_.
 
-        .. note:: The index has to provide segment information conform to the
-            Unified Format.
+        .. note:: Currently expects a segmented index. In the future it is
+            planned to support other index types (e.g. filewise), too. Until
+            then you can use audata.util.to_segmented_frame_ for conversion
 
         Args:
             index: index with segment information
@@ -201,6 +202,13 @@ class Generic:
 
         Raises:
             RuntimeError: if sampling rates of model and signal do not match
+
+        .. _`Unified Format`: http://tools.pp.audeering.com/audata/
+            data-tables.html
+
+        .. _audata.util.to_segmented_frame: http://tools.pp.audeering.com/
+            audata/api-utils.html#to-segmented-frame
+
 
         """
         if not index.names == ('file', 'start', 'end'):
@@ -322,7 +330,7 @@ class Segment:
                     [pd.to_timedelta([]), pd.to_timedelta([])],
                     names=['start', 'end']
                 )
-        self.generic = Generic(process_func=segment_func,
+        self.process = Process(process_func=segment_func,
                                sampling_rate=sampling_rate,
                                resample=resample,
                                verbose=verbose,
@@ -351,7 +359,7 @@ class Segment:
             RuntimeError: if sampling rates of model and signal do not match
 
         """
-        index = self.generic.process_file(file, start=start,
+        index = self.process.process_file(file, start=start,
                                           end=end, channel=channel)
         files = [file] * len(index)
         if start is not None:
@@ -386,7 +394,7 @@ class Segment:
             RuntimeError: if sampling rates of model and signal do not match
 
         """
-        series = self.generic.process_files(files, channel=channel)
+        series = self.process.process_files(files, channel=channel)
         files = []
         starts = []
         ends = []
@@ -450,7 +458,7 @@ class Segment:
             RuntimeError: if sampling rates of model and signal do not match
 
         """
-        index = self.generic.process_signal(
+        index = self.process.process_signal(
             signal, sampling_rate, start=start, end=end
         )
         if not len(index.levels) == 2:

@@ -7,7 +7,6 @@ of methods to apply them to signals or files, e.g.:
 * :func:`process_file`
 * :func:`process_files`
 * :func:`process_folder`
-* :func:`process_index`
 
 :mod:`audbmodel.interface` provides you classes
 that you can inherit or just instanciate
@@ -18,13 +17,13 @@ Example:
     >>> def process_func(signal, sampling_rate):
     ...     return signal.shape[1] / sampling_rate
     ...
-    >>> model = Generic(process_func=process_func)
+    >>> model = Process(process_func=process_func)
     >>> signal = np.array([1., 2., 3.])
     >>> model.process_signal(signal, sampling_rate=3)
     1.0
 
 """
 from audmodel.core.interface import (
-    Generic,
+    Process,
     Segment,
 )
