@@ -182,49 +182,6 @@ class Process:
         files = audeer.list_file_names(root, filetype=filetype)
         return self.process_files(files, channel=channel)
 
-    def process_unified_format_index(
-            self,
-            index: pd.MultiIndex,
-            *,
-            channel: int = None) -> pd.Series:
-        r"""Process from a segmented index conform to the `Unified Format`_.
-
-        .. note:: Currently expects a segmented index. In the future it is
-            planned to support other index types (e.g. filewise), too. Until
-            then you can use audata.util.to_segmented_frame_ for conversion
-
-        Args:
-            index: index with segment information
-            channel: channel number (default 0)
-
-        Returns:
-            Series with predictions in the Unified Format
-
-        Raises:
-            RuntimeError: if sampling rates of model and signal do not match
-
-        .. _`Unified Format`: http://tools.pp.audeering.com/audata/
-            data-tables.html
-
-        .. _audata.util.to_segmented_frame: http://tools.pp.audeering.com/
-            audata/api-utils.html#to-segmented-frame
-
-
-        """
-        if not index.names == ('file', 'start', 'end'):
-            raise ValueError('Not a segmented index conform to Unified Format')
-
-        y = [None] * len(index)
-
-        with audeer.progress_bar(index, total=len(index),
-                                 desc=f'Process',
-                                 disable=not self.verbose) as pbar:
-            for idx, (file, start, end) in enumerate(pbar):
-                y[idx] = self.process_file(file, channel=channel, start=start,
-                                           end=end)
-
-        return pd.Series(y, index=index)
-
     def process_signal(
             self,
             signal: np.ndarray,
@@ -270,12 +227,12 @@ class Process:
         max_i = signal.shape[-1]
         if start is not None:
             start_i = int(round(start.total_seconds() * sampling_rate))
-            start_i = max(start_i, max_i)
+            start_i = min(start_i, max_i)
         else:
             start_i = 0
         if end is not None and not pd.isna(end):
             end_i = int(round(end.total_seconds() * sampling_rate))
-            end_i = max(end_i, max_i)
+            end_i = min(end_i, max_i)
         else:
             end_i = max_i
 
@@ -288,6 +245,91 @@ class Process:
             )
         else:
             return signal
+
+    def process_signal_from_index(
+            self,
+            signal: np.ndarray,
+            sampling_rate: int,
+            index: pd.MultiIndex,
+    ) -> pd.Series:
+        r"""Split a signal into segments and process each segment.
+
+        Args:
+            signal: signal values
+            sampling_rate: sampling rate in Hz
+            sampling_rate:
+            index: a :class:`pandas.MultiIndex` with two levels
+                named `start` and `end` that hold start and end
+                positions as :class:`pandas.Timedelta` objects.
+
+        Returns:
+            Series with processed segments in the Unified Format
+
+        """
+
+        if not len(index.levels) == 2:
+            raise ValueError(f'Index has {len(index.levels)} levels, '
+                             f'expected 2.')
+        if not index.levels[0].dtype == 'timedelta64[ns]':
+            raise ValueError(f'Level 0 has type {type(index.levels[0].dtype)}'
+                             f', expected timedelta64[ns].')
+        if not index.levels[1].dtype == 'timedelta64[ns]':
+            raise ValueError(f'Level 0 has type {type(index.levels[0].dtype)}'
+                             f', expected timedelta64[ns].')
+
+        y = [None] * len(index)
+
+        with audeer.progress_bar(index, total=len(index),
+                                 desc=f'Process',
+                                 disable=not self.verbose) as pbar:
+            for idx, (start, end) in enumerate(pbar):
+                y[idx] = self.process_signal(signal, sampling_rate,
+                                             start=start, end=end)
+
+        return pd.Series(y, index=index)
+
+    def process_unified_format_index(
+            self,
+            index: pd.MultiIndex,
+            *,
+            channel: int = None) -> pd.Series:
+        r"""Process from a segmented index conform to the `Unified Format`_.
+
+        .. note:: Currently expects a segmented index. In the future it is
+            planned to support other index types (e.g. filewise), too. Until
+            then you can use audata.util.to_segmented_frame_ for conversion
+
+        Args:
+            index: index with segment information
+            channel: channel number (default 0)
+
+        Returns:
+            Series with processed segments in the Unified Format
+
+        Raises:
+            RuntimeError: if sampling rates of model and signal do not match
+
+        .. _`Unified Format`: http://tools.pp.audeering.com/audata/
+            data-tables.html
+
+        .. _audata.util.to_segmented_frame: http://tools.pp.audeering.com/
+            audata/api-utils.html#to-segmented-frame
+
+
+        """
+        if not index.names == ('file', 'start', 'end'):
+            raise ValueError('Not a segmented index conform to Unified Format')
+
+        y = [None] * len(index)
+
+        with audeer.progress_bar(index, total=len(index),
+                                 desc=f'Process',
+                                 disable=not self.verbose) as pbar:
+            for idx, (file, start, end) in enumerate(pbar):
+                y[idx] = self.process_file(file, channel=channel, start=start,
+                                           end=end)
+
+        return pd.Series(y, index=index)
 
 
 class Segment:

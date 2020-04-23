@@ -191,7 +191,7 @@ def test_folder(tmpdir):
         ),
     ],
 )
-def test_process_func(
+def test_process_signal(
         process_func,
         process_func_kwargs,
         signal,
@@ -212,44 +212,100 @@ def test_process_func(
     np.array_equal(predicted_signal, expected_signal)
 
 
-def test_index(tmpdir):
-
+@pytest.mark.parametrize(
+    'process_func,signal,sampling_rate,index',
+    [
+        (
+            None,
+            np.random.random(5 * 44100),
+            44100,
+            pd.MultiIndex.from_arrays(
+                [
+                    pd.timedelta_range('0s', '3s', 3),
+                    pd.timedelta_range('1s', '4s', 3),
+                ],
+                names=['start', 'end']
+            ),
+        ),
+        (
+            signal_max,
+            np.random.random(5 * 44100),
+            44100,
+            pd.MultiIndex.from_arrays(
+                [
+                    pd.timedelta_range('0s', '3s', 3),
+                    pd.timedelta_range('1s', '4s', 3),
+                ],
+                names=['start', 'end']
+            ),
+        ),
+        (
+            signal_max,
+            np.random.random(5 * 44100),
+            44100,
+            pd.MultiIndex.from_arrays(
+                [
+                    pd.to_timedelta([]),
+                    pd.to_timedelta([]),
+                ],
+                names=['start', 'end']
+            ),
+        ),
+        pytest.param(
+            signal_max,
+            np.random.random(5 * 44100),
+            44100,
+            pd.MultiIndex.from_arrays(
+                [
+                    pd.timedelta_range('0s', '3s', 3),
+                ],
+            ),
+            marks=pytest.mark.xfail(raises=ValueError)
+        ),
+        pytest.param(
+            signal_max,
+            np.random.random(5 * 44100),
+            44100,
+            pd.MultiIndex.from_arrays(
+                [
+                    ['wrong', 'data', 'type'],
+                    pd.timedelta_range('1s', '4s', 3),
+                ],
+            ),
+            marks=pytest.mark.xfail(raises=ValueError)
+        ),
+        pytest.param(
+            signal_max,
+            np.random.random(5 * 44100),
+            44100,
+            pd.MultiIndex.from_arrays(
+                [
+                    pd.timedelta_range('0s', '3s', 3),
+                    ['wrong', 'data', 'type'],
+                ],
+            ),
+            marks=pytest.mark.xfail(raises=ValueError)
+        ),
+    ],
+)
+def test_process_signal_from_index(
+        process_func,
+        signal,
+        sampling_rate,
+        index,
+):
     model = audmodel.interface.Process(
-        process_func=lambda signal, sampling_rate: signal,
+        process_func=process_func,
         sampling_rate=None,
         resample=False,
         verbose=False,
     )
-    sampling_rate = 8000
-    signal = np.random.uniform(-1.0, 1.0, (1, 3 * sampling_rate))
-    path = str(tmpdir.mkdir('wav'))
-    file = f'{path}/file.wav'
-    af.write(file, signal, sampling_rate)
-
-    # valid index
-    index = pd.MultiIndex.from_arrays(
-        [
-            [file] * 3,
-            pd.timedelta_range('0s', '2s', 3),
-            pd.timedelta_range('1s', '3s', 3),
-        ],
-        names=('file', 'start', 'end')
-    )
-    result = model.process_unified_format_index(index)
-    for (file, start, end), value in result.items():
-        signal, sampling_rate = audmodel.interface.Process.read_audio(
-            file, start=start, end=end
+    result = model.process_signal_from_index(signal, sampling_rate, index)
+    for (start, end), y in result.items():
+        np.testing.assert_equal(
+            y,
+            model.process_signal(signal, sampling_rate, start=start, end=end)
         )
-        np.testing.assert_equal(signal, value)
-
-    # bad index
-    index = pd.MultiIndex(levels=[[], [], []],
-                          codes=[[], [], []],
-                          names=['no', 'unified', 'format'])
-    try:
-        model.process_unified_format_index(index)
-    except ValueError:
-        assert True
 
 
 def test_read_audio(tmpdir):
@@ -312,3 +368,41 @@ def test_sampling_rate_mismatch(
     )
     signal = np.array([1., 2., 3.])
     model.process_signal(signal, signal_sampling_rate)
+
+
+def test_unified_format_index(tmpdir):
+
+    model = audmodel.interface.Process(
+        process_func=lambda signal, sampling_rate: signal,
+        sampling_rate=None,
+        resample=False,
+        verbose=False,
+    )
+    sampling_rate = 8000
+    signal = np.random.uniform(-1.0, 1.0, (1, 3 * sampling_rate))
+    path = str(tmpdir.mkdir('wav'))
+    file = f'{path}/file.wav'
+    af.write(file, signal, sampling_rate)
+
+    # valid index
+    index = pd.MultiIndex.from_arrays(
+        [
+            [file] * 3,
+            pd.timedelta_range('0s', '2s', 3),
+            pd.timedelta_range('1s', '3s', 3),
+        ],
+        names=('file', 'start', 'end')
+    )
+    result = model.process_unified_format_index(index)
+    for (file, start, end), value in result.items():
+        signal, sampling_rate = audmodel.interface.Process.read_audio(
+            file, start=start, end=end
+        )
+        np.testing.assert_equal(signal, value)
+
+    # bad index
+    index = pd.MultiIndex(levels=[[], [], []],
+                          codes=[[], [], []],
+                          names=['no', 'unified', 'format'])
+    with pytest.raises(ValueError):
+        model.process_unified_format_index(index)
