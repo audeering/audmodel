@@ -214,8 +214,11 @@ class Process:
                 and sampling_rate != self.sampling_rate
         ):
             if self.resample is not None:
+                # TODO: support stereo, see
+                # https://gitlab.audeering.com/tools/pyaudsp/-/issues/20
                 signal = self.resample(signal, sampling_rate)
                 signal = np.atleast_2d(signal)
+                sampling_rate = self.sampling_rate
             else:
                 raise RuntimeError(
                     f'Signal sampling rate of {sampling_rate} Hz '
