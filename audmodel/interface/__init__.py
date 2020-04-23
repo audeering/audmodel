@@ -1,12 +1,13 @@
 r"""Model interference interfaces.
 
 The idea is that all our models provide a common set
-of methods to apply them to signals or files:
+of methods to apply them to signals or files, e.g.:
 
 * :func:`process_signal`
 * :func:`process_file`
 * :func:`process_files`
 * :func:`process_folder`
+* :func:`process_index`
 
 :mod:`audbmodel.interface` provides you classes
 that you can inherit or just instanciate
@@ -25,4 +26,5 @@ Example:
 """
 from audmodel.core.interface import (
     Generic,
+    Segment,
 )

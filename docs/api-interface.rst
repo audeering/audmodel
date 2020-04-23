@@ -8,3 +8,9 @@ Generic
 
 .. autoclass:: Generic
     :members:
+
+Segment
+-------
+
+.. autoclass:: Segment
+    :members:
