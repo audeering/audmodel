@@ -7,6 +7,15 @@ The format is based on `Keep a Changelog`_,
 and this project adheres to `Semantic Versioning`_.
 
 
+Version 0.5.0 (2020-04-23)
+--------------------------
+
+* Added: :class:`audmodel.interface.Segment`
+* Added: :meth:`audmodel.get_model_url`
+* Changed: renamed interface class `Generic` to :class:`audmodel.interface.Process`
+* Changed: :meth:`audmodel.publish` returns the model's uid instead of url
+
+
 Version 0.4.1 (2020-04-20)
 --------------------------
 

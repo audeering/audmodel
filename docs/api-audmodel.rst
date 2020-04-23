@@ -39,6 +39,11 @@ get_model_id
 
 .. autofunction:: get_model_id
 
+get_model_url
+-------------
+
+.. autofunction:: get_model_url
+
 get_params
 ----------
 

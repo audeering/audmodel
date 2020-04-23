@@ -178,6 +178,20 @@ def get_model_url(name: str,
                   subgroup: str = None,
                   private: bool = False,
                   verbose: bool = False) -> str:
+    r"""Return model url.
+
+    Args:
+        name: model name
+        uid: unique model identifier
+        subgroup: extend group id to
+            :attr:`audmodel.config.GROUP_ID`.<subgroup>. You can increase
+            the depth by using dot-notation, e.g. setting
+            ``subgroup=foo.bar`` will result in
+            `com.audeering.models.foo.bar`
+        private: repository is private
+        verbose: show debug messages
+
+    """
     group_id, repository = Lookup.server(name, subgroup, private)
     versions = Lookup.versions(name, subgroup=subgroup, private=private)
     for version in versions:
