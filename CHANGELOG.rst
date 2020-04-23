@@ -7,6 +7,13 @@ The format is based on `Keep a Changelog`_,
 and this project adheres to `Semantic Versioning`_.
 
 
+Version 0.5.1 (2020-04-23)
+--------------------------
+
+* Fixed: :meth:`audmodel.interface.Process.process_signal` uses correct
+  sampling rate after resampling
+
+
 Version 0.5.0 (2020-04-23)
 --------------------------
 
