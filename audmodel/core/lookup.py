@@ -114,7 +114,9 @@ class Lookup:
             if row.equals(s):
                 return str(uid)
 
-        raise RuntimeError(f"Entry for '{params}' does not exist.")
+        raise RuntimeError(f"Could not find requested entry '{params}' "
+                           f"in version {self.version}:"
+                           f"\n\n{df.to_string()}")
 
     def remove(self, params: typing.Dict[str, typing.Any]) -> str:
 
