@@ -97,7 +97,7 @@ def test_folder(tmpdir):
         af.write(file, signal, sampling_rate)
     result = model.process_folder(path)
     for idx in range(3):
-        signal, sampling_rate = audmodel.interface.Process.read_audio(
+        signal, sampling_rate = model.read_audio(
             files[idx]
         )
         np.testing.assert_equal(result[idx], signal)
@@ -221,6 +221,18 @@ def test_process_signal(
             44100,
             pd.MultiIndex.from_arrays(
                 [
+                    pd.to_timedelta([]),
+                    pd.to_timedelta([]),
+                ],
+                names=['start', 'end']
+            ),
+        ),
+        (
+            None,
+            np.random.random(5 * 44100),
+            44100,
+            pd.MultiIndex.from_arrays(
+                [
                     pd.timedelta_range('0s', '3s', 3),
                     pd.timedelta_range('1s', '4s', 3),
                 ],
@@ -314,7 +326,7 @@ def test_read_audio(tmpdir):
     path = str(tmpdir.mkdir('wav'))
     file = os.path.join(path, 'file.wav')
     af.write(file, signal, sampling_rate)
-    s, sr = audmodel.interface.Process.read_audio(
+    s, sr = audmodel.interface.Process().read_audio(
         file,
         start=pd.Timedelta('00:00:00.1'),
         end=pd.Timedelta('00:00:00.2'),
@@ -361,7 +373,7 @@ def test_sampling_rate_mismatch(
         resample,
 ):
     model = audmodel.interface.Process(
-        process_func=lambda signal, sampling_rate: signal,
+        process_func=None,
         sampling_rate=model_sampling_rate,
         resample=resample,
         verbose=False,
@@ -373,7 +385,7 @@ def test_sampling_rate_mismatch(
 def test_unified_format_index(tmpdir):
 
     model = audmodel.interface.Process(
-        process_func=lambda signal, sampling_rate: signal,
+        process_func=None,
         sampling_rate=None,
         resample=False,
         verbose=False,
@@ -383,6 +395,18 @@ def test_unified_format_index(tmpdir):
     path = str(tmpdir.mkdir('wav'))
     file = f'{path}/file.wav'
     af.write(file, signal, sampling_rate)
+
+    # empty index
+    index = pd.MultiIndex.from_arrays(
+        [
+            [],
+            pd.to_timedelta([]),
+            pd.to_timedelta([]),
+        ],
+        names=('file', 'start', 'end')
+    )
+    result = model.process_unified_format_index(index)
+    assert result.empty
 
     # valid index
     index = pd.MultiIndex.from_arrays(
@@ -395,7 +419,7 @@ def test_unified_format_index(tmpdir):
     )
     result = model.process_unified_format_index(index)
     for (file, start, end), value in result.items():
-        signal, sampling_rate = audmodel.interface.Process.read_audio(
+        signal, sampling_rate = model.read_audio(
             file, start=start, end=end
         )
         np.testing.assert_equal(signal, value)

@@ -25,5 +25,6 @@ Example:
 """
 from audmodel.core.interface import (
     Process,
+    ProcessWithContext,
     Segment,
 )

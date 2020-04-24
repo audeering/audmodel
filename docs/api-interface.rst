@@ -9,6 +9,12 @@ Process
 .. autoclass:: Process
     :members:
 
+ProcessWithContext
+------------------
+
+.. autoclass:: ProcessWithContext
+    :members:
+
 Segment
 -------
 
