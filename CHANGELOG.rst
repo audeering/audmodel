@@ -7,6 +7,13 @@ The format is based on `Keep a Changelog`_,
 and this project adheres to `Semantic Versioning`_.
 
 
+Version 0.5.2 (2020-04-24)
+--------------------------
+
+* Added: :class:`audmodel.interface.ProcessWithContext`
+* Changed: :meth:`audmodel.load` prints more informative error message
+
+
 Version 0.5.1 (2020-04-23)
 --------------------------
 
