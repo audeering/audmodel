@@ -112,7 +112,6 @@ class Process:
         with audeer.progress_bar(
                 files,
                 total=len(files),
-                desc='',
                 disable=not self.verbose,
         ) as pbar:
             for idx, file in enumerate(pbar):
@@ -225,10 +224,17 @@ class Process:
 
         y = [None] * len(index)
 
-        with audeer.progress_bar(index, total=len(index),
-                                 desc='Process',
-                                 disable=not self.verbose) as pbar:
+        with audeer.progress_bar(
+                index,
+                total=len(index),
+                disable=not self.verbose,
+        ) as pbar:
             for idx, (start, end) in enumerate(pbar):
+                desc = audeer.format_display_message(
+                    'f{start} - {end}',
+                    pbar=True,
+                )
+                pbar.set_description(desc, refresh=True)
                 y[idx] = self.process_signal(signal, sampling_rate,
                                              start=start, end=end)
 
@@ -268,10 +274,14 @@ class Process:
 
         y = [None] * len(index)
 
-        with audeer.progress_bar(index, total=len(index),
-                                 desc='Process',
-                                 disable=not self.verbose) as pbar:
+        with audeer.progress_bar(
+                index,
+                total=len(index),
+                disable=not self.verbose,
+        ) as pbar:
             for idx, (file, start, end) in enumerate(pbar):
+                desc = audeer.format_display_message(file, pbar=True)
+                pbar.set_description(desc, refresh=True)
                 y[idx] = self.process_file(file, channel=channel, start=start,
                                            end=end)
 
@@ -430,10 +440,14 @@ class ProcessWithContext:
         files = index.levels[0]
         ys = [None] * len(files)
 
-        with audeer.progress_bar(files, total=len(files),
-                                 desc='Process',
-                                 disable=not self.verbose) as pbar:
+        with audeer.progress_bar(
+                files,
+                total=len(files),
+                disable=not self.verbose,
+        ) as pbar:
             for idx, file in enumerate(pbar):
+                desc = audeer.format_display_message(file, pbar=True)
+                pbar.set_description(desc, refresh=True)
                 mask = index.isin([file], 0)
                 select = index[mask].droplevel(0)
                 signal, sampling_rate = self.read_audio(file, channel=channel)
