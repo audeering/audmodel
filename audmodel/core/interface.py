@@ -226,7 +226,7 @@ class Process:
         y = [None] * len(index)
 
         with audeer.progress_bar(index, total=len(index),
-                                 desc=f'Process',
+                                 desc='Process',
                                  disable=not self.verbose) as pbar:
             for idx, (start, end) in enumerate(pbar):
                 y[idx] = self.process_signal(signal, sampling_rate,
@@ -269,7 +269,7 @@ class Process:
         y = [None] * len(index)
 
         with audeer.progress_bar(index, total=len(index),
-                                 desc=f'Process',
+                                 desc='Process',
                                  disable=not self.verbose) as pbar:
             for idx, (file, start, end) in enumerate(pbar):
                 y[idx] = self.process_file(file, channel=channel, start=start,
@@ -431,7 +431,7 @@ class ProcessWithContext:
         ys = [None] * len(files)
 
         with audeer.progress_bar(files, total=len(files),
-                                 desc=f'Process',
+                                 desc='Process',
                                  disable=not self.verbose) as pbar:
             for idx, file in enumerate(pbar):
                 mask = index.isin([file], 0)
