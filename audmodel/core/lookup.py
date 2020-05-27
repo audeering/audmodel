@@ -180,13 +180,9 @@ class Lookup:
 
         group_id, repository = Lookup.server(name, subgroup, private)
 
-        try:
-            versions = audfactory.versions(group_id,
-                                           config.LOOKUP_TABLE_NAME,
-                                           repository=repository)
-        except RuntimeError:
-            versions = []
-
+        versions = audfactory.versions(group_id,
+                                       config.LOOKUP_TABLE_NAME,
+                                       repository=repository)
         return version in versions
 
     @staticmethod
