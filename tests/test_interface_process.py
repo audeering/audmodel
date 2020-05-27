@@ -92,16 +92,21 @@ def test_folder(tmpdir):
     sampling_rate = 8000
     path = str(tmpdir.mkdir('wav'))
     files = [f'{path}/file{n}.wav' for n in range(3)]
+    rel_path = os.path.relpath(path)
+    rel_files = [f'{rel_path}/file{n}.wav' for n in range(3)]
     for file in files:
         signal = np.random.uniform(-1.0, 1.0, (1, sampling_rate))
         af.write(file, signal, sampling_rate)
     result = model.process_folder(path)
+    rel_result = model.process_folder(rel_path)
     for idx in range(3):
         signal, sampling_rate = model.read_audio(
             files[idx]
         )
         np.testing.assert_equal(result[idx], signal)
         np.testing.assert_equal(result[files[idx]], signal)
+        np.testing.assert_equal(rel_result[idx], signal)
+        np.testing.assert_equal(rel_result[rel_files[idx]], signal)
 
 
 @pytest.mark.parametrize(

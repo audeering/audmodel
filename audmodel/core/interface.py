@@ -1,3 +1,4 @@
+import os
 import typing
 
 import audiofile as af
@@ -144,6 +145,7 @@ class Process:
 
         """
         files = audeer.list_file_names(root, filetype=filetype)
+        files = [os.path.join(root, os.path.basename(f)) for f in files]
         return self.process_files(files, channel=channel)
 
     def process_signal(
