@@ -64,6 +64,18 @@ load_by_id
 
 .. autofunction:: load_by_id
 
+Parameter
+---------
+
+.. autoclass:: Parameter
+    :members:
+
+Parameters
+----------
+
+.. autoclass:: Parameters
+    :members:
+
 publish
 -------
 

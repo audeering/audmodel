@@ -3,7 +3,7 @@ import pytest
 import audmodel
 
 
-@pytest.mark.parametrize('name,columns,version,force', [
+@pytest.mark.parametrize('name,params,version,force', [
     (
         pytest.NAME,
         [],
@@ -12,34 +12,36 @@ import audmodel
     ),
     pytest.param(  # columns do not match
         pytest.NAME,
-        ['property1', 'property2', 'property3'],
+        pytest.COLUMNS,
         '1.0.0',
         False,
         marks=pytest.mark.xfail(raises=RuntimeError),
     ),
     (
         pytest.NAME,
-        ['property1', 'property2', 'property3'],
+        pytest.PARAMS_OBJ.to_dict(),
         '2.0.0',
         False,
     ),
     (
         pytest.NAME,
-        ['property1', 'property2', 'property3'],
+        pytest.COLUMNS,
         '2.0.0',
         True,
     ),
     pytest.param(  # model exists
         pytest.NAME,
-        ['property1', 'property2', 'property3'],
+        pytest.COLUMNS,
         '2.0.0',
         False,
         marks=pytest.mark.xfail(raises=RuntimeError),
     ),
 ])
-def test_create_lookup_table(name, columns, version, force):
-    audmodel.create_lookup_table(name, columns, version,
+def test_create_lookup_table(name, params, version, force):
+    audmodel.create_lookup_table(name, params, version,
                                  subgroup=pytest.SUBGROUP,
                                  force=force)
     df = audmodel.get_lookup_table(name, version, subgroup=pytest.SUBGROUP)
-    assert df.columns.to_list() == sorted(columns)
+    if isinstance(params, audmodel.Parameters):
+        params = params.keys()
+    assert df.columns.to_list() == sorted(params)

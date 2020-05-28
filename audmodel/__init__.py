@@ -1,5 +1,4 @@
 from audmodel import interface
-from audmodel.core.config import config
 from audmodel.core.api import (
     create_lookup_table,
     delete_lookup_table,
@@ -16,7 +15,11 @@ from audmodel.core.api import (
     remove,
     versions,
 )
-
+from audmodel.core.config import config
+from audmodel.core.params import (
+    Parameter,
+    Parameters,
+)
 
 # Disencourage from audmodel import *
 __all__ = []

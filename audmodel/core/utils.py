@@ -1,7 +1,7 @@
-import os
-import zipfile
 import errno
+import os
 import tempfile
+import zipfile
 
 import audeer
 import audfactory
