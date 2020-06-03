@@ -164,6 +164,8 @@ class Parameters:
     def to_command_line(
             self,
             parser: argparse.ArgumentParser,
+            *,
+            version: str = None,
     ):
         r"""Add parameters to command line parser.
 
@@ -171,9 +173,14 @@ class Parameters:
 
         Args:
             parser: command line parser
+            version: version string (only matching parameters are included)
 
         """
         for name, param in self.items():
+
+            if version not in param:
+                continue
+
             if param.version is not None:
                 help = f'{param.description} (version: {param.version})'
             else:

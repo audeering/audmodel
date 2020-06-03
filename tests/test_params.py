@@ -113,6 +113,11 @@ def test_parameters_command_line():
     assert p.bar == args.bar
     assert p.toggle is True
 
+    parser = argparse.ArgumentParser()
+    p.to_command_line(parser, version='1.0.0')
+    with pytest.raises(SystemExit):
+        parser.parse_args(args=[f'--bar={new_value}'])
+
 
 def test_parameters_dict():
 
