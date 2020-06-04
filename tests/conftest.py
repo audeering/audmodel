@@ -6,6 +6,8 @@ import audfactory
 import audmodel
 
 
+audmodel.config.REPOSITORY_PUBLIC = 'unittests-public-local'
+
 pytest.SUBGROUP = f'audmodel.{str(uuid.uuid1())}'
 pytest.ROOT = os.path.dirname(os.path.realpath(__file__))
 pytest.NAME = 'audmodel'
