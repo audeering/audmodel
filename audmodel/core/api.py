@@ -7,7 +7,6 @@ import audeer
 import audfactory
 
 from .config import config
-from .lookup import Lookup
 from . import utils
 
 
@@ -19,7 +18,7 @@ def create_lookup_table(name: str,
                         private: bool = False,
                         force: bool = False,
                         verbose: bool = False) -> str:
-    r"""Create lookup table and return url.
+    r"""Create lookup table.
 
     Args:
         name: model name
@@ -32,14 +31,23 @@ def create_lookup_table(name: str,
             `com.audeering.models.foo.bar`
         private: repository is private
         force: create the lookup table even if it exists
-        verbose: show debug messages
+
+    Returns:
+        URL to lookup table
 
     Raises:
         RuntimeError: if table exists already
 
     """
-    return Lookup.create(name, params, version, subgroup=subgroup,
-                         private=private, force=force, verbose=verbose)
+    group_id, repository = _server(name, subgroup, private)
+    url = audfactory.Lookup.create(
+        group_id,
+        version,
+        params,
+        repository=repository,
+        force=force,
+    )
+    return url
 
 
 def get_default_cache_root() -> str:
@@ -76,8 +84,23 @@ def delete_lookup_table(name: str,
         RuntimeError: if table is not empty
 
     """
-    Lookup.delete(name, version, subgroup=subgroup,
-                  private=private, force=force)
+    group_id, repository = _server(name, subgroup, private)
+    lookup = audfactory.Lookup(
+        group_id,
+        version=version,
+        repository=repository,
+    )
+    table = lookup.table
+    if len(table) > 1:
+        if not force:
+            raise RuntimeError(
+                f"Cannot delete lookup table '{name}-{version}' "
+                f"if it is not empty.")
+        for uid in [row[0] for row in table[1:]]:
+            url = _url_entry(group_id, repository, uid, version)
+            audfactory.artifactory_path(url).parent.parent.rmdir()
+        lookup.clear()
+    audfactory.artifactory_path(lookup.url).parent.rmdir()
 
 
 def extend_params(name: str,
@@ -89,8 +112,7 @@ def extend_params(name: str,
                   ],
                   *,
                   subgroup: str = None,
-                  private: bool = False,
-                  verbose: bool = False) -> pd.DataFrame:
+                  private: bool = False) -> pd.DataFrame:
     r"""Extend table with new parameters and return it.
 
     Args:
@@ -105,20 +127,22 @@ def extend_params(name: str,
             ``subgroup=foo.bar`` will result in
             `com.audeering.models.foo.bar`
         private: repository is private
-        verbose: show debug messages
 
     """
-    lu = Lookup(name, version, subgroup=subgroup,
-                private=private, verbose=verbose)
-    return lu.extend(new_params)
+    group_id, repository = _server(name, subgroup, private)
+    lookup = audfactory.Lookup(
+        group_id,
+        version=version,
+        repository=repository,
+    )
+    return _table_to_df(lookup.extend(new_params))
 
 
 def get_lookup_table(name: str,
                      version: str = None,
                      *,
                      subgroup: str = None,
-                     private: bool = False,
-                     verbose: bool = False) -> pd.DataFrame:
+                     private: bool = False) -> pd.DataFrame:
     r"""Return lookup table.
 
     Args:
@@ -130,14 +154,18 @@ def get_lookup_table(name: str,
             ``subgroup=foo.bar`` will result in
             `com.audeering.models.foo.bar`
         private: repository is private
-        verbose: show debug messages
 
     Raises:
         RuntimeError: if table does not exist
 
     """
-    return Lookup(name, version, subgroup=subgroup,
-                  private=private, verbose=verbose).table
+    group_id, repository = _server(name, subgroup, private)
+    lookup = audfactory.Lookup(
+        group_id,
+        version=version,
+        repository=repository,
+    )
+    return _table_to_df(lookup.table)
 
 
 def get_model_id(name: str,
@@ -145,8 +173,7 @@ def get_model_id(name: str,
                  version: str = None,
                  *,
                  subgroup: str = None,
-                 private: bool = False,
-                 verbose: bool = False) -> str:
+                 private: bool = False) -> str:
     r"""Return unique model id.
 
     Args:
@@ -159,25 +186,31 @@ def get_model_id(name: str,
             ``subgroup=foo.bar`` will result in
             `com.audeering.models.foo.bar`
         private: repository is private
-        verbose: show debug messages
 
     Raises:
         RuntimeError: if model does not exist
 
     """
+    group_id, repository = _server(name, subgroup, private)
     if version is None:
-        version = latest_version(name, params,
-                                 subgroup=subgroup, private=private)
-    return Lookup(name, version, subgroup=subgroup,
-                  private=private, verbose=verbose).find(params)
+        version = audfactory.Lookup.latest_version(
+            group_id,
+            params=params,
+            repository=repository,
+        )
+    lookup = audfactory.Lookup(
+        group_id,
+        version=version,
+        repository=repository,
+    )
+    return lookup.find(params)
 
 
 def get_model_url(name: str,
                   uid: str,
                   *,
                   subgroup: str = None,
-                  private: bool = False,
-                  verbose: bool = False) -> str:
+                  private: bool = False) -> str:
     r"""Return model url.
 
     Args:
@@ -189,14 +222,20 @@ def get_model_url(name: str,
             ``subgroup=foo.bar`` will result in
             `com.audeering.models.foo.bar`
         private: repository is private
-        verbose: show debug messages
 
     """
-    group_id, repository = Lookup.server(name, subgroup, private)
-    versions = Lookup.versions(name, subgroup=subgroup, private=private)
+    group_id, repository = _server(name, subgroup, private)
+    versions = audfactory.Lookup.versions(
+        group_id,
+        repository=repository,
+    )
     for version in versions:
-        lu = Lookup(name, version, subgroup=subgroup, private=private)
-        if uid in lu.table.index.to_list():
+        lookup = audfactory.Lookup(
+            group_id,
+            version=version,
+            repository=repository,
+        )
+        if uid in [row[0] for row in lookup.table[1:]]:
             server_url = audfactory.server_url(group_id,
                                                name=uid,
                                                repository=repository,
@@ -210,8 +249,7 @@ def get_params(name: str,
                version: str = None,
                *,
                subgroup: str = None,
-               private: bool = False,
-               verbose: bool = False) -> typing.List[str]:
+               private: bool = False) -> typing.List[str]:
     r"""Return list of parameters.
 
     Args:
@@ -223,14 +261,18 @@ def get_params(name: str,
             ``subgroup=foo.bar`` will result in
             `com.audeering.models.foo.bar`
         private: repository is private
-        verbose: show debug messages
 
     Raises:
         RuntimeError: if table does not exist
 
     """
-    return list(get_lookup_table(name, version, subgroup=subgroup,
-                                 private=private, verbose=verbose).columns)
+    group_id, repository = _server(name, subgroup, private)
+    lookup = audfactory.Lookup(
+        group_id,
+        version=version,
+        repository=repository,
+    )
+    return list(_table_to_df(lookup.table).columns)
 
 
 def latest_version(name: str,
@@ -251,8 +293,13 @@ def latest_version(name: str,
         private: repository is private
 
     """
-    return Lookup.latest_version(name, params,
-                                 subgroup=subgroup, private=private)
+    group_id, repository = _server(name, subgroup, private)
+    version = audfactory.Lookup.latest_version(
+        group_id,
+        params=params,
+        repository=repository,
+    )
+    return version
 
 
 def load(name: str,
@@ -283,24 +330,30 @@ def load(name: str,
         private: repository is private
         force: download model even if it exists already
         root: store model within this folder
-        verbose: show debug messages
+        verbose: show verbose output
 
     Raises:
         RuntimeError: if model does not exist
 
     """
+    group_id, repository = _server(name, subgroup, private)
     if version is None:
-        version = latest_version(name, params,
-                                 subgroup=subgroup, private=private)
-    group_id, repository = Lookup.server(name, subgroup, private)
-    lu = Lookup(name, version, subgroup=subgroup,
-                private=private, verbose=verbose)
-    uid = lu.find(params)
+        version = audfactory.Lookup.latest_version(
+            group_id,
+            params=params,
+            repository=repository,
+        )
+    lookup = audfactory.Lookup(
+        group_id,
+        version=version,
+        repository=repository,
+    )
+    uid = lookup.find(params)
     root = audeer.safe_path(root or get_default_cache_root())
     root = os.path.join(root, audfactory.group_id_to_path(group_id),
-                        lu.version)
+                        lookup.version)
     root = utils.download_folder(root, group_id, repository, uid,
-                                 lu.version, force=force, verbose=verbose)
+                                 lookup.version, force=force, verbose=verbose)
     return root
 
 
@@ -330,23 +383,30 @@ def load_by_id(name: str,
         private: repository is private
         force: download model even if it exists already
         root: store model within this folder
-        verbose: show debug messages
+        verbose: show verbose output
 
     Raises:
         RuntimeError: if model does not exist
 
     """
-    group_id, repository = Lookup.server(name, subgroup, private)
+    group_id, repository = _server(name, subgroup, private)
 
-    versions = Lookup.versions(name, subgroup=subgroup, private=private)
+    versions = audfactory.Lookup.versions(
+        group_id,
+        repository=repository,
+    )
     for version in versions:
-        lu = Lookup(name, version, subgroup=subgroup, private=private)
-        if uid in lu.table.index.to_list():
+        lookup = audfactory.Lookup(
+            group_id,
+            version=version,
+            repository=repository,
+        )
+        if uid in [row[0] for row in lookup.table[1:]]:
             root = audeer.safe_path(root or get_default_cache_root())
             root = os.path.join(root, audfactory.group_id_to_path(group_id),
-                                lu.version)
+                                lookup.version)
             root = utils.download_folder(root, group_id, repository, uid,
-                                         lu.version, force=force,
+                                         lookup.version, force=force,
                                          verbose=verbose)
             return root
 
@@ -382,25 +442,32 @@ def publish(root: str,
         private: repository is private
         create: create lookup table if it does not exist
         force: publish model even if it exists already
-        verbose: show debug messages
+        verbose: show verbose output
 
     Raises:
         RuntimeError: if an artifact exists already
 
     """
-    if not Lookup.exists(name, version, subgroup=subgroup, private=private):
+    group_id, repository = _server(name, subgroup, private)
+    if not audfactory.Lookup.exists(group_id, version, repository=repository):
         if create:
-            create_lookup_table(name, list(params.keys()), version,
-                                subgroup=subgroup, private=private,
-                                verbose=verbose)
+            audfactory.Lookup.create(
+                group_id,
+                version,
+                list(params.keys()),
+                repository=repository,
+            )
         else:
             raise RuntimeError(f"A lookup table for '{name}' and "
                                f"'{version}' does not exist yet.")
 
-    lu = Lookup(name, version, subgroup=subgroup,
-                private=private, verbose=verbose)
-    uid = lu.append(params)
-    utils.upload_folder(root, lu.group_id, lu.repository,
+    lookup = audfactory.Lookup(
+        group_id,
+        version=version,
+        repository=repository,
+    )
+    uid = lookup.append(params)
+    utils.upload_folder(root, group_id, repository,
                         uid, version, force=force, verbose=verbose)
     return uid
 
@@ -410,8 +477,7 @@ def remove(name: str,
            version: str,
            *,
            subgroup: str = None,
-           private: bool = False,
-           verbose: bool = False) -> str:
+           private: bool = False) -> str:
     r"""Remove a model and return its unique model identifier.
 
     Args:
@@ -424,14 +490,21 @@ def remove(name: str,
             ``subgroup=foo.bar`` will result in
             `com.audeering.models.foo.bar`
         private: repository is private
-        verbose: show debug messages
 
     Raises:
         RuntimeError: if model does not exist
 
     """
-    return Lookup(name, version, subgroup=subgroup,
-                  private=private, verbose=verbose).remove(params)
+    group_id, repository = _server(name, subgroup, private)
+    lookup = audfactory.Lookup(
+        group_id,
+        version=version,
+        repository=repository,
+    )
+    uid = lookup.remove(params)
+    url = _url_entry(group_id, repository, uid, version)
+    audfactory.artifactory_path(url).parent.parent.rmdir()
+    return uid
 
 
 def versions(name: str,
@@ -452,4 +525,38 @@ def versions(name: str,
         private: repository is private
 
     """
-    return Lookup.versions(name, params, subgroup=subgroup, private=private)
+    group_id, repository = _server(name, subgroup, private)
+    versions = audfactory.Lookup.versions(
+        group_id,
+        name=name,
+        params=params,
+        repository=repository,
+    )
+    return versions
+
+
+def _server(name: str, subgroup: str, private: bool) -> (str, str):
+    group_id = f'{config.GROUP_ID}.{subgroup}.{name}' \
+        if subgroup is not None else f'{config.GROUP_ID}.{name}'
+    repository = config.REPOSITORY_PRIVATE if private \
+        else config.REPOSITORY_PUBLIC
+    return group_id, repository
+
+
+def _table_to_df(table):
+    columns = table[0][1:]
+    if len(table) > 1:
+        index = [entry[0] for entry in table[1:]]
+        data = [entry[1:] for entry in table[1:]]
+    else:
+        index = []
+        data = []
+    return pd.DataFrame(data=data, index=index, columns=columns)
+
+
+def _url_entry(group_id: str, repository: str, name: str, version: str) -> str:
+    server_url = audfactory.server_url(group_id,
+                                       name=name,
+                                       repository=repository,
+                                       version=version)
+    return f'{server_url}/{name}-{version}.zip'

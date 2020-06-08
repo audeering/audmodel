@@ -65,9 +65,8 @@ def test_publish(root, name, params, version, create, verbose):
                            subgroup=pytest.SUBGROUP, create=create,
                            verbose=verbose)
     assert uid == audmodel.get_model_id(name, params, version,
-                                        subgroup=pytest.SUBGROUP,
-                                        verbose=verbose)
+                                        subgroup=pytest.SUBGROUP)
 
     df = audmodel.get_lookup_table(name, version,
-                                   subgroup=pytest.SUBGROUP, verbose=verbose)
+                                   subgroup=pytest.SUBGROUP)
     pd.testing.assert_series_equal(df.loc[uid], pd.Series(params, name=uid))
