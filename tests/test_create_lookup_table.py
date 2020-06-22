@@ -41,7 +41,7 @@ def test_create_lookup_table(name, params, version, force):
     audmodel.create_lookup_table(name, params, version,
                                  subgroup=pytest.SUBGROUP,
                                  force=force)
-    df = audmodel.get_lookup_table(name, version, subgroup=pytest.SUBGROUP)
+    lookup = audmodel.get_lookup_table(name, version, subgroup=pytest.SUBGROUP)
     if isinstance(params, audmodel.Parameters):
         params = params.keys()
-    assert df.columns.to_list() == sorted(params)
+    assert lookup.columns == sorted(params)

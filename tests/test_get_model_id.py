@@ -1,5 +1,4 @@
 import pytest
-import pandas as pd
 
 import audmodel
 
@@ -29,8 +28,7 @@ def test_get_model_id(name, params, version):
     if version is None:
         version = audmodel.latest_version(name, params,
                                           subgroup=pytest.SUBGROUP)
-    df = audmodel.get_lookup_table(name, version,
-                                   subgroup=pytest.SUBGROUP)
-    s = pd.Series(params, name=uid)
-    s.sort_index(inplace=True)
-    pd.testing.assert_series_equal(df.loc[uid], s)
+    lookup = audmodel.get_lookup_table(name, version,
+                                       subgroup=pytest.SUBGROUP)
+    assert uid in lookup.ids
+    assert lookup[uid] == {key: params[key] for key in sorted(params)}

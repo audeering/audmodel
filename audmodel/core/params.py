@@ -4,8 +4,6 @@ import pkg_resources
 import typing
 import oyaml as yaml
 
-import pandas as pd
-
 
 class Parameter:
     r"""Single parameter.
@@ -291,17 +289,6 @@ class Parameters:
         """
         return self.__dict__.values()
 
-    def __call__(self) -> pd.DataFrame:  # pragma: no cover
-        index = pd.Index([p for p in list(self.keys())], name='Name')
-        data = {
-            'Value': [p.value for p in self.values()],
-            'Default': [p.default for p in self.values()],
-            'Choices': [p.choices for p in self.values()],
-            'Description': [p.description for p in self.values()],
-            'Version': [p.version for p in self.values()]
-        }
-        return pd.DataFrame(data, index=index)
-
     def __getattribute__(self, name) -> typing.Any:
         if not name == '__dict__' and name in self.__dict__:
             p = self.__dict__[name]
@@ -316,4 +303,32 @@ class Parameters:
         p.set_value(value)
 
     def __str__(self):  # pragma: no cover
-        return self().to_string()
+        table = [
+            [
+                'Name', 'Value', 'Default', 'Choices',
+                'Description', 'Version',
+            ]
+        ]
+        for name, p in self.items():
+            table.append(
+                [
+                    name, p.value, p.default, p.choices,
+                    p.description, p.version,
+                ]
+            )
+        padding = 2
+        # Longest string in each column
+        transposed_table = [list(x) for x in zip(*table)]
+        col_width = [
+            len(max([str(word) for word in row], key=len)) + padding
+            for row in transposed_table
+        ]
+        # Don't pad the last column
+        col_width[-1] -= padding
+        row = [
+            ''.join(
+                str(word).ljust(width) for word, width in zip(row, col_width)
+            )
+            for row in table
+        ]
+        return '\n'.join(row)

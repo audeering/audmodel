@@ -1,8 +1,6 @@
 import typing
 import os
 
-import pandas as pd
-
 import audeer
 import audfactory
 
@@ -112,7 +110,7 @@ def extend_params(name: str,
                   ],
                   *,
                   subgroup: str = None,
-                  private: bool = False) -> pd.DataFrame:
+                  private: bool = False) -> audfactory.Lookup:
     r"""Extend table with new parameters and return it.
 
     Args:
@@ -135,14 +133,15 @@ def extend_params(name: str,
         version=version,
         repository=repository,
     )
-    return _table_to_df(lookup.extend(new_params))
+    lookup.extend(new_params)
+    return lookup
 
 
 def get_lookup_table(name: str,
                      version: str = None,
                      *,
                      subgroup: str = None,
-                     private: bool = False) -> pd.DataFrame:
+                     private: bool = False) -> audfactory.Lookup:
     r"""Return lookup table.
 
     Args:
@@ -165,7 +164,7 @@ def get_lookup_table(name: str,
         version=version,
         repository=repository,
     )
-    return _table_to_df(lookup.table)
+    return lookup
 
 
 def get_model_id(name: str,
@@ -272,7 +271,7 @@ def get_params(name: str,
         version=version,
         repository=repository,
     )
-    return list(_table_to_df(lookup.table).columns)
+    return lookup.columns
 
 
 def latest_version(name: str,
@@ -541,17 +540,6 @@ def _server(name: str, subgroup: str, private: bool) -> (str, str):
     repository = config.REPOSITORY_PRIVATE if private \
         else config.REPOSITORY_PUBLIC
     return group_id, repository
-
-
-def _table_to_df(table):
-    columns = table[0][1:]
-    if len(table) > 1:
-        index = [entry[0] for entry in table[1:]]
-        data = [entry[1:] for entry in table[1:]]
-    else:
-        index = []
-        data = []
-    return pd.DataFrame(data=data, index=index, columns=columns)
 
 
 def _url_entry(group_id: str, repository: str, name: str, version: str) -> str:

@@ -1,4 +1,3 @@
-from audmodel import interface
 from audmodel.core.api import (
     create_lookup_table,
     delete_lookup_table,

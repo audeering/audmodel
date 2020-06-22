@@ -20,8 +20,8 @@ import audmodel
     ),
 ])
 def test_get_lookup_table(name, version):
-    df = audmodel.get_lookup_table(name, version, subgroup=pytest.SUBGROUP)
-    assert df.columns.to_list() == sorted(pytest.COLUMNS)
-    for params, (_, row) in zip(pytest.PARAMS, df.iterrows()):
-        for key, value in params.items():
-            assert row[key] == value
+    lookup = audmodel.get_lookup_table(name, version, subgroup=pytest.SUBGROUP)
+    assert lookup.columns == sorted(pytest.COLUMNS)
+    for params, row in zip(pytest.PARAMS, lookup.table[1:]):
+        for idx, key in enumerate(lookup.columns):
+            assert row[idx + 1] == params[key]

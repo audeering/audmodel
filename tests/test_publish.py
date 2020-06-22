@@ -1,8 +1,5 @@
 import pytest
 
-import pandas as pd
-
-import audfactory
 import audmodel
 
 
@@ -67,6 +64,6 @@ def test_publish(root, name, params, version, create, verbose):
     assert uid == audmodel.get_model_id(name, params, version,
                                         subgroup=pytest.SUBGROUP)
 
-    df = audmodel.get_lookup_table(name, version,
-                                   subgroup=pytest.SUBGROUP)
-    pd.testing.assert_series_equal(df.loc[uid], pd.Series(params, name=uid))
+    lookup = audmodel.get_lookup_table(name, version,
+                                       subgroup=pytest.SUBGROUP)
+    assert lookup[uid] == {key: params[key] for key in sorted(params)}

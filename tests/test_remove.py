@@ -18,5 +18,5 @@ import audmodel
 ])
 def test_remove(name, params, version):
     uid = audmodel.remove(name, params, version, subgroup=pytest.SUBGROUP)
-    df = audmodel.get_lookup_table(name, version, subgroup=pytest.SUBGROUP)
-    assert uid not in df.index
+    lookup = audmodel.get_lookup_table(name, version, subgroup=pytest.SUBGROUP)
+    assert uid not in lookup.ids
