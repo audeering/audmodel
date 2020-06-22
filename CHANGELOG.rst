@@ -7,6 +7,16 @@ The format is based on `Keep a Changelog`_,
 and this project adheres to `Semantic Versioning`_.
 
 
+Version 0.6.0 (2020-06-22)
+--------------------------
+
+* Added: :class:`audmodel.Parameter` and :class:`audmodel.Parameters`
+* Changed: ``unittest-public-local`` repository for unit testing
+* Changed: replace ``Lookup`` class with :class:`audfactory.Lookup`
+* Removed: remove ``aumodel.interface`` module
+* Removed: depedencies to ``audiofile``, ``audsp``, ``numpy``, ``pandas``
+
+
 Version 0.5.2 (2020-04-24)
 --------------------------
 

@@ -33,8 +33,7 @@ extensions = [
 ]
 intersphinx_mapping = {
     'python': ('https://docs.python.org/3/', None),
-    'numpy': ('https://docs.scipy.org/doc/numpy/', None),
-    'pandas': ('https://pandas.pydata.org/pandas-docs/stable/', None),
+    'audfactory': ('http://tools.pp.audeering.com/audfactory/', None),
 }
 # Disable Gitlab as we need to sign in
 linkcheck_ignore = [
