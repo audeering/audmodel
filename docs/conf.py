@@ -6,7 +6,7 @@ import graphviz
 # Project -----------------------------------------------------------------
 project = 'audmodel'
 copyright = '2019-2020 audEERING GmbH'
-author = 'Hagen Wierstorf'
+author = 'Johannes Wagner, Hagen Wierstorf'
 # The x.y.z version read from tags
 try:
     version = check_output(['git', 'describe', '--tags', '--always'])
