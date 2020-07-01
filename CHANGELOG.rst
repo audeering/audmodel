@@ -7,6 +7,13 @@ The format is based on `Keep a Changelog`_,
 and this project adheres to `Semantic Versioning`_.
 
 
+Version 0.6.1 (2020-07-01)
+--------------------------
+
+* Fixed: :func:`audmodel.versions` where not using the correct lookup table name
+  and was broken
+
+
 Version 0.6.0 (2020-06-22)
 --------------------------
 
