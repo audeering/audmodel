@@ -527,7 +527,7 @@ def versions(name: str,
     group_id, repository = _server(name, subgroup, private)
     versions = audfactory.Lookup.versions(
         group_id,
-        name=name,
+        name=config.LOOKUP_TABLE_NAME,
         params=params,
         repository=repository,
     )
