@@ -38,6 +38,7 @@ intersphinx_mapping = {
 # Disable Gitlab as we need to sign in
 linkcheck_ignore = [
     'https://gitlab.audeering.com',
+    'http://sphinx-doc.org',
 ]
 # Ignore package dependencies during building the docs
 autodoc_mock_imports = [
