@@ -9,10 +9,10 @@ config
 .. autoclass:: config
     :members:
 
-get_default_cache_root
-----------------------
+default_cache_root
+------------------
 
-.. autofunction:: get_default_cache_root
+.. autofunction:: default_cache_root
 
 get_lookup_table
 ----------------

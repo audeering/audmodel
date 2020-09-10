@@ -15,7 +15,7 @@ from audmodel.core.url import (
 from audmodel.core.utils import upload_folder
 
 
-def get_default_cache_root() -> str:
+def default_cache_root() -> str:
     r"""Return the default path under which models will be stored.
 
     """
@@ -135,7 +135,7 @@ def load(
     r"""Download a model by id and return model folder.
 
     .. note:: If ``root`` is not set, the model is downloaded to the default
-        cache folder (see :meth:`audmodel.get_default_cache_root`). If the
+        cache folder (see :meth:`audmodel.default_cache_root`). If the
         model already exists in the cache, the download is skipped (unless
         ``force`` is set).
 
@@ -156,9 +156,9 @@ def load(
     )
     version = version_from_url(model_url)
 
-    root = audeer.safe_path(root or get_default_cache_root())
+    root = audeer.safe_path(root or default_cache_root())
     root = os.path.join(
-        root or get_default_cache_root(),
+        root or default_cache_root(),
         audfactory.group_id_to_path(group_id),
         version,
         uid,
