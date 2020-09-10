@@ -25,37 +25,6 @@ def default_cache_root() -> str:
     return os.environ.get('AUDMODEL_CACHE_ROOT') or config.AUDMODEL_CACHE_ROOT
 
 
-def get_lookup_table(
-        name: str,
-        version: str = None,
-        *,
-        subgroup: str = None,
-        private: bool = False,
-) -> audfactory.Lookup:
-    r"""Return lookup table.
-
-    Args:
-        name: model name
-        version: version string
-        subgroup: extend group id to
-            :attr:`audmodel.config.GROUP_ID`.<subgroup>. You can increase
-            the depth by using dot-notation, e.g. setting
-            ``subgroup=foo.bar`` will result in
-            `com.audeering.models.foo.bar`
-        private: repository is private
-
-    Raises:
-        RuntimeError: if table does not exist
-
-    """
-    lookup = audfactory.Lookup(
-        _group_id(name, subgroup),
-        version=version,
-        repository=_repository(private),
-    )
-    return lookup
-
-
 def latest_version(
         name: str,
         params: typing.Dict[str, typing.Any] = None,
@@ -139,6 +108,49 @@ def load(
         )
 
     return root
+
+
+def lookup_table(
+        name: str,
+        version: str = None,
+        *,
+        subgroup: str = None,
+        private: bool = False,
+) -> audfactory.Lookup:
+    r"""Lookup table of specified models.
+
+    Models are specified by the ``name``, ``subgroup``, ``version``,
+    and ``private`` arguments.
+    Besides they can vary by having different parameters,
+    which are locked inside a lookup table
+    and assigned to unique model IDs.
+    To get an overview of all different parameters models
+    where trained with,
+    you can download the lookup table and inspect it.
+
+    Args:
+        name: model name
+        version: version string
+        subgroup: extend group id to
+            :attr:`audmodel.config.GROUP_ID`.<subgroup>. You can increase
+            the depth by using dot-notation, e.g. setting
+            ``subgroup=foo.bar`` will result in
+            `com.audeering.models.foo.bar`
+        private: repository is private
+
+    Returns:
+        lookup table of models
+
+    Raises:
+        RuntimeError: if table does not exist
+
+    """
+    lookup = audfactory.Lookup(
+        _group_id(name, subgroup),
+        version=version,
+        repository=_repository(private),
+    )
+    return lookup
 
 
 def name(uid: str) -> str:

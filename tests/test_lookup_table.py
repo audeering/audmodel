@@ -28,8 +28,8 @@ import audmodel
         marks=pytest.mark.xfail(raises=RuntimeError),
     ),
 ])
-def test_get_lookup_table(name, version, private):
-    lookup = audmodel.get_lookup_table(
+def test_lookup_table(name, version, private):
+    lookup = audmodel.lookup_table(
         name,
         version,
         subgroup=pytest.SUBGROUP,

@@ -14,11 +14,6 @@ default_cache_root
 
 .. autofunction:: default_cache_root
 
-get_lookup_table
-----------------
-
-.. autofunction:: get_lookup_table
-
 latest_version
 --------------
 
@@ -28,6 +23,11 @@ load
 ----
 
 .. autofunction:: load
+
+lookup_table
+------------
+
+.. autofunction:: lookup_table
 
 name
 ----

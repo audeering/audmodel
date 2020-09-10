@@ -37,7 +37,7 @@ def test_get_model_id(name, params, version):
             subgroup=pytest.SUBGROUP,
             private=pytest.PRIVATE,
         )
-    lookup = audmodel.get_lookup_table(
+    lookup = audmodel.lookup_table(
         name,
         version,
         subgroup=pytest.SUBGROUP,

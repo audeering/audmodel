@@ -64,6 +64,6 @@ def test_publish(root, name, params, version, create, verbose):
     assert uid == audmodel.get_model_id(name, params, version,
                                         subgroup=pytest.SUBGROUP)
 
-    lookup = audmodel.get_lookup_table(name, version,
+    lookup = audmodel.lookup_table(name, version,
                                        subgroup=pytest.SUBGROUP)
     assert lookup[uid] == {key: params[key] for key in sorted(params)}

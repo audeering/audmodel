@@ -1,9 +1,9 @@
 from audmodel.core.api import (
     default_cache_root,
-    get_lookup_table,
     parameters,
     latest_version,
     load,
+    lookup_table,
     name,
     publish,
     remove,

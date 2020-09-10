@@ -6,7 +6,7 @@ import audmodel
 def test_remove():
     uid = pytest.UIDS[0]
     audmodel.remove(uid)
-    lookup = audmodel.get_lookup_table(
+    lookup = audmodel.lookup_table(
         pytest.NAME,
         pytest.VERSION,
         subgroup=pytest.SUBGROUP,
