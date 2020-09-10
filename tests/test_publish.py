@@ -58,12 +58,29 @@ import audmodel
     ),
 ])
 def test_publish(root, name, params, version, create, verbose):
-    uid = audmodel.publish(root, name, params, version,
-                           subgroup=pytest.SUBGROUP, create=create,
-                           verbose=verbose)
-    assert uid == audmodel.get_model_id(name, params, version,
-                                        subgroup=pytest.SUBGROUP)
+    uid = audmodel.publish(
+        root,
+        name,
+        params,
+        version,
+        subgroup=pytest.SUBGROUP,
+        private=pytest.PRIVATE,
+        create=create,
+        verbose=verbose,
+    )
+    expected_uid = audmodel.uid(
+        name,
+        params,
+        version,
+        subgroup=pytest.SUBGROUP,
+        private=pytest.PRIVATE,
+    )
+    assert uid == expected_uid
 
-    lookup = audmodel.lookup_table(name, version,
-                                       subgroup=pytest.SUBGROUP)
+    lookup = audmodel.lookup_table(
+        name,
+        version,
+        subgroup=pytest.SUBGROUP,
+        private=pytest.PRIVATE,
+    )
     assert lookup[uid] == {key: params[key] for key in sorted(params)}

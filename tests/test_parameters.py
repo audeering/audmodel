@@ -11,5 +11,5 @@ import audfactory
 @pytest.mark.usefixtures('create')
 def test_parameters():
     uid = pytest.UIDS[0]
-    params = parameters(uid)
+    params = audmodel.parameters(uid)
     assert params == pytest.PARAMS[0]

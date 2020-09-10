@@ -11,7 +11,6 @@ import audfactory
 @pytest.mark.usefixtures('create')
 @pytest.mark.parametrize('verbose', [True, False])
 def test_load(verbose):
-    print(pytest.UIDS)
     uid = pytest.UIDS[0]
     root = os.path.join(tempfile._get_default_tempdir(), 'audmodel')
     model_root = audmodel.load(uid, root=root, verbose=verbose)

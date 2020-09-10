@@ -107,5 +107,4 @@ def create():
         )
         uids.append(uid)
     pytest.UIDS = uids
-    print(pytest.UIDS)
     yield
