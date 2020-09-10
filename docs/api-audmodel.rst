@@ -24,16 +24,6 @@ get_model_id
 
 .. autofunction:: get_model_id
 
-get_model_url
--------------
-
-.. autofunction:: get_model_url
-
-get_params
-----------
-
-.. autofunction:: get_params
-
 latest_version
 --------------
 
@@ -44,10 +34,10 @@ load
 
 .. autofunction:: load
 
-load_by_id
-----------
+name
+----
 
-.. autofunction:: load_by_id
+.. autofunction:: name
 
 Parameter
 ---------
@@ -61,6 +51,11 @@ Parameters
 .. autoclass:: Parameters
     :members:
 
+parameters
+----------
+
+.. autofunction:: parameters
+
 publish
 -------
 
@@ -70,6 +65,21 @@ remove
 ------
 
 .. autofunction:: remove
+
+subgroup
+--------
+
+.. autofunction:: subgroup
+
+url
+---
+
+.. autofunction:: url
+
+version
+-------
+
+.. autofunction:: version
 
 versions
 --------

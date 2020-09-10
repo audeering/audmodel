@@ -3,20 +3,17 @@ import audmodel
 
 
 @pytest.mark.usefixtures('create')
-@pytest.mark.parametrize('name,params,version', [
-    (
+def test_remove():
+    uid = pytest.UIDS[0]
+    audmodel.remove(uid)
+    lookup = audmodel.get_lookup_table(
         pytest.NAME,
-        pytest.PARAMS[0],
         pytest.VERSION,
-    ),
-    pytest.param(
-        pytest.NAME,
-        pytest.PARAMS[0],
-        pytest.VERSION,
-        marks=pytest.mark.xfail(raises=RuntimeError)
-    ),
-])
-def test_remove(name, params, version):
-    uid = audmodel.remove(name, params, version, subgroup=pytest.SUBGROUP)
-    lookup = audmodel.get_lookup_table(name, version, subgroup=pytest.SUBGROUP)
+        subgroup=pytest.SUBGROUP,
+        private=pytest.PRIVATE,
+    )
     assert uid not in lookup.ids
+    # Fail when UID does not exists
+    error_msg = f"A model with ID '{uid}' does not exist"
+    with pytest.raises(RuntimeError, match=error_msg):
+        audmodel.remove(uid)

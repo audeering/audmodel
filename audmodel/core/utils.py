@@ -7,33 +7,6 @@ import audeer
 import audfactory
 
 
-def download_folder(root: str,
-                    group_id: str,
-                    repository: str,
-                    name: str,
-                    version: str,
-                    *,
-                    force: bool = False,
-                    verbose: bool = False) -> str:
-
-    server_url = audfactory.server_url(group_id,
-                                       name=name,
-                                       repository=repository,
-                                       version=version)
-    url = f'{server_url}/{name}-{version}.zip'
-    src_path = os.path.join(tempfile._get_default_tempdir(), f'{name}.zip')
-    dst_root = os.path.join(root, audeer.basename_wo_ext(src_path))
-    dst_root = audeer.safe_path(dst_root)
-
-    if force or not os.path.exists(dst_root):
-        audeer.mkdir(dst_root)
-        audfactory.download_artifact(url, src_path, verbose=verbose)
-        unzip(src_path, dst_root, verbose=verbose)
-        os.remove(src_path)
-
-    return dst_root
-
-
 def scan_files(root: str,
                sub_dir: str = '') -> (str, str):
 
@@ -43,24 +16,6 @@ def scan_files(root: str,
                                   os.path.join(sub_dir, entry.name))
         else:
             yield sub_dir, entry.name
-
-
-def unzip(src_path: str, dst_root: str, *, verbose: bool = False) -> None:
-
-    with zipfile.ZipFile(src_path, 'r') as zf:
-        if verbose:
-            members = zf.infolist()
-            with audeer.progress_bar(members,
-                                     total=len(members),
-                                     desc='') as pbar:
-                for member in pbar:
-                    desc = audeer.format_display_message(f'Unzip '
-                                                         f'{member.filename}',
-                                                         pbar=True)
-                    pbar.set_description_str(desc, refresh=True)
-                    zf.extract(member, dst_root)
-        else:
-            zf.extractall(dst_root)
 
 
 def upload_folder(root: str,

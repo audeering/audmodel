@@ -23,12 +23,25 @@ import audmodel
     ),
 ])
 def test_get_model_id(name, params, version):
-    uid = audmodel.get_model_id(name, params, version,
-                                subgroup=pytest.SUBGROUP)
+    uid = audmodel.get_model_id(
+        name,
+        params,
+        version,
+        subgroup=pytest.SUBGROUP,
+        private=pytest.PRIVATE,
+    )
     if version is None:
-        version = audmodel.latest_version(name, params,
-                                          subgroup=pytest.SUBGROUP)
-    lookup = audmodel.get_lookup_table(name, version,
-                                       subgroup=pytest.SUBGROUP)
+        version = audmodel.latest_version(
+            name,
+            params,
+            subgroup=pytest.SUBGROUP,
+            private=pytest.PRIVATE,
+        )
+    lookup = audmodel.get_lookup_table(
+        name,
+        version,
+        subgroup=pytest.SUBGROUP,
+        private=pytest.PRIVATE,
+    )
     assert uid in lookup.ids
     assert lookup[uid] == {key: params[key] for key in sorted(params)}

@@ -2,15 +2,17 @@ import os
 import pytest
 import uuid
 
+import audeer
 import audfactory
 import audmodel
 
 
-audmodel.config.REPOSITORY_PUBLIC = 'unittests-public-local'
+audmodel.config.REPOSITORY_PRIVATE = 'unittests-public-local'
 
-pytest.SUBGROUP = f'audmodel.{str(uuid.uuid1())}'
+pytest.SUBGROUP = f'audmodel.{audeer.uid()}'
 pytest.ROOT = os.path.dirname(os.path.realpath(__file__))
 pytest.NAME = 'audmodel'
+pytest.PRIVATE = True
 pytest.COLUMNS = [
     'property1',
     'property2',
@@ -70,7 +72,7 @@ pytest.PARAMETERS = audmodel.Parameters().add(
 
 def cleanup():
     group_id = f'{audmodel.config.GROUP_ID}.{pytest.SUBGROUP}'
-    repository = f'{audmodel.config.REPOSITORY_PUBLIC}'
+    repository = f'{audmodel.config.REPOSITORY_PRIVATE}'
     path = audfactory.artifactory_path(
         audfactory.server_url(group_id, name=pytest.NAME,
                               repository=repository)).parent
@@ -92,8 +94,18 @@ def cleanup_test():
 
 @pytest.fixture(scope='module')
 def create():
+    uids = []
     for params in pytest.PARAMS:
-        pytest.UID = audmodel.publish(pytest.ROOT, pytest.NAME, params,
-                                      pytest.VERSION, subgroup=pytest.SUBGROUP,
-                                      create=True)
+        uid = audmodel.publish(
+            pytest.ROOT,
+            pytest.NAME,
+            params,
+            pytest.VERSION,
+            subgroup=pytest.SUBGROUP,
+            private=pytest.PRIVATE,
+            create=True,
+        )
+        uids.append(uid)
+    pytest.UIDS = uids
+    print(pytest.UIDS)
     yield
