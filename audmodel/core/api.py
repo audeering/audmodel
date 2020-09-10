@@ -15,52 +15,6 @@ def get_default_cache_root() -> str:
     return os.environ.get('AUDMODEL_CACHE_ROOT') or config.AUDMODEL_CACHE_ROOT
 
 
-def delete_lookup_table(name: str,
-                        version: str,
-                        *,
-                        subgroup: str = None,
-                        private: bool = False,
-                        force: bool = False) -> None:
-    r"""Delete a lookup table.
-
-    .. note:: Unless ``force`` is set, the operation will fail if the lookup
-        table is not empty. Use :meth:`audmodel.remove` to remove entries
-        first.
-
-    Args:
-        name: model name
-        version: version string
-        subgroup: extend group id to
-            :attr:`audmodel.config.GROUP_ID`.<subgroup>. You can increase
-            the depth by using dot-notation, e.g. setting
-            ``subgroup=foo.bar`` will result in
-            `com.audeering.models.foo.bar`
-        private: repository is private
-        force: delete lookup table even if it is not empty
-
-    Raises:
-        RuntimeError: if table is not empty
-
-    """
-    group_id, repository = _server(name, subgroup, private)
-    lookup = audfactory.Lookup(
-        group_id,
-        version=version,
-        repository=repository,
-    )
-    table = lookup.table
-    if len(table) > 1:
-        if not force:
-            raise RuntimeError(
-                f"Cannot delete lookup table '{name}-{version}' "
-                f"if it is not empty.")
-        for uid in [row[0] for row in table[1:]]:
-            url = _url_entry(group_id, repository, uid, version)
-            audfactory.artifactory_path(url).parent.parent.rmdir()
-        lookup.clear()
-    audfactory.artifactory_path(lookup.url).parent.rmdir()
-
-
 def get_lookup_table(name: str,
                      version: str = None,
                      *,

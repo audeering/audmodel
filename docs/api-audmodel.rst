@@ -9,11 +9,6 @@ config
 .. autoclass:: config
     :members:
 
-delete_lookup_table
--------------------
-
-.. autofunction::  delete_lookup_table
-
 get_default_cache_root
 ----------------------
 
