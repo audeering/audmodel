@@ -8,46 +8,6 @@ from .config import config
 from . import utils
 
 
-def create_lookup_table(name: str,
-                        params: typing.Sequence[str],
-                        version: str,
-                        *,
-                        subgroup: str = None,
-                        private: bool = False,
-                        force: bool = False,
-                        verbose: bool = False) -> str:
-    r"""Create lookup table.
-
-    Args:
-        name: model name
-        params: list with model parameters
-        version: version string
-        subgroup: extend group id to
-            :attr:`audmodel.config.GROUP_ID`.<subgroup>. You can increase
-            the depth by using dot-notation, e.g. setting
-            ``subgroup=foo.bar`` will result in
-            `com.audeering.models.foo.bar`
-        private: repository is private
-        force: create the lookup table even if it exists
-
-    Returns:
-        URL to lookup table
-
-    Raises:
-        RuntimeError: if table exists already
-
-    """
-    group_id, repository = _server(name, subgroup, private)
-    url = audfactory.Lookup.create(
-        group_id,
-        version,
-        params,
-        repository=repository,
-        force=force,
-    )
-    return url
-
-
 def get_default_cache_root() -> str:
     r"""Return the default path under which models will be stored.
 

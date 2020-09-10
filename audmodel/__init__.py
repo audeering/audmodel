@@ -1,5 +1,4 @@
 from audmodel.core.api import (
-    create_lookup_table,
     delete_lookup_table,
     extend_params,
     get_default_cache_root,

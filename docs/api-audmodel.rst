@@ -9,11 +9,6 @@ config
 .. autoclass:: config
     :members:
 
-create_lookup_table
--------------------
-
-.. autofunction:: create_lookup_table
-
 delete_lookup_table
 -------------------
 
