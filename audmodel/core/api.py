@@ -16,7 +16,10 @@ from audmodel.core.utils import upload_folder
 
 
 def default_cache_root() -> str:
-    r"""Return the default path under which models will be stored.
+    r"""Default path under which models are stored.
+
+    Returns:
+        path to model cache
 
     """
     return os.environ.get('AUDMODEL_CACHE_ROOT') or config.AUDMODEL_CACHE_ROOT
