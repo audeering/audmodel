@@ -63,18 +63,23 @@ def load(
         root: str = None,
         verbose: bool = False,
 ) -> str:
-    r"""Download a model by id and return model folder.
+    r"""Download a model by its unique ID.
 
-    .. note:: If ``root`` is not set, the model is downloaded to the default
-        cache folder (see :meth:`audmodel.default_cache_root`). If the
-        model already exists in the cache, the download is skipped (unless
-        ``force`` is set).
+    .. note:: If ``root`` is not set,
+        the model is downloaded to the default cache folder
+        (see :meth:`audmodel.default_cache_root`).
+        If the model already exists in the cache,
+        the download is skipped
+        (unless ``force`` is set).
 
     Args:
         uid: unique model identifier
         force: download model even if it exists already
         root: store model within this folder
         verbose: show verbose output
+
+    Returns:
+        path to model folder
 
     Raises:
         RuntimeError: if model does not exist
@@ -201,11 +206,14 @@ def publish(
         force: bool = False,
         verbose: bool = False,
 ) -> str:
-    r"""Zip model, publish as a new artifact and returns the model's unique id.
+    r"""Zip model and publish as a new artifact.
 
-    .. note:: Assigns a unique id and adds an entry in the lookup table.
-        If the lookup table does not exist it will be created. If an entry
-        already exists, the operation will fail.
+    .. note:: Assigns a unique ID
+        and adds an entry in the lookup table.
+        If the lookup table does not exist,
+        it will be created.
+        If an entry already exists,
+        the operation will fail.
 
     Args:
         root: folder with model files
@@ -221,6 +229,9 @@ def publish(
         create: create lookup table if it does not exist
         force: publish model even if it exists already
         verbose: show verbose output
+
+    Returns:
+        unique model ID
 
     Raises:
         RuntimeError: if an artifact exists already
@@ -290,7 +301,7 @@ def uid(
         subgroup: str = None,
         private: bool = False,
 ) -> str:
-    r"""Return unique model id.
+    r"""Unique model ID for given model arguments.
 
     Look for the UID of a published model,
     specified by name, version, and parameters.
@@ -413,8 +424,8 @@ def versions(
         *,
         subgroup: str = None,
         private: bool = False,
-) -> typing.Sequence[str]:
-    r"""Return a list of available versions.
+) -> typing.List[str]:
+    r"""Available model versions.
 
     Args:
         name: model name
@@ -425,6 +436,9 @@ def versions(
             ``subgroup=foo.bar`` will result in
             `com.audeering.models.foo.bar`
         private: repository is private
+
+    Returns:
+        available model versions
 
     """
     versions = audfactory.Lookup.versions(
