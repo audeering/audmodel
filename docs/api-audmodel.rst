@@ -14,11 +14,6 @@ delete_lookup_table
 
 .. autofunction::  delete_lookup_table
 
-extend_params
--------------
-
-.. autofunction::  extend_params
-
 get_default_cache_root
 ----------------------
 

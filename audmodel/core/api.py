@@ -61,42 +61,6 @@ def delete_lookup_table(name: str,
     audfactory.artifactory_path(lookup.url).parent.rmdir()
 
 
-def extend_params(name: str,
-                  version: str,
-                  new_params: typing.Union[
-                      str,
-                      typing.Sequence[str],
-                      typing.Dict[str, typing.Any],
-                  ],
-                  *,
-                  subgroup: str = None,
-                  private: bool = False) -> audfactory.Lookup:
-    r"""Extend table with new parameters and return it.
-
-    Args:
-        name: model name
-        version: version string
-        new_params: a dictionary with parameters (keys) and default values.
-            If a list of parameter names is given instead, the default value
-            will be `None`
-        subgroup: extend group id to
-            :attr:`audmodel.config.GROUP_ID`.<subgroup>. You can increase
-            the depth by using dot-notation, e.g. setting
-            ``subgroup=foo.bar`` will result in
-            `com.audeering.models.foo.bar`
-        private: repository is private
-
-    """
-    group_id, repository = _server(name, subgroup, private)
-    lookup = audfactory.Lookup(
-        group_id,
-        version=version,
-        repository=repository,
-    )
-    lookup.extend(new_params)
-    return lookup
-
-
 def get_lookup_table(name: str,
                      version: str = None,
                      *,
