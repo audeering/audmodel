@@ -19,11 +19,6 @@ get_lookup_table
 
 .. autofunction:: get_lookup_table
 
-get_model_id
-------------
-
-.. autofunction:: get_model_id
-
 latest_version
 --------------
 
@@ -70,6 +65,11 @@ subgroup
 --------
 
 .. autofunction:: subgroup
+
+uid
+---
+
+.. autofunction:: uid
 
 url
 ---

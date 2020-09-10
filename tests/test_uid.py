@@ -23,7 +23,7 @@ import audmodel
     ),
 ])
 def test_get_model_id(name, params, version):
-    uid = audmodel.get_model_id(
+    uid = audmodel.uid(
         name,
         params,
         version,

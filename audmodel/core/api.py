@@ -56,47 +56,6 @@ def get_lookup_table(
     return lookup
 
 
-def get_model_id(
-        name: str,
-        params: typing.Dict[str, typing.Any],
-        version: str = None,
-        *,
-        subgroup: str = None,
-        private: bool = False,
-) -> str:
-    r"""Return unique model id.
-
-    Args:
-        name: model name
-        params: dictionary with parameters
-        version: version string
-        subgroup: extend group id to
-            :attr:`audmodel.config.GROUP_ID`.<subgroup>. You can increase
-            the depth by using dot-notation, e.g. setting
-            ``subgroup=foo.bar`` will result in
-            `com.audeering.models.foo.bar`
-        private: repository is private
-
-    Raises:
-        RuntimeError: if model does not exist
-
-    """
-    group_id = _group_id(name, subgroup)
-    repository = _repository(private)
-    if version is None:
-        version = audfactory.Lookup.latest_version(
-            group_id,
-            params=params,
-            repository=repository,
-        )
-    lookup = audfactory.Lookup(
-        group_id,
-        version=version,
-        repository=repository,
-    )
-    return lookup.find(params)
-
-
 def latest_version(
         name: str,
         params: typing.Dict[str, typing.Any] = None,
@@ -309,6 +268,53 @@ def subgroup(uid: str) -> str:
     """
     model_url = url(uid)
     return subgroup_from_url(model_url)
+
+
+def uid(
+        name: str,
+        params: typing.Dict[str, typing.Any],
+        version: str = None,
+        *,
+        subgroup: str = None,
+        private: bool = False,
+) -> str:
+    r"""Return unique model id.
+
+    Look for the UID of a published model,
+    specified by name, version, and parameters.
+
+    Args:
+        name: model name
+        params: dictionary with parameters
+        version: version string
+        subgroup: extend group id to
+            :attr:`audmodel.config.GROUP_ID`.<subgroup>. You can increase
+            the depth by using dot-notation, e.g. setting
+            ``subgroup=foo.bar`` will result in
+            `com.audeering.models.foo.bar`
+        private: repository is private
+
+    Returns:
+        unique model ID
+
+    Raises:
+        RuntimeError: if no lookup table for the model exists
+
+    """
+    group_id = _group_id(name, subgroup)
+    repository = _repository(private)
+    if version is None:
+        version = audfactory.Lookup.latest_version(
+            group_id,
+            params=params,
+            repository=repository,
+        )
+    lookup = audfactory.Lookup(
+        group_id,
+        version=version,
+        repository=repository,
+    )
+    return lookup.find(params)
 
 
 def url(uid: str) -> str:

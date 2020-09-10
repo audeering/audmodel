@@ -1,7 +1,6 @@
 from audmodel.core.api import (
     default_cache_root,
     get_lookup_table,
-    get_model_id,
     parameters,
     latest_version,
     load,
@@ -9,6 +8,7 @@ from audmodel.core.api import (
     publish,
     remove,
     subgroup,
+    uid,
     url,
     version,
     versions,
