@@ -7,7 +7,7 @@ import audfactory
 import audmodel
 
 
-audmodel.config.REPOSITORY_PRIVATE = 'unittests-public-local'
+audmodel.core.define.defaults.REPOSITORY_PRIVATE = 'unittests-public-local'
 
 pytest.SUBGROUP = f'audmodel.{audeer.uid()}'
 pytest.ROOT = os.path.dirname(os.path.realpath(__file__))
@@ -29,8 +29,8 @@ pytest.VERSION = '1.0.0'
 
 
 def cleanup():
-    group_id = f'{audmodel.config.GROUP_ID}.{pytest.SUBGROUP}'
-    repository = f'{audmodel.config.REPOSITORY_PRIVATE}'
+    group_id = f'{audmodel.core.define.defaults.GROUP_ID}.{pytest.SUBGROUP}'
+    repository = f'{audmodel.core.define.defaults.REPOSITORY_PRIVATE}'
     path = audfactory.artifactory_path(
         audfactory.server_url(group_id, name=pytest.NAME,
                               repository=repository)).parent

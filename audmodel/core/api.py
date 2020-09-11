@@ -6,12 +6,7 @@ import audeer
 import audfactory
 
 from audmodel.core.config import config
-from audmodel.core.define import (
-    GROUP_ID,
-    LOOKUP_TABLE_NAME,
-    REPOSITORY_PUBLIC,
-    REPOSITORY_PRIVATE,
-)
+from audmodel.core.define import defaults
 from audmodel.core.url import (
     name_from_url,
     repository_from_url,
@@ -292,7 +287,7 @@ def publish(
     * feature set(s)
     * scaling applied to the features
     * classifier
-    
+
     For ``subgroup`` we recommend to encode:
 
     * task the model was trained for, e.g. ``gender``
@@ -471,7 +466,10 @@ def url(uid: str) -> str:
         raise ValueError('Provided unique ID not valid')
     try:
         pattern = f'artifact?name={uid}'
-        for repository in [REPOSITORY_PUBLIC, REPOSITORY_PRIVATE]:
+        for repository in [
+                defaults.REPOSITORY_PUBLIC,
+                defaults.REPOSITORY_PRIVATE,
+        ]:
             r = audfactory.rest_api_search(pattern, repository=repository)
             if r.status_code != 200:  # pragma: no cover
                 raise RuntimeError(
@@ -555,7 +553,7 @@ def versions(
     """
     versions = audfactory.Lookup.versions(
         _group_id(name, subgroup),
-        name=LOOKUP_TABLE_NAME,
+        name=defaults.LOOKUP_TABLE_NAME,
         params=params,
         repository=_repository(private),
     )
@@ -564,9 +562,9 @@ def versions(
 
 def _group_id(name: str, subgroup: str) -> str:
     if subgroup is None:
-        return f'{GROUP_ID}.{name}'
+        return f'{defaults.GROUP_ID}.{name}'
     else:
-        return f'{GROUP_ID}.{subgroup}.{name}'
+        return f'{defaults.GROUP_ID}.{subgroup}.{name}'
 
 
 def _lookup_from_url(model_url: str) -> audfactory.Lookup:
@@ -585,6 +583,6 @@ def _lookup_from_url(model_url: str) -> audfactory.Lookup:
 
 def _repository(private: bool) -> str:
     if private:
-        return REPOSITORY_PRIVATE
+        return defaults.REPOSITORY_PRIVATE
     else:
-        return REPOSITORY_PUBLIC
+        return defaults.REPOSITORY_PUBLIC
