@@ -1,7 +1,5 @@
 from subprocess import check_output
 
-import graphviz
-
 
 # Project -----------------------------------------------------------------
 project = 'audmodel'
@@ -30,7 +28,6 @@ extensions = [
     'sphinx.ext.viewcode',
     'sphinx.ext.intersphinx',
     'sphinx.ext.autosectionlabel',
-    'nbsphinx',
     'sphinx_copybutton',  # for "copy to clipboard" buttons
 ]
 intersphinx_mapping = {
@@ -53,19 +50,6 @@ autodoc_mock_imports = [
 # Reference with :ref:`data-header:Database`
 autosectionlabel_prefix_document = True
 autosectionlabel_maxdepth = 2
-# Disable auto-build of Jupyter notebooks
-nbsphinx_execute = 'never'
-# This is processed by Jinja2 and inserted before each Jupyter notebook
-nbsphinx_prolog = r"""
-{% set docname = env.doc2path(env.docname, base='docs') %}
-{% set base_url = "https://gitlab.audeering.com/tools/audmodel/raw" %}
-
-.. role:: raw-html(raw)
-    :format: html
-
-:raw-html:`<div class="notebook"><a href="{{ base_url }}/{{ env.config.version }}/{{ docname }}?inline=false"> Download notebook: {{ docname }}</a></div>`
-"""  # noqa: E501
-nbsphinx_timeout = 3600
 
 # HTML --------------------------------------------------------------------
 html_theme = 'sphinx_audeering_theme'
@@ -74,11 +58,5 @@ html_theme_options = {
     'logo_only': False,
 }
 html_title = title
-
-
-# Graphviz figures --------------------------------------------------------
-dot_files = [
-    './pics/workflow.dot',
-]
-for dot_file in dot_files:
-    graphviz.render('dot', 'svg', dot_file)
+html_static_path = ['_static']
+html_css_files = ['css/custom.css']
