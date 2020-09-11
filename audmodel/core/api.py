@@ -246,7 +246,15 @@ def parameters(uid: str) -> typing.Dict:
     Raises:
         RuntimeError: if table does not exist
 
-    """
+    Example:
+        >>> parameters('98ccb530-b162-11ea-8427-ac1f6bac2502')
+        {'classifier': "LinearSVC(C=0.1, class_weight='balanced', random_state=0)",
+         'experiment': 'msp.msppodcast-1.0.0',
+         'features': 'GeMAPSplus_v01',
+         'sampling_rate': 8000,
+         'scaler': 'StandardScaler()'}
+
+    """  # noqa: E501
     model_url = url(uid)
     lookup = _lookup_from_url(model_url)
     return lookup[uid]
