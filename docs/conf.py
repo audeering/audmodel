@@ -23,6 +23,7 @@ source_suffix = '.rst'
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 pygments_style = None
 extensions = [
+    'jupyter_sphinx',  # executing code blocks
     'sphinx.ext.autodoc',
     'sphinx.ext.napoleon',  # support for Google-style docstrings
     'sphinx_autodoc_typehints',
@@ -30,6 +31,7 @@ extensions = [
     'sphinx.ext.intersphinx',
     'sphinx.ext.autosectionlabel',
     'nbsphinx',
+    'sphinx_copybutton',  # for "copy to clipboard" buttons
 ]
 intersphinx_mapping = {
     'python': ('https://docs.python.org/3/', None),

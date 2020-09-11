@@ -6,3 +6,5 @@ sphinx-autodoc-typehints
 nbsphinx
 jupyter
 jupyter_contrib_nbextensions
+sphinx-copybutton
+jupyter-sphinx >=0.3.1
