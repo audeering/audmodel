@@ -178,7 +178,7 @@ def lookup_table(
     Args:
         name: model name
         version: version string
-        subgroup: extend group id to
+        subgroup: extend group ID to
             ``com.audeering.models.<subgroup>``.
             You can increase the depth
             by using dot-notation,
@@ -193,7 +193,21 @@ def lookup_table(
     Raises:
         RuntimeError: if table does not exist
 
-    """
+    Example:
+        >>> t = lookup_table('audgender', subgroup='gender', version='1.0.0')
+        >>> t.columns
+        ['classifier', 'experiment', 'features', 'sampling_rate', 'scaler']
+        >>> t.ids
+        ['f4e42076-b160-11ea-8427-ac1f6bac2502',
+         '98ccb530-b162-11ea-8427-ac1f6bac2502']
+        >>> t['98ccb530-b162-11ea-8427-ac1f6bac2502']
+        {'classifier': "LinearSVC(C=0.1, class_weight='balanced', random_state=0)",
+         'experiment': 'msp.msppodcast-1.0.0',
+         'features': 'GeMAPSplus_v01',
+         'sampling_rate': 8000,
+         'scaler': 'StandardScaler()'}
+
+    """  # noqa: E501
     lookup = audfactory.Lookup(
         _group_id(name, subgroup),
         version=version,
