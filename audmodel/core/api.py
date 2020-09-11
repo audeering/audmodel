@@ -52,10 +52,15 @@ def latest_version(
 ) -> str:
     r"""Latest available version of model.
 
+    The highest version,
+    that is available for the combination
+    of provided ``name``, ``subgroup``,
+    and model ``params``.
+
     Args:
         name: model name
         params: dictionary with parameters
-        subgroup: extend group id to
+        subgroup: extend group ID to
             ``com.audeering.models.<subgroup>``.
             You can increase the depth
             by using dot-notation,
@@ -66,6 +71,10 @@ def latest_version(
 
     Returns:
         latest version of model
+
+    Example:
+        >>> latest_version('audgender', subgroup='gender')
+        '1.0.0'
 
     """
     version = audfactory.Lookup.latest_version(
