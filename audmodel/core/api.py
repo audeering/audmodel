@@ -83,7 +83,6 @@ def latest_version(
 def load(
         uid: str,
         *,
-        force: bool = False,
         root: str = None,
         verbose: bool = False,
 ) -> str:
@@ -93,12 +92,10 @@ def load(
     the model is downloaded to the default cache folder,
     see :meth:`audmodel.default_cache_root`.
     If the model already exists in the cache folder,
-    the download is skipped,
-    unless ``force`` is set.
+    the download is skipped.
 
     Args:
         uid: unique model identifier
-        force: download model even if it exists already
         root: store model within this folder
         verbose: show verbose output
 
@@ -139,7 +136,7 @@ def load(
     root = audeer.safe_path(root)
 
     zip_file = os.path.join(tempfile._get_default_tempdir(), f'{uid}.zip')
-    if force or not os.path.exists(root):
+    if not os.path.exists(root):
         audeer.mkdir(root)
         audfactory.download_artifact(model_url, zip_file, verbose=verbose)
         audeer.extract_archive(

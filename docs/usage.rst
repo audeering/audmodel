@@ -318,9 +318,6 @@ Within the model cache folder
 the model is placed in a unique sub-folder, namely
 ``<subgroup>/<name>/<version>/<uid>``.
 
-If you want to overwrite a model in the cache,
-you have to use ``force=True`` with :func:`audmodel.load`.
-
 
 .. jupyter-execute::
     :hide-code:
