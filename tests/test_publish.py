@@ -21,6 +21,15 @@ import audmodel
         True,
         True,
     ),
+    # Add another parameter column to lookup table
+    (
+        pytest.ROOT,
+        pytest.NAME,
+        {'extend': 'params'},
+        pytest.VERSION,
+        False,
+        False,
+    ),
     (
         pytest.ROOT,
         pytest.NAME,
@@ -33,15 +42,6 @@ import audmodel
         pytest.ROOT,
         pytest.NAME,
         pytest.PARAMS[1],
-        pytest.VERSION,
-        False,
-        False,
-        marks=pytest.mark.xfail(raises=RuntimeError)
-    ),
-    pytest.param(
-        pytest.ROOT,
-        pytest.NAME,
-        {'bad': 'params'},
         pytest.VERSION,
         False,
         False,
@@ -83,4 +83,4 @@ def test_publish(root, name, params, version, create, verbose):
         subgroup=pytest.SUBGROUP,
         private=pytest.PRIVATE,
     )
-    assert lookup[uid] == {key: params[key] for key in sorted(params)}
+    assert set(params.keys()).issubset(set(lookup.columns))

@@ -3,6 +3,9 @@ import pytest
 import audmodel
 
 
+PARAMS = {**pytest.PARAMS[0], **{'extend': None}}
+
+
 @pytest.mark.usefixtures('create')
 @pytest.mark.parametrize('name,params,expected_version', [
     (
@@ -12,7 +15,7 @@ import audmodel
     ),
     (
         pytest.NAME,
-        pytest.PARAMS[0],
+        PARAMS,
         pytest.VERSION,
     ),
     (

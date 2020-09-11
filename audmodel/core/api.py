@@ -348,9 +348,26 @@ def publish(
         version=version,
         repository=repository,
     )
+
+    param_keys = list(params.keys())
+    # Extend lookup table if more parameters are given
+    if param_keys not in lookup.columns:
+        lookup.extend(param_keys)
+    # Extend parameters if more are available in lookup table
+    for column in lookup.columns:
+        if column not in param_keys:
+            params[column] = None
+
     uid = lookup.append(params)
-    upload_folder(root, group_id, repository,
-                  uid, version, force=force, verbose=verbose)
+    upload_folder(
+        root,
+        group_id,
+        repository,
+        uid,
+        version,
+        force=force,
+        verbose=verbose,
+    )
     return uid
 
 

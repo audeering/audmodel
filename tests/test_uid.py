@@ -3,16 +3,19 @@ import pytest
 import audmodel
 
 
+PARAMS = {**pytest.PARAMS[0], **{'extend': None}}
+
+
 @pytest.mark.usefixtures('create')
 @pytest.mark.parametrize('name,params,version', [
     (
         pytest.NAME,
-        pytest.PARAMS[0],
+        PARAMS,
         pytest.VERSION,
     ),
     (
         pytest.NAME,
-        pytest.PARAMS[0],
+        PARAMS,
         None,
     ),
     pytest.param(
@@ -22,7 +25,7 @@ import audmodel
         marks=pytest.mark.xfail(raises=RuntimeError),
     ),
 ])
-def test_get_model_id(name, params, version):
+def test_uid(name, params, version):
     uid = audmodel.uid(
         name,
         params,
