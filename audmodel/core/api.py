@@ -66,7 +66,7 @@ def latest_version(
             by using dot-notation,
             e.g. setting ``subgroup=foo.bar``
             will result in
-            `com.audeering.models.foo.bar`
+            ``com.audeering.models.foo.bar``
         private: repository is private
 
     Returns:
@@ -184,7 +184,7 @@ def lookup_table(
             by using dot-notation,
             e.g. setting ``subgroup=foo.bar``
             will result in
-            `com.audeering.models.foo.bar`
+            ``com.audeering.models.foo.bar``
         private: repository is private
 
     Returns:
@@ -321,7 +321,7 @@ def publish(
             e.g. setting
             ``subgroup=foo.bar``
             will result in
-            `com.audeering.models.foo.bar`
+            ``com.audeering.models.foo.bar``
         private: repository is private
         create: create lookup table if it does not exist
         force: publish model even if it exists already
@@ -417,7 +417,7 @@ def uid(
             e.g. setting
             ``subgroup=foo.bar``
             will result in
-            `com.audeering.models.foo.bar`
+            ``com.audeering.models.foo.bar``
         private: repository is private
 
     Returns:
@@ -535,14 +535,14 @@ def versions(
     Args:
         name: model name
         params: dictionary with parameters
-        subgroup: extend group id to
+        subgroup: extend group ID to
             ``com.audeering.models.<subgroup>``.
             You can increase the depth
             by using dot-notation,
             e.g. setting
             ``subgroup=foo.bar``
             will result in
-            `com.audeering.models.foo.bar`
+            ``com.audeering.models.foo.bar``
         private: repository is private
 
     Returns:
