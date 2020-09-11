@@ -403,14 +403,14 @@ def uid(
 ) -> str:
     r"""Unique model ID for given model arguments.
 
-    Look for the UID of a published model,
-    specified by name, version, and parameters.
+    Look for the unique ID of a published model,
+    specified by model ``params``, ``name``, and ``subgroup``.
 
     Args:
         name: model name
         params: dictionary with parameters
         version: version string
-        subgroup: extend group id to
+        subgroup: extend group ID to
             ``com.audeering.models.<subgroup>``.
             You can increase the depth
             by using dot-notation,
