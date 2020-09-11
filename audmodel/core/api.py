@@ -264,7 +264,6 @@ def publish(
         subgroup: str = None,
         private: bool = False,
         create: bool = True,
-        force: bool = False,
         verbose: bool = False,
 ) -> str:
     r"""Zip model and publish as a new artifact.
@@ -319,7 +318,6 @@ def publish(
             ``com.audeering.models.foo.bar``
         private: repository is private
         create: create lookup table if it does not exist
-        force: publish model even if it exists already
         verbose: show verbose output
 
     Returns:
@@ -359,15 +357,8 @@ def publish(
             params[column] = None
 
     uid = lookup.append(params)
-    upload_folder(
-        root,
-        group_id,
-        repository,
-        uid,
-        version,
-        force=force,
-        verbose=verbose,
-    )
+    upload_folder(root, group_id, repository, uid, version, verbose)
+
     return uid
 
 

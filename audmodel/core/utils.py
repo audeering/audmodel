@@ -18,14 +18,14 @@ def scan_files(root: str,
             yield sub_dir, entry.name
 
 
-def upload_folder(root: str,
-                  group_id: str,
-                  repository: str,
-                  name: str,
-                  version: str,
-                  *,
-                  force: bool = False,
-                  verbose: bool = False) -> str:
+def upload_folder(
+        root: str,
+        group_id: str,
+        repository: str,
+        name: str,
+        version: str,
+        verbose: bool = False,
+) -> str:
 
     root = audeer.safe_path(root)
     if not os.path.isdir(root):
@@ -38,7 +38,7 @@ def upload_folder(root: str,
                                        version=version)
     url = f'{server_url}/{name}-{version}.zip'
 
-    if force or not audfactory.artifactory_path(url).exists():
+    if not audfactory.artifactory_path(url).exists():
         src_path = os.path.join(tempfile._get_default_tempdir(),
                                 f'{name}-{version}.zip')
         zip_folder(root, src_path, verbose=verbose)
