@@ -527,6 +527,11 @@ def versions(
 ) -> typing.List[str]:
     r"""Available model versions.
 
+    All versions,
+    that are available for the combination
+    of provided ``name``, ``subgroup``,
+    and model ``params``.
+
     Args:
         name: model name
         params: dictionary with parameters
@@ -542,6 +547,10 @@ def versions(
 
     Returns:
         available model versions
+
+    Example:
+        >>> versions('voxcnn', subgroup='speakerid')
+        ['0.1.0', '0.2.0', '0.3.0', '0.3.1', '0.3.2']
 
     """
     versions = audfactory.Lookup.versions(
