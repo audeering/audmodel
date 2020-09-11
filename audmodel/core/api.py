@@ -6,6 +6,12 @@ import audeer
 import audfactory
 
 from audmodel.core.config import config
+from audmodel.core.define import (
+    GROUP_ID,
+    LOOKUP_TABLE_NAME,
+    REPOSITORY_PUBLIC,
+    REPOSITORY_PRIVATE,
+)
 from audmodel.core.url import (
     name_from_url,
     repository_from_url,
@@ -38,9 +44,11 @@ def latest_version(
         name: model name
         params: dictionary with parameters
         subgroup: extend group id to
-            :attr:`audmodel.config.GROUP_ID`.<subgroup>. You can increase
-            the depth by using dot-notation, e.g. setting
-            ``subgroup=foo.bar`` will result in
+            ``com.audeering.models.<subgroup>``.
+            You can increase the depth
+            by using dot-notation,
+            e.g. setting ``subgroup=foo.bar``
+            will result in
             `com.audeering.models.foo.bar`
         private: repository is private
 
@@ -137,9 +145,11 @@ def lookup_table(
         name: model name
         version: version string
         subgroup: extend group id to
-            :attr:`audmodel.config.GROUP_ID`.<subgroup>. You can increase
-            the depth by using dot-notation, e.g. setting
-            ``subgroup=foo.bar`` will result in
+            ``com.audeering.models.<subgroup>``.
+            You can increase the depth
+            by using dot-notation,
+            e.g. setting ``subgroup=foo.bar``
+            will result in
             `com.audeering.models.foo.bar`
         private: repository is private
 
@@ -221,9 +231,12 @@ def publish(
         params: dictionary with parameters
         version: version string
         subgroup: extend group id to
-            :attr:`audmodel.config.GROUP_ID`.<subgroup>. You can increase
-            the depth by using dot-notation, e.g. setting
-            ``subgroup=foo.bar`` will result in
+            ``com.audeering.models.<subgroup>``.
+            You can increase the depth
+            by using dot-notation,
+            e.g. setting
+            ``subgroup=foo.bar``
+            will result in
             `com.audeering.models.foo.bar`
         private: repository is private
         create: create lookup table if it does not exist
@@ -311,9 +324,12 @@ def uid(
         params: dictionary with parameters
         version: version string
         subgroup: extend group id to
-            :attr:`audmodel.config.GROUP_ID`.<subgroup>. You can increase
-            the depth by using dot-notation, e.g. setting
-            ``subgroup=foo.bar`` will result in
+            ``com.audeering.models.<subgroup>``.
+            You can increase the depth
+            by using dot-notation,
+            e.g. setting
+            ``subgroup=foo.bar``
+            will result in
             `com.audeering.models.foo.bar`
         private: repository is private
 
@@ -368,10 +384,7 @@ def url(uid: str) -> str:
         raise ValueError('Provided unique ID not valid')
     try:
         pattern = f'artifact?name={uid}'
-        for repository in [
-                config.REPOSITORY_PUBLIC,
-                config.REPOSITORY_PRIVATE,
-        ]:
+        for repository in [REPOSITORY_PUBLIC, REPOSITORY_PRIVATE]:
             r = audfactory.rest_api_search(pattern, repository=repository)
             if r.status_code != 200:  # pragma: no cover
                 raise RuntimeError(
@@ -431,9 +444,12 @@ def versions(
         name: model name
         params: dictionary with parameters
         subgroup: extend group id to
-            :attr:`audmodel.config.GROUP_ID`.<subgroup>. You can increase
-            the depth by using dot-notation, e.g. setting
-            ``subgroup=foo.bar`` will result in
+            ``com.audeering.models.<subgroup>``.
+            You can increase the depth
+            by using dot-notation,
+            e.g. setting
+            ``subgroup=foo.bar``
+            will result in
             `com.audeering.models.foo.bar`
         private: repository is private
 
@@ -443,7 +459,7 @@ def versions(
     """
     versions = audfactory.Lookup.versions(
         _group_id(name, subgroup),
-        name=config.LOOKUP_TABLE_NAME,
+        name=LOOKUP_TABLE_NAME,
         params=params,
         repository=_repository(private),
     )
@@ -452,9 +468,9 @@ def versions(
 
 def _group_id(name: str, subgroup: str) -> str:
     if subgroup is None:
-        return f'{config.GROUP_ID}.{name}'
+        return f'{GROUP_ID}.{name}'
     else:
-        return f'{config.GROUP_ID}.{subgroup}.{name}'
+        return f'{GROUP_ID}.{subgroup}.{name}'
 
 
 def _lookup_from_url(model_url: str) -> audfactory.Lookup:
@@ -473,6 +489,6 @@ def _lookup_from_url(model_url: str) -> audfactory.Lookup:
 
 def _repository(private: bool) -> str:
     if private:
-        return config.REPOSITORY_PRIVATE
+        return REPOSITORY_PRIVATE
     else:
-        return config.REPOSITORY_PUBLIC
+        return REPOSITORY_PUBLIC
