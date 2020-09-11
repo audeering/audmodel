@@ -274,19 +274,47 @@ def publish(
 ) -> str:
     r"""Zip model and publish as a new artifact.
 
-    .. note:: Assigns a unique ID
-        and adds an entry in the lookup table.
-        If the lookup table does not exist,
-        it will be created.
-        If an entry already exists,
-        the operation will fail.
+    Assigns a unique ID
+    and adds an entry in the lookup table.
+    If the lookup table does not exist,
+    it will be created.
+    If an entry already exists,
+    the operation will fail.
+
+    Before publishing a model,
+    pick meaningful model ``params``, ``name``, ``subgroup``
+    values.
+
+    For model ``params`` we recommend to encode:
+
+    * data used to train the model
+    * sampling rate
+    * feature set(s)
+    * scaling applied to the features
+    * classifier
+    
+    For ``subgroup`` we recommend to encode:
+
+    * task the model was trained for, e.g. ``gender``
+    * maybe also project, e.g. ``projectsmile.agent-tone4``
+    * package that was used for training,
+      if not encoded in name,
+      e.g. ``projectsmile.agent-tone4.autrainer``
+
+    For ``name`` we recommend to encode:
+
+    * package that was used for training, e.g. ``autrainer``
+    * or if the package contains different sub-routines,
+      encode package in ``subgroup`` and the sub-routine
+      in ``name``,
+      e.g. ``sklearn``
 
     Args:
         root: folder with model files
         name: model name
         params: dictionary with parameters
         version: version string
-        subgroup: extend group id to
+        subgroup: extend group ID to
             ``com.audeering.models.<subgroup>``.
             You can increase the depth
             by using dot-notation,
