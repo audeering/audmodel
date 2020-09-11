@@ -371,7 +371,7 @@ def publish(
     return uid
 
 
-def remove(uid: str) -> None:
+def remove(uid: str):
     r"""Remove a model.
 
     The model will be deleted on Artifactory,
