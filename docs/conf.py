@@ -50,6 +50,9 @@ autodoc_mock_imports = [
 # Reference with :ref:`data-header:Database`
 autosectionlabel_prefix_document = True
 autosectionlabel_maxdepth = 2
+# Select only code from example ceels
+copybutton_prompt_text = r'>>> |\.\.\. '
+copybutton_prompt_is_regexp = True
 
 # HTML --------------------------------------------------------------------
 html_theme = 'sphinx_audeering_theme'
