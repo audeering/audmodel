@@ -25,49 +25,7 @@ pytest.PARAMS = [
         pytest.COLUMNS[2]: idx,
     } for idx in range(3)
 ]
-pytest.PARAMS_OBJ = audmodel.Parameters().add(
-    audmodel.Parameter(
-        name=pytest.COLUMNS[0],
-        dtype=str,
-        description='',
-    )
-).add(
-    audmodel.Parameter(
-        name=pytest.COLUMNS[1],
-        dtype=str,
-        description='',
-    )
-).add(
-    audmodel.Parameter(
-        name=pytest.COLUMNS[2],
-        dtype=int,
-        description='',
-    )
-)
 pytest.VERSION = '1.0.0'
-pytest.PARAMETERS = audmodel.Parameters().add(
-    audmodel.Parameter(
-        name='foo',
-        dtype=str,
-        description='a string',
-        choices=[None, 'foo'],
-    )
-).add(
-    audmodel.Parameter(
-        name='bar',
-        dtype=int,
-        description='an integer',
-        default=1,
-        version='>=2.0.0',
-    )
-).add(
-    audmodel.Parameter(
-        name='toggle',
-        dtype=bool,
-        description='a boolean',
-        default=False,
-    )
-)
 
 
 def cleanup():

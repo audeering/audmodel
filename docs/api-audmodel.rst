@@ -34,18 +34,6 @@ name
 
 .. autofunction:: name
 
-Parameter
----------
-
-.. autoclass:: Parameter
-    :members:
-
-Parameters
-----------
-
-.. autoclass:: Parameters
-    :members:
-
 parameters
 ----------
 
