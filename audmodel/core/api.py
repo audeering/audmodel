@@ -362,6 +362,9 @@ def publish(
 def remove(uid: str) -> None:
     r"""Remove a model.
 
+    The model will be deleted on Artifactory,
+    and removed from its corresponding lookup table.
+
     Args:
         uid: unique model ID
 
