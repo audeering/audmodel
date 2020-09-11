@@ -94,12 +94,12 @@ def load(
 ) -> str:
     r"""Download a model by its unique ID.
 
-    .. note:: If ``root`` is not set,
-        the model is downloaded to the default cache folder
-        (see :meth:`audmodel.default_cache_root`).
-        If the model already exists in the cache,
-        the download is skipped
-        (unless ``force`` is set).
+    If ``root`` is not set,
+    the model is downloaded to the default cache folder,
+    see :meth:`audmodel.default_cache_root`.
+    If the model already exists in the cache folder,
+    the download is skipped,
+    unless ``force`` is set.
 
     Args:
         uid: unique model identifier
@@ -112,6 +112,19 @@ def load(
 
     Raises:
         RuntimeError: if model does not exist
+
+    Example:
+        >>> model_folder = load('98ccb530-b162-11ea-8427-ac1f6bac2502')
+        >>> '/'.join(model_folder.split('/')[-8:])
+        'audmodel/com/audeering/models/gender/audgender/1.0.0/98ccb530-b162-11ea-8427-ac1f6bac2502'
+        >>> sorted(os.listdir(model_folder))
+        ['data-preprocessing',
+         'extractor',
+         'feature-preprocessing',
+         'metrics',
+         'post-processing',
+         'requirements.txt.lock',
+         'trainer']
 
     """
     model_url = url(uid)
