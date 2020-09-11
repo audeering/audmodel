@@ -24,6 +24,18 @@ from audmodel.core.utils import upload_folder
 def default_cache_root() -> str:
     r"""Default path under which models are stored.
 
+    It first looks for the environment variable
+    ``AUDMODEL_CACHE_ROOT``,
+    which can be set in bash:
+
+    .. code-block:: bash
+
+        export AUDMODEL_CACHE_ROOT=/path/to/your/cache
+
+    If it the environment variable is not set,
+    :attr:`config.AUDMODEL_CACHE_ROOT`
+    is returned.
+
     Returns:
         path to model cache
 
