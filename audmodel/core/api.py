@@ -426,7 +426,22 @@ def uid(
     Raises:
         RuntimeError: if no lookup table for the model exists
 
-    """
+    Example:
+        >>> uid(
+        ...     'audgender',
+        ...     {
+        ...         'classifier': "LinearSVC(C=0.1, class_weight='balanced', random_state=0)",
+        ...         'experiment': 'msp.msppodcast-1.0.0',
+        ...         'features': 'GeMAPSplus_v01',
+        ...         'sampling_rate': 8000,
+        ...         'scaler': 'StandardScaler()',
+        ...     },
+        ...     subgroup='gender',
+        ...     version='1.0.0',
+        ... )
+        '98ccb530-b162-11ea-8427-ac1f6bac2502'
+
+    """  # noqa: E501
     group_id = _group_id(name, subgroup)
     repository = _repository(private)
     if version is None:
