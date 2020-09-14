@@ -46,13 +46,17 @@ Usage
 Introduction
 ------------
 
-* We want to **publish** models on Artifactory_
-* We want to **load** models from Artifactory_
-* We want to tag models with **parameters**
+:mod:`audmodel` is a versatile tool
+that
+
+* **publishes** models on Artifactory_
+* **loads** models from Artifactory_
+* tags models with **parameters**
   (e.g. the sampling rate it was trained on)
 
-We assume that a model consists of one or more files
-that are stored in a folder on your local disk,
+:mod:`audmodel` assumes
+a model consists of file(s)
+stored in a local folder,
 e.g:
 
 .. code-block::
@@ -70,23 +74,24 @@ needs to be passed, e.g.:
 .. code-block:: python
 
     params = {
-        'task': 'anger,
+        'data': 'emodb',
         'rate': 8000,
     }
 
-If we now publish the model (e.g. as version ``1.0.0``),
-the following will happen:
+When publishing the model,
+:mod:`audmodel`
 
-1. A unique ``<id>`` is created
-2. The model folder is zipped and published as artifact ``<id>-<version>.zip``
-3. A row is added to a lookup table with ``<id>`` as index
+1. creates a unique ``<id>``
+2. zips the model folder and publishes it as artifact ``<id>-<version>.zip``
+3. adds a row to a lookup table with ``<id>`` as index
    and ``params`` as values
 
-And if we later download the model:
+When downloading the model,
+:mod:`audmodel`
 
-1. The requested ``<id>`` is resolved by Artifactory_
-2. The artifact ``<id>-<version>.zip`` is downloaded
-3. The archive is unpacked to the local model cache folder
+1. requests the ``<id>`` on Artifactory_
+2. downloads the artifact ``<id>-<version>.zip``
+3. unpacks the archive to the local model cache folder
 
 
 Publish a model
