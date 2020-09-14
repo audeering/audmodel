@@ -316,7 +316,7 @@ with a non empty ``root`` argument.
 
 Within the model cache folder
 the model is placed in a unique sub-folder, namely
-``<subgroup>/<name>/<version>/<uid>``.
+``com/audeering/models/<subgroup>/<name>/<version>/<uid>``.
 
 
 .. jupyter-execute::
