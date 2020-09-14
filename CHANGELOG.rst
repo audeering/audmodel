@@ -7,6 +7,43 @@ The format is based on `Keep a Changelog`_,
 and this project adheres to `Semantic Versioning`_.
 
 
+Version 0.8.0 (2020-09-14)
+--------------------------
+
+.. note:: With this version it becomes possible
+    to load models only by their unique id.
+    This introduces several breaking changes.
+    For more details see the following
+    `issue <https://gitlab.audeering.com/tools/audmodel/-/merge_requests/41>`_.
+
+* Added:
+
+  * :meth:`audmodel.default_cache_root`
+  * :meth:`audmodel.name`
+  * :meth:`audmodel.parameters`
+  * :meth:`audmodel.subgroup`
+  * :meth:`audmodel.uid`
+  * :meth:`audmodel.url`
+  * :meth:`audmodel.version`
+
+* Changed:
+
+  * :meth:`audmodel.latest_version`
+  * :meth:`audmodel.load`
+  * :meth:`audmodel.remove`
+  * :meth:`audmodel.versions`
+
+* Removed:
+
+  * ``audmodel.create_lookup_table``
+  * ``audmodel.delete_lookup_table``
+  * ``audmodel.extend_params``
+  * ``audmodel.get_*``
+  * ``audmodel.load_by_id``
+  * ``audmodel.Parameter``
+  * ``audmodel.Parameters``
+
+
 Version 0.6.1 (2020-07-01)
 --------------------------
 
