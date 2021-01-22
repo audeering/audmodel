@@ -3,6 +3,11 @@ audmodel
 
 .. automodule:: audmodel
 
+author
+------
+
+.. autofunction:: author
+
 config
 ------
 

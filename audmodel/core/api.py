@@ -16,6 +16,30 @@ from audmodel.core.url import (
 from audmodel.core.utils import upload_folder
 
 
+def author(uid: str) -> str:
+    r"""Author of model.
+
+    The author is defined
+    by the Artifactory user name
+    of the person that published the model.
+
+    Args:
+        uid: unique model ID
+
+    Returns:
+        model author
+
+    Example:
+        >>> author('98ccb530-b162-11ea-8427-ac1f6bac2502')
+        'jwagner'
+
+    """
+    model_url = url(uid)
+    path = audfactory.artifactory_path(model_url)
+    stats = path.stat()
+    return stats.modified_by
+
+
 def date(uid: str) -> str:
     r"""Publication date of model.
 
