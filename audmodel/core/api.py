@@ -16,6 +16,30 @@ from audmodel.core.url import (
 from audmodel.core.utils import upload_folder
 
 
+def date(uid: str) -> str:
+    r"""Publication date of model.
+
+    The publication date is defined
+    as the last date the model artifact was modified
+    on Artifactory.
+
+    Args:
+        uid: unique model ID
+
+    Returns:
+        model publication date
+
+    Example:
+        >>> date('98ccb530-b162-11ea-8427-ac1f6bac2502')
+        '2020/06/18'
+
+    """
+    model_url = url(uid)
+    path = audfactory.artifactory_path(model_url)
+    stats = path.stat()
+    return stats.mtime.strftime('%Y/%m/%d')
+
+
 def default_cache_root() -> str:
     r"""Default path under which models are stored.
 

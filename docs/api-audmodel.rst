@@ -9,6 +9,12 @@ config
 .. autoclass:: config
     :members:
 
+date
+----
+
+.. autofunction:: date
+
+
 default_cache_root
 ------------------
 

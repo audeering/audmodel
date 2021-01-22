@@ -1,4 +1,5 @@
 from audmodel.core.api import (
+    date,
     default_cache_root,
     latest_version,
     load,
