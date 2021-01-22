@@ -89,8 +89,6 @@ def default_cache_root() -> str:
 def exists(uid: str) -> bool:
     r"""Check if a model with this ID exists.
 
-    Returns ``False`` if Artifactory is not accessable.
-
     Args:
         uid: unique model ID
 
@@ -108,7 +106,9 @@ def exists(uid: str) -> bool:
     """
     try:
         url(uid)
-    except Exception:
+    except RuntimeError:
+        return False
+    except ValueError:
         return False
 
     return True
@@ -583,7 +583,7 @@ def url(uid: str) -> str:
             raise RuntimeError(f"A model with ID '{uid}' does not exist")
         url = urls[0]['uri']
     except ConnectionError:  # pragma: no cover
-        raise RuntimeError(
+        raise ConnectionError(
             'Artifactory is offline.\n\n'
             'Please make sure https://artifactory.audeering.com '
             'is reachable.'
