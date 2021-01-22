@@ -155,8 +155,13 @@ and can always be used to safely identify a model.
 Load a model
 ------------
 
-With the model ID we can find its actual URL
-on Artifactory:
+With the model ID we can check if a model exists:
+
+.. jupyter-execute::
+
+    audmodel.exists(uid)
+
+And we can find its actual URL on Artifactory:
 
 .. jupyter-execute::
 

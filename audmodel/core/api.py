@@ -86,6 +86,34 @@ def default_cache_root() -> str:
     return os.environ.get('AUDMODEL_CACHE_ROOT') or config.AUDMODEL_CACHE_ROOT
 
 
+def exists(uid: str) -> bool:
+    r"""Check if a model with this ID exists.
+
+    Returns ``False`` if Artifactory is not accessable.
+
+    Args:
+        uid: unique model ID
+
+    Returns:
+        ``True`` if a model with this ID is found
+
+    Example:
+        >>> exists('98ccb530-b162-11ea-8427-ac1f6bac2502')
+        True
+        >>> exists('00000000-0000-0000-0000-000000000000')
+        False
+        >>> exists('bad-id')
+        False
+
+    """
+    try:
+        url(uid)
+    except Exception:
+        return False
+
+    return True
+
+
 def latest_version(
         name: str,
         params: typing.Dict[str, typing.Any] = None,
@@ -530,10 +558,8 @@ def url(uid: str) -> str:
         'models-public-local/com/audeering/models/gender/audgender'
 
     """
-    # UID has '-' at position 8, 13, 18, 23
-    idx = [8, 13, 18, 23]
-    if len(uid) != 36 or any([uid[i] != '-' for i in idx]):
-        raise ValueError('Provided unique ID not valid')
+    if not audeer.is_uid(uid):
+        raise ValueError(f"'{uid}' is not a valid ID")
     try:
         pattern = f'artifact?name={uid}'
         for repository in [
@@ -550,7 +576,7 @@ def url(uid: str) -> str:
                 )
             urls = r.json()['results']
             if len(urls) > 1:  # pragma: no cover
-                raise RuntimeError(f'Found more then one model: {urls}')
+                raise RuntimeError(f'Found more than one model: {urls}')
             elif len(urls) == 1:
                 break
         if len(urls) == 0:

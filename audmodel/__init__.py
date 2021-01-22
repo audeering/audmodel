@@ -2,6 +2,7 @@ from audmodel.core.api import (
     author,
     date,
     default_cache_root,
+    exists,
     latest_version,
     load,
     lookup_table,

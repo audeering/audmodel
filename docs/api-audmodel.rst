@@ -19,11 +19,15 @@ date
 
 .. autofunction:: date
 
-
 default_cache_root
 ------------------
 
 .. autofunction:: default_cache_root
+
+exists
+------
+
+.. autofunction:: exists
 
 latest_version
 --------------
