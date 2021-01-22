@@ -1,14 +1,12 @@
 import os
 import pytest
-import uuid
 
 import audeer
 import audfactory
 import audmodel
 
-
-audmodel.core.define.defaults.REPOSITORY_PRIVATE = 'unittests-public-local'
-
+pytest.REPOSITORY = 'unittests-public-local'
+audmodel.core.define.defaults.REPOSITORY_PRIVATE = pytest.REPOSITORY
 pytest.SUBGROUP = f'audmodel.{audeer.uid()}'
 pytest.ROOT = os.path.dirname(os.path.realpath(__file__))
 pytest.NAME = 'audmodel'

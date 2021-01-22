@@ -131,8 +131,8 @@ def load(
 
     Example:
         >>> model_folder = load('98ccb530-b162-11ea-8427-ac1f6bac2502')
-        >>> '/'.join(model_folder.split('/')[-8:])
-        'audmodel/com/audeering/models/gender/audgender/1.0.0/98ccb530-b162-11ea-8427-ac1f6bac2502'
+        >>> '/'.join(model_folder.split('/')[-9:])
+        'audmodel/models-public-local/com/audeering/models/gender/audgender/1.0.0/98ccb530-b162-11ea-8427-ac1f6bac2502'
         >>> sorted(os.listdir(model_folder))
         ['data-preprocessing',
          'extractor',
@@ -144,6 +144,7 @@ def load(
 
     """
     model_url = url(uid)
+    repository = repository_from_url(model_url)
     group_id = _group_id(
         name_from_url(model_url),
         subgroup_from_url(model_url),
@@ -153,6 +154,7 @@ def load(
     root = audeer.safe_path(root or default_cache_root())
     root = os.path.join(
         root or default_cache_root(),
+        repository,
         audfactory.group_id_to_path(group_id),
         version,
         uid,

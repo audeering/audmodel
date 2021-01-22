@@ -19,6 +19,7 @@ def test_load(verbose):
     group_id = f'{audmodel.core.define.defaults.GROUP_ID}.{pytest.SUBGROUP}'
     assert model_root == os.path.join(
         root,
+        pytest.REPOSITORY,
         audfactory.group_id_to_path(group_id),
         pytest.NAME,
         pytest.VERSION,
