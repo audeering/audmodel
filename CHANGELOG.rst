@@ -7,6 +7,17 @@ The format is based on `Keep a Changelog`_,
 and this project adheres to `Semantic Versioning`_.
 
 
+Version 0.9.0 (2021-01-25)
+--------------------------
+
+* Added: :func:`audmodel.date`
+* Added: :func:`audmodel.author`
+* Added: :func:`audmodel.exists`
+* Changed: include the repository name in the folders created in cache
+* Changed: :func:`audmodel.url` raises now ``ConnectionError``
+  instead of ``RuntimeError`` if Artifactory is offline
+
+
 Version 0.8.0 (2020-09-14)
 --------------------------
 
