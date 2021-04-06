@@ -7,6 +7,12 @@ The format is based on `Keep a Changelog`_,
 and this project adheres to `Semantic Versioning`_.
 
 
+Version 0.10.0 (2021-04-06)
+---------------------------
+
+* Changed: use audfactory>=1.0.0
+
+
 Version 0.9.1 (2021-01-26)
 --------------------------
 
