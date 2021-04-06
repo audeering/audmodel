@@ -7,7 +7,7 @@ import audmodel
 
 
 URL = (
-    f'{audfactory.config.ARTIFACTORY_ROOT}/'
+    f'{audmodel.core.define.defaults.ARTIFACTORY_HOST}/'
     f'{audmodel.core.define.defaults.REPOSITORY_PUBLIC}'
 )
 
@@ -56,7 +56,7 @@ def test_from_url(group_id, subgroup, name):
 def test_url():
     uid = pytest.UIDS[0]
     url = audmodel.url(uid)
-    assert audfactory.artifactory_path(url).exists()
+    assert audfactory.path(url).exists()
     error_msg = f"'bad-id' is not a valid ID"
     with pytest.raises(ValueError, match=error_msg):
         audmodel.url('bad-id')

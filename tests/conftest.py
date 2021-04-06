@@ -5,6 +5,7 @@ import audeer
 import audfactory
 import audmodel
 
+pytest.SERVER = 'https://artifactory.audeering.com/artifactory'
 pytest.REPOSITORY = 'unittests-public-local'
 audmodel.core.define.defaults.REPOSITORY_PRIVATE = pytest.REPOSITORY
 pytest.SUBGROUP = f'audmodel.{audeer.uid()}'
@@ -29,9 +30,13 @@ pytest.VERSION = '1.0.0'
 def cleanup():
     group_id = f'{audmodel.core.define.defaults.GROUP_ID}.{pytest.SUBGROUP}'
     repository = f'{audmodel.core.define.defaults.REPOSITORY_PRIVATE}'
-    path = audfactory.artifactory_path(
-        audfactory.server_url(group_id, name=pytest.NAME,
-                              repository=repository)).parent
+    url = audfactory.url(
+        pytest.SERVER,
+        repository=repository,
+        group_id=group_id,
+        name=pytest.NAME,
+    )
+    path = audfactory.path(url).parent
     if path.exists():
         path.rmdir()
 

@@ -5,7 +5,6 @@ import shutil
 
 import audmodel
 import audeer
-import audfactory
 
 
 @pytest.mark.usefixtures('create')

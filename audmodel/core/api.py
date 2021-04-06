@@ -35,7 +35,7 @@ def author(uid: str) -> str:
 
     """
     model_url = url(uid)
-    path = audfactory.artifactory_path(model_url)
+    path = audfactory.path(model_url)
     stats = path.stat()
     return stats.modified_by
 
@@ -59,7 +59,7 @@ def date(uid: str) -> str:
 
     """
     model_url = url(uid)
-    path = audfactory.artifactory_path(model_url)
+    path = audfactory.path(model_url)
     stats = path.stat()
     return stats.mtime.strftime('%Y/%m/%d')
 
@@ -149,9 +149,10 @@ def latest_version(
 
     """
     version = audfactory.Lookup.latest_version(
+        defaults.ARTIFACTORY_HOST,
+        _repository(private),
         _group_id(name, subgroup),
         params=params,
-        repository=_repository(private),
     )
     return version
 
@@ -216,7 +217,7 @@ def load(
     zip_file = os.path.join(tempfile._get_default_tempdir(), f'{uid}.zip')
     if not os.path.exists(root):
         audeer.mkdir(root)
-        audfactory.download_artifact(model_url, zip_file, verbose=verbose)
+        audfactory.download(model_url, zip_file, verbose=verbose)
         audeer.extract_archive(
             zip_file,
             root,
@@ -279,9 +280,10 @@ def lookup_table(
 
     """  # noqa: E501
     lookup = audfactory.Lookup(
+        defaults.ARTIFACTORY_HOST,
+        _repository(private),
         _group_id(name, subgroup),
         version=version,
-        repository=_repository(private),
     )
     return lookup
 
@@ -402,24 +404,27 @@ def publish(
         RuntimeError: if an artifact exists already
 
     """
+    server = defaults.ARTIFACTORY_HOST
     group_id = _group_id(name, subgroup)
     repository = _repository(private)
-    if not audfactory.Lookup.exists(group_id, version, repository=repository):
+    if not audfactory.Lookup.exists(server, repository, group_id, version):
         if create:
             audfactory.Lookup.create(
+                server,
+                repository,
                 group_id,
                 version,
                 list(params.keys()),
-                repository=repository,
             )
         else:
             raise RuntimeError(f"A lookup table for '{name}' and "
                                f"'{version}' does not exist yet.")
 
     lookup = audfactory.Lookup(
+        server,
+        repository,
         group_id,
         version=version,
-        repository=repository,
     )
 
     param_keys = list(params.keys())
@@ -450,7 +455,7 @@ def remove(uid: str):
     model_url = url(uid)
     lookup = _lookup_from_url(model_url)
     lookup.remove(lookup[uid])
-    audfactory.artifactory_path(model_url).parent.parent.rmdir()
+    audfactory.path(model_url).parent.parent.rmdir()
 
 
 def subgroup(uid: str) -> str:
@@ -520,18 +525,20 @@ def uid(
         '98ccb530-b162-11ea-8427-ac1f6bac2502'
 
     """  # noqa: E501
-    group_id = _group_id(name, subgroup)
     repository = _repository(private)
+    group_id = _group_id(name, subgroup)
     if version is None:
         version = audfactory.Lookup.latest_version(
+            defaults.ARTIFACTORY_HOST,
+            repository,
             group_id,
             params=params,
-            repository=repository,
         )
     lookup = audfactory.Lookup(
+        defaults.ARTIFACTORY_HOST,
+        repository,
         group_id,
         version=version,
-        repository=repository,
     )
     return lookup.find(params)
 
@@ -566,7 +573,11 @@ def url(uid: str) -> str:
                 defaults.REPOSITORY_PUBLIC,
                 defaults.REPOSITORY_PRIVATE,
         ]:
-            r = audfactory.rest_api_search(pattern, repository=repository)
+            search_url = (
+                f'{defaults.ARTIFACTORY_HOST}/'
+                f'api/search/{pattern}&repos={repository}'
+            )
+            r = audfactory.rest_api_get(search_url)
             if r.status_code != 200:  # pragma: no cover
                 raise RuntimeError(
                     f'Error trying to find model.\n'
@@ -590,7 +601,7 @@ def url(uid: str) -> str:
         )
     # Replace beginning of URL as it includes /api/storage and port
     relative_repo_url = '/'.join(url.split('/')[6:])
-    url = f'{audfactory.config.ARTIFACTORY_ROOT}/{relative_repo_url}'
+    url = f'{defaults.ARTIFACTORY_HOST}/{relative_repo_url}'
     return url
 
 
@@ -648,10 +659,11 @@ def versions(
 
     """
     versions = audfactory.Lookup.versions(
+        defaults.ARTIFACTORY_HOST,
+        _repository(private),
         _group_id(name, subgroup),
         name=defaults.LOOKUP_TABLE_NAME,
         params=params,
-        repository=_repository(private),
     )
     return versions
 
@@ -671,9 +683,10 @@ def _lookup_from_url(model_url: str) -> audfactory.Lookup:
     version = version_from_url(model_url)
     repository = repository_from_url(model_url)
     return audfactory.Lookup(
+        defaults.ARTIFACTORY_HOST,
+        repository,
         group_id,
         version=version,
-        repository=repository,
     )
 
 

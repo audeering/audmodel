@@ -6,6 +6,8 @@ import zipfile
 import audeer
 import audfactory
 
+from audmodel.core.define import defaults
+
 
 def scan_files(root: str,
                sub_dir: str = '') -> (str, str):
@@ -32,22 +34,20 @@ def upload_folder(
         raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT),
                                 root)
 
-    server_url = audfactory.server_url(group_id,
-                                       name=name,
-                                       repository=repository,
-                                       version=version)
+    server_url = audfactory.url(
+        defaults.ARTIFACTORY_HOST,
+        repository=repository,
+        group_id=group_id,
+        name=name,
+        version=version,
+    )
     url = f'{server_url}/{name}-{version}.zip'
 
-    if not audfactory.artifactory_path(url).exists():
+    if not audfactory.path(url).exists():
         src_path = os.path.join(tempfile._get_default_tempdir(),
                                 f'{name}-{version}.zip')
         zip_folder(root, src_path, verbose=verbose)
-        audfactory.upload_artifact(src_path,
-                                   repository,
-                                   group_id,
-                                   name,
-                                   version,
-                                   verbose=verbose)
+        audfactory.deploy(src_path, url, verbose=verbose)
         os.remove(src_path)
 
     return url

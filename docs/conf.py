@@ -32,7 +32,7 @@ extensions = [
 ]
 intersphinx_mapping = {
     'python': ('https://docs.python.org/3/', None),
-    'audfactory': ('http://tools.pp.audeering.com/audfactory/', None),
+    'audfactory': ('https://audeering.github.io/audfactory/', None),
 }
 # Disable Gitlab as we need to sign in
 linkcheck_ignore = [

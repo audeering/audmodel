@@ -16,7 +16,7 @@ def repository_from_url(url: str) -> str:
 def subgroup_from_url(url: str) -> typing.Union[None, str]:
     # Consider length of group ID
     url_start = (
-        f'{audfactory.config.ARTIFACTORY_ROOT}/'
+        f'{defaults.ARTIFACTORY_HOST}/'
         f'repo/'
         f'{audfactory.group_id_to_path(defaults.GROUP_ID)}'
     )

@@ -336,10 +336,13 @@ the model is placed in a unique sub-folder, namely
         root = os.path.join(os.getcwd(), 'models')
         if os.path.exists(root):
             shutil.rmtree(root)
-        path = audfactory.artifactory_path(
-            audfactory.server_url(audmodel.core.define.defaults.GROUP_ID,
-                                  name='mymodel',
-                                  repository='models-public-local')).parent
+        url = audfactory.url(
+            audmodel.core.define.defaults.ARTIFACTORY_HOST,
+            repository='models-public-local',
+            group_id=audmodel.core.define.defaults.GROUP_ID,
+            name='mymodel',
+        )
+        path = audfactory.path(url).parent
         if path.exists():
             path.rmdir()
 

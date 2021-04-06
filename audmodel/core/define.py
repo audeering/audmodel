@@ -1,5 +1,8 @@
 class defaults():
 
+    ARTIFACTORY_HOST = 'https://artifactory.audeering.com/artifactory'
+    r"""Server address of Artifactory server."""
+
     GROUP_ID = 'com.audeering.models'
     r"""Default group ID."""
 
