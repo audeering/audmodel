@@ -2,6 +2,7 @@ import typing
 
 import audfactory
 
+from audmodel.core.config import config
 from audmodel.core.define import defaults
 
 
@@ -18,7 +19,7 @@ def subgroup_from_url(url: str) -> typing.Union[None, str]:
     url_start = (
         f'{defaults.ARTIFACTORY_HOST}/'
         f'repo/'
-        f'{audfactory.group_id_to_path(defaults.GROUP_ID)}'
+        f'{audfactory.group_id_to_path(config.GROUP_ID)}'
     )
     start_length = len(url_start.split('/'))
     subgroup = '.'.join(url.split('/')[start_length:-4])

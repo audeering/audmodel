@@ -34,8 +34,8 @@ URL = (
 )
 def test_from_url(group_id, subgroup, name):
     version = '1.0.0'
-    repository = audmodel.core.define.defaults.REPOSITORY_PUBLIC
-    audmodel.core.define.defaults.GROUP_ID = group_id
+    repository = audmodel.config.REPOSITORY_PUBLIC
+    audmodel.config.GROUP_ID = group_id
     if subgroup is None:
         group_id = group_id
     else:

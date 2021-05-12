@@ -7,7 +7,7 @@ import audmodel
 
 pytest.SERVER = 'https://artifactory.audeering.com/artifactory'
 pytest.REPOSITORY = 'unittests-public-local'
-audmodel.core.define.defaults.REPOSITORY_PRIVATE = pytest.REPOSITORY
+audmodel.config.REPOSITORY_PRIVATE = pytest.REPOSITORY
 pytest.SUBGROUP = f'audmodel.{audeer.uid()}'
 pytest.ROOT = os.path.dirname(os.path.realpath(__file__))
 pytest.NAME = 'audmodel'

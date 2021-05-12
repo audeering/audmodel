@@ -15,7 +15,57 @@ from audmodel.core.url import (
     subgroup_from_url,
     version_from_url,
 )
-from audmodel.core.utils import upload_folder
+from audmodel.core.utils import (
+    upload_folder,
+)
+
+
+def author(uid: str) -> str:
+    r"""Author of model.
+
+    The author is defined
+    by the Artifactory user name
+    of the person that published the model.
+
+    Args:
+        uid: unique model ID
+
+    Returns:
+        model author
+
+    Example:
+        >>> author('98ccb530-b162-11ea-8427-ac1f6bac2502')
+        'jwagner'
+
+    """
+    model_url = url(uid)
+    path = audfactory.path(model_url)
+    stats = path.stat()
+    return stats.modified_by
+
+
+def date(uid: str) -> str:
+    r"""Publication date of model.
+
+    The publication date is defined
+    as the last date the model artifact was modified
+    on Artifactory.
+
+    Args:
+        uid: unique model ID
+
+    Returns:
+        model publication date
+
+    Example:
+        >>> date('98ccb530-b162-11ea-8427-ac1f6bac2502')
+        '2020/06/18'
+
+    """
+    model_url = url(uid)
+    path = audfactory.path(model_url)
+    stats = path.stat()
+    return stats.mtime.strftime('%Y/%m/%d')
 
 
 def latest_version(
@@ -147,6 +197,116 @@ def parameters(uid: str) -> typing.Dict:
     return lookup[uid]
 
 
+def publish(
+        root: str,
+        name: str,
+        params: typing.Dict[str, typing.Any],
+        version: str,
+        *,
+        subgroup: str = None,
+        private: bool = False,
+        create: bool = True,
+        verbose: bool = False,
+) -> str:
+    r"""Zip model and publish as a new artifact.
+
+    Assigns a unique ID
+    and adds an entry in the lookup table.
+    If the lookup table does not exist,
+    it will be created.
+    If an entry already exists,
+    the operation will fail.
+
+    Before publishing a model,
+    pick meaningful model ``params``, ``name``, ``subgroup``
+    values.
+
+    For model ``params`` we recommend to encode:
+
+    * data used to train the model
+    * sampling rate
+    * feature set(s)
+    * scaling applied to the features
+    * classifier
+
+    For ``subgroup`` we recommend to encode:
+
+    * task the model was trained for, e.g. ``gender``
+    * maybe also project, e.g. ``projectsmile.agent-tone4``
+    * package that was used for training,
+      if not encoded in name,
+      e.g. ``projectsmile.agent-tone4.autrainer``
+
+    For ``name`` we recommend to encode:
+
+    * package that was used for training, e.g. ``autrainer``
+    * or if the package contains different sub-routines,
+      encode package in ``subgroup`` and the sub-routine
+      in ``name``,
+      e.g. ``sklearn``
+
+    Args:
+        root: folder with model files
+        name: model name
+        params: dictionary with parameters
+        version: version string
+        subgroup: extend group ID to
+            ``com.audeering.models.<subgroup>``.
+            You can increase the depth
+            by using dot-notation,
+            e.g. setting
+            ``subgroup=foo.bar``
+            will result in
+            ``com.audeering.models.foo.bar``
+        private: repository is private
+        create: create lookup table if it does not exist
+        verbose: show verbose output
+
+    Returns:
+        unique model ID
+
+    Raises:
+        RuntimeError: if an artifact exists already
+
+    """
+    server = defaults.ARTIFACTORY_HOST
+    group_id = _group_id(name, subgroup)
+    repository = _repository(private)
+    if not audfactory.Lookup.exists(server, repository, group_id, version):
+        if create:
+            audfactory.Lookup.create(
+                server,
+                repository,
+                group_id,
+                version,
+                list(params.keys()),
+            )
+        else:
+            raise RuntimeError(f"A lookup table for '{name}' and "
+                               f"'{version}' does not exist yet.")
+
+    lookup = audfactory.Lookup(
+        server,
+        repository,
+        group_id,
+        version=version,
+    )
+
+    param_keys = list(params.keys())
+    # Extend lookup table if more parameters are given
+    if param_keys not in lookup.columns:
+        lookup.extend(param_keys)
+    # Extend parameters if more are available in lookup table
+    for column in lookup.columns:
+        if column not in param_keys:
+            params[column] = None
+
+    uid = lookup.append(params)
+    upload_folder(root, group_id, repository, uid, version, verbose)
+
+    return uid
+
+
 def remove(uid: str):
     r"""Remove a model.
 
@@ -257,8 +417,8 @@ def url(uid: str) -> str:
     try:
         pattern = f'artifact?name={uid}'
         for repository in [
-                defaults.REPOSITORY_PUBLIC,
-                defaults.REPOSITORY_PRIVATE,
+                config.REPOSITORY_PUBLIC,
+                config.REPOSITORY_PRIVATE,
         ]:
             search_url = (
                 f'{defaults.ARTIFACTORY_HOST}/'
@@ -339,9 +499,9 @@ def versions(
 
 def _group_id(name: str, subgroup: str) -> str:
     if subgroup is None:
-        return f'{defaults.GROUP_ID}.{name}'
+        return f'{config.GROUP_ID}.{name}'
     else:
-        return f'{defaults.GROUP_ID}.{subgroup}.{name}'
+        return f'{config.GROUP_ID}.{subgroup}.{name}'
 
 
 def _lookup_from_url(model_url: str) -> audfactory.Lookup:
@@ -361,6 +521,6 @@ def _lookup_from_url(model_url: str) -> audfactory.Lookup:
 
 def _repository(private: bool) -> str:
     if private:
-        return defaults.REPOSITORY_PRIVATE
+        return config.REPOSITORY_PRIVATE
     else:
-        return defaults.REPOSITORY_PUBLIC
+        return config.REPOSITORY_PUBLIC

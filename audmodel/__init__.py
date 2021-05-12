@@ -9,10 +9,10 @@ from audmodel.core.api import (
     name,
     parameters,
     publish,
+    remove,
     subgroup,
     uid,
     url,
-    version,
     versions,
 )
 from audmodel.core.config import config

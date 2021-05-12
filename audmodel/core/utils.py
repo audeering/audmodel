@@ -53,7 +53,7 @@ def upload_folder(
     return url
 
 
-def zip_folder(src_root: str, dst_path: str, *, verbose: bool = False) -> None:
+def zip_folder(src_root: str, dst_path: str, *, verbose: bool = False):
 
     with zipfile.ZipFile(dst_path, 'w', zipfile.ZIP_DEFLATED) as zf:
         files = list(scan_files(src_root))

@@ -1,22 +1,19 @@
+import datetime
+import errno
 import os
 import tempfile
 import typing
 
+import audbackend
 import oyaml as yaml
 
 import audeer
 import audfactory
 
+from audmodel.core.backend import get_backend
 from audmodel.core.config import config
-from audmodel.core.define import defaults
 import audmodel.core.legacy as legacy
-from audmodel.core.url import (
-    name_from_url,
-    repository_from_url,
-    subgroup_from_url,
-    version_from_url,
-)
-from audmodel.core.utils import upload_folder
+from audmodel.core.utils import zip_folder
 
 
 def author(uid: str) -> str:
@@ -37,10 +34,10 @@ def author(uid: str) -> str:
         'jwagner'
 
     """
-    model_url = url(uid)
-    path = audfactory.path(model_url)
-    stats = path.stat()
-    return stats.modified_by
+    try:
+        return header(uid)['author']
+    except FileNotFoundError:
+        return legacy.author(uid)
 
 
 def date(uid: str) -> str:
@@ -61,10 +58,10 @@ def date(uid: str) -> str:
         '2020/06/18'
 
     """
-    model_url = url(uid)
-    path = audfactory.path(model_url)
-    stats = path.stat()
-    return stats.mtime.strftime('%Y/%m/%d')
+    try:
+        return header(uid)['date']
+    except FileNotFoundError:
+        return legacy.date(uid)
 
 
 def default_cache_root() -> str:
@@ -121,71 +118,46 @@ def header(
         uid: str,
         *,
         version: str = None,
-        verbose: bool = False,
 ) -> dict:
+    r"""Download model header.
 
-    model_url = url(uid, version=version)
+    Args:
+        uid: unique model ID
+        version: version string
+
+    Returns:
+        dictionary with meta information about model
+
+    """
+    path, version, backend = path_version_backend(uid, version=version)
 
     with tempfile.TemporaryDirectory() as root:
-        path = audfactory.download(
-            model_url[:-4] + '.yaml',
-            root,
-            verbose=verbose,
+        src_path = path + '.yaml'
+        dst_path = os.path.join(root, 'header.yaml')
+        backend.get_file(
+            src_path,
+            dst_path,
+            version,
         )
-        with open(path, 'r') as fp:
+        with open(dst_path, 'r') as fp:
             return yaml.load(fp, Loader=yaml.Loader)
 
 
-def latest_version(
-        name: str,
-        params: typing.Dict[str, typing.Any] = None,
-        *,
-        subgroup: str = None,
-        private: bool = False,
-) -> str:
+def latest_version(uid: str) -> str:
     r"""Latest available version of model.
 
-    The highest version,
-    that is available for the combination
-    of provided ``name``, ``subgroup``,
-    and model ``params``.
-
     Args:
-        name: model name
-        params: dictionary with parameters
-        subgroup: extend group ID to
-            ``com.audeering.models.<subgroup>``.
-            You can increase the depth
-            by using dot-notation,
-            e.g. setting ``subgroup=foo.bar``
-            will result in
-            ``com.audeering.models.foo.bar``
-        private: repository is private
+        uid: unique model ID
 
     Returns:
         latest version of model
 
     Example:
-        >>> latest_version('audgender', subgroup='gender')
+        >>> latest_version('98ccb530-b162-11ea-8427-ac1f6bac2502')
         '1.0.0'
 
     """
-    vs = versions(
-        name,
-        params,
-        subgroup=subgroup,
-        private=private,
-    )
-    if vs:
-        v = vs[-1]
-    else:
-        v = legacy.latest_version(
-            name,
-            params,
-            subgroup=subgroup,
-            private=private,
-        )
-    return v
+    return versions(uid)[-1]
 
 
 def load(
@@ -204,10 +176,10 @@ def load(
     the download is skipped.
 
     Args:
-        uid: unique model identifier
-        version: version string,
+        uid: unique model ID
+        version: version string
         root: store model within this folder
-        verbose: show verbose output
+        verbose: show debug messages
 
     Returns:
         path to model folder
@@ -229,34 +201,35 @@ def load(
          'trainer']
 
     """
-    model_url = url(uid, version=version)
-    repository = repository_from_url(model_url)
-    group_id = _group_id(
-        name_from_url(model_url),
-        subgroup_from_url(model_url),
-    )
-    if version is None:
-        version = version_from_url(model_url)
+    path, version, backend = path_version_backend(uid, version=version)
 
     root = audeer.safe_path(root or default_cache_root())
     root = os.path.join(
-        root or default_cache_root(),
-        repository,
-        audfactory.group_id_to_path(group_id),
-        uid,
+        root,
+        backend.repository,
+        path.replace(backend.sep, os.path.sep),
         version,
     )
-    root = audeer.safe_path(root)
 
     if not os.path.exists(root):
         tmp_root = audeer.mkdir(root + '~')
-        path = audfactory.download(model_url, tmp_root, verbose=verbose)
+
+        # get archive
+        src_path = path + '.zip'
+        dst_path = os.path.join(tmp_root, 'model.zip')
+        backend.get_file(
+            src_path,
+            dst_path,
+            version,
+        )
         audeer.extract_archive(
-            path,
+            dst_path,
             tmp_root,
             keep_archive=False,
             verbose=verbose,
         )
+
+        # move folder
         audeer.mkdir(root)
         os.rename(tmp_root, root)
 
@@ -277,8 +250,9 @@ def name(uid: str) -> str:
         'audgender'
 
     """
-    model_url = url(uid)
-    return name_from_url(model_url)
+    path, _, backend = path_version_backend(uid)
+    path = backend.split(path)[0]
+    return backend.split(path)[1]
 
 
 def parameters(uid: str) -> typing.Dict:
@@ -304,13 +278,98 @@ def parameters(uid: str) -> typing.Dict:
     """  # noqa: E501
     try:
         return header(uid)['params']
-    except RuntimeError:
+    except FileNotFoundError:
         return legacy.parameters(uid)
+
+
+def path_version_backend(
+        uid: str,
+        *,
+        version: str = None,
+) -> (str, str, audbackend.Backend):
+    r"""Get path, version and backend."""
+
+    if not audeer.is_uid(uid):
+        raise ValueError(f"'{uid}' is not a valid ID")
+
+    backend = None
+    urls = []
+
+    if config.BACKEND_HOST[0] == 'artifactory':
+        # use REST API on Artifactory
+        try:
+            host = config.BACKEND_HOST[1]
+            pattern = f'artifact?name={uid}'
+            for repository in [
+                config.REPOSITORY_PUBLIC,
+                config.REPOSITORY_PRIVATE,
+            ]:
+                search_url = (
+                    f'{host}/'
+                    f'api/search/{pattern}&repos={repository}'
+                )
+                r = audfactory.rest_api_get(search_url)
+                if r.status_code != 200:  # pragma: no cover
+                    raise RuntimeError(
+                        f'Error trying to find model.\n'
+                        f'The REST API query was not successful:\n'
+                        f'Error code: {r.status_code}\n'
+                        f'Error message: {r.text}'
+                    )
+                results = r.json()['results']
+                if results:
+                    private = repository == config.REPOSITORY_PRIVATE
+                    backend = get_backend(private)
+                    for result in results:
+                        url = result['uri']
+                        if url.endswith('.zip'):
+                            # Replace beginning of URI
+                            # as it includes /api/storage and port
+                            url = '/'.join(url.split('/')[6:])
+                            url = f'{host}/{url}'
+                            urls.append(url)
+                    break
+        except ConnectionError:  # pragma: no cover
+            raise ConnectionError(
+                'Artifactory is offline.\n\n'
+                'Please make sure https://artifactory.audeering.com '
+                'is reachable.'
+            )
+    else:
+        # use glob otherwise
+        pattern = f'**/{uid}/*/*.zip'
+        for private in [True, False]:
+            backend = get_backend(private)
+            urls = backend.glob(pattern)
+
+    if not urls:
+        raise RuntimeError(f"A model with ID '{uid}' does not exist.")
+
+    url = None
+    if version is None:
+        url = urls[-1]
+        version = url.split('/')[-2]
+    else:
+        for u in urls:
+            if u.endswith(f'{version}.zip'):
+                url = u
+                break
+
+    if url is None:
+        raise RuntimeError(f"A model with ID '{uid}' "
+                           f"and version '{version}' "
+                           f"does not exist.")
+
+    path = url[len(backend.host) + len(backend.repository) + 2:]
+    path = backend.join(*path.split(backend.sep)[:-2])
+
+    return path, version, backend
 
 
 def publish(
         root: str,
         name: str,
+        author: str,
         params: typing.Dict[str, typing.Any],
         version: str,
         *,
@@ -351,6 +410,7 @@ def publish(
     Args:
         root: folder with model files
         name: model name
+        author: author name(s)
         params: dictionary with parameters
         version: version string
         subgroup: extend group ID to
@@ -362,7 +422,7 @@ def publish(
             will result in
             ``com.audeering.models.foo.bar``
         private: repository is private
-        verbose: show verbose output
+        verbose: show debug messages
 
     Returns:
         unique model ID
@@ -371,35 +431,54 @@ def publish(
         RuntimeError: if an artifact exists already
 
     """
-    group_id = _group_id(name, subgroup)
-    repository = _repository(private)
-    model_id = uid(name, params, subgroup=subgroup, private=private)
-
-    # publish meta data
-
-    meta = {
-        'name': name,
-        'subgroup': subgroup,
-        'params': params,
-        'version': version,
-    }
-    with tempfile.TemporaryDirectory() as tmp_root:
-        meta_path = os.path.join(tmp_root, 'header.yaml')
-        with open(meta_path, 'w') as fp:
-            yaml.dump(meta, fp)
-        url = audfactory.url(
-            defaults.ARTIFACTORY_HOST,
-            repository=repository,
-            group_id=group_id,
-            name=model_id,
-            version=version,
+    root = audeer.safe_path(root)
+    if not os.path.isdir(root):
+        raise FileNotFoundError(
+            errno.ENOENT,
+            os.strerror(errno.ENOENT),
+            root,
         )
-        meta_url = f'{url}/{model_id}-{version}.yaml'
-        audfactory.deploy(meta_path, meta_url, verbose=verbose)
 
-    # upload model
+    backend = get_backend(private)
+    model_id = uid(name, params, subgroup=subgroup, private=private)
+    path = backend.join(
+        *config.GROUP_ID.split('.'),
+        *subgroup.split('.'),
+        name,
+        model_id,
+    )
 
-    upload_folder(root, group_id, repository, model_id, version, verbose)
+    if backend.exists(path + '.zip', version):
+        raise RuntimeError(
+            f"A model with ID "
+            f"'{model_id}' "
+            f"and version "
+            f"'{version}' "
+            f"exists already."
+        )
+
+    with tempfile.TemporaryDirectory() as tmp_root:
+
+        # header
+        src_path = os.path.join(tmp_root, 'header.yaml')
+        dst_path = path + '.yaml'
+        header = {
+            'name': name,
+            'subgroup': subgroup,
+            'author': author,
+            'date': str(datetime.datetime.now()),
+            'params': params,
+            'version': version,
+        }
+        with open(src_path, 'w') as fp:
+            yaml.dump(header, fp)
+        backend.put_file(src_path, dst_path, version)
+
+        # archive
+        src_path = os.path.join(tmp_root, 'model.zip')
+        dst_path = path + '.zip'
+        zip_folder(root, src_path, verbose=verbose)
+        backend.put_file(src_path, dst_path, version)
 
     return model_id
 
@@ -417,7 +496,11 @@ def remove(
         version: version string
 
     """
-    pass
+    path, version, backend = path_version_backend(uid, version=version)
+
+    if backend.exists(path + '.yaml', version):
+        backend.remove_file(path + '.yaml', version)
+    backend.remove_file(path + '.zip', version)
 
 
 def subgroup(uid: str) -> str:
@@ -434,8 +517,11 @@ def subgroup(uid: str) -> str:
         'gender'
 
     """
-    model_url = url(uid)
-    return subgroup_from_url(model_url)
+    path, _, backend = path_version_backend(uid)
+    path = backend.split(path)[0]
+    path = path[len(config.GROUP_ID) + 1:]
+    path = backend.split(path)[0]
+    return path.replace(backend.sep, '.')
 
 
 def uid(
@@ -478,13 +564,12 @@ def uid(
         '944dcc3e-04f3-5837-f3aa-8d19714b4735'
 
     """  # noqa: E501
-    group_id = _group_id(name, subgroup)
-    repository = _repository(private)
-    unique_string = (
-        '' if params is None else str(params)
-        + group_id
-        + repository
-    )
+    group_id = f'{config.GROUP_ID}.{name}' if subgroup is None \
+        else f'{config.GROUP_ID}.{subgroup}.{name}'
+    repository = config.REPOSITORY_PRIVATE if private \
+        else config.REPOSITORY_PUBLIC
+    params = '' if params is None else str(params)
+    unique_string = params + group_id + repository
     return audeer.uid(from_string=unique_string)
 
 
@@ -515,141 +600,23 @@ def url(
         'models-public-local/com/audeering/models/gender/audgender'
 
     """
-    if not audeer.is_uid(uid):
-        raise ValueError(f"'{uid}' is not a valid ID")
-    try:
-        pattern = f'artifact?name={uid}'
-        for repository in [
-                defaults.REPOSITORY_PUBLIC,
-                defaults.REPOSITORY_PRIVATE,
-        ]:
-            search_url = (
-                f'{defaults.ARTIFACTORY_HOST}/'
-                f'api/search/{pattern}&repos={repository}'
-            )
-            r = audfactory.rest_api_get(search_url)
-            if r.status_code != 200:  # pragma: no cover
-                raise RuntimeError(
-                    f'Error trying to find model.\n'
-                    f'The REST API query was not successful:\n'
-                    f'Error code: {r.status_code}\n'
-                    f'Error message: {r.text}'
-                )
-            urls = r.json()['results']
-            if len(urls) > 0:
-                break
-        if len(urls) == 0:
-            raise RuntimeError(f"A model with ID '{uid}' does not exist.")
-
-        if version is None:
-            url = urls[-1]['uri']
-        else:
-            url = None
-            for u in urls:
-                if u['uri'].endswith(f'{version}.zip'):
-                    url = u['uri']
-                    break
-            if url is None:
-                raise RuntimeError(f"A model with ID '{uid}' "
-                                   f"and version '{version}' "
-                                   f"does not exist.")
-
-    except ConnectionError:  # pragma: no cover
-        raise ConnectionError(
-            'Artifactory is offline.\n\n'
-            'Please make sure https://artifactory.audeering.com '
-            'is reachable.'
-        )
-    # Replace beginning of URL as it includes /api/storage and port
-    relative_repo_url = '/'.join(url.split('/')[6:])
-    url = f'{defaults.ARTIFACTORY_HOST}/{relative_repo_url}'
-    return url
+    path, version, backend = path_version_backend(uid, version=version)
+    return backend.path(path + '.zip', version)
 
 
-def version(uid: str) -> str:
-    r"""Version of model.
+def versions(uid: str) -> typing.List[str]:
+    r"""Available model versions.
 
     Args:
         uid: unique model ID
 
     Returns:
-        model version
+        list with versions
 
     Example:
-        >>> version('98ccb530-b162-11ea-8427-ac1f6bac2502')
-        '1.0.0'
+        >>> versions('98ccb530-b162-11ea-8427-ac1f6bac2502')
+        ['1.0.0']
 
     """
-    model_url = url(uid)
-    return version_from_url(model_url)
-
-
-def versions(
-        name: str,
-        params: typing.Dict[str, typing.Any] = None,
-        *,
-        subgroup: str = None,
-        private: bool = False,
-) -> typing.List[str]:
-    r"""Available model versions.
-
-    All versions,
-    that are available for the combination
-    of provided ``name``, ``subgroup``,
-    and model ``params``.
-
-    Args:
-        name: model name
-        params: dictionary with parameters
-        subgroup: extend group ID to
-            ``com.audeering.models.<subgroup>``.
-            You can increase the depth
-            by using dot-notation,
-            e.g. setting
-            ``subgroup=foo.bar``
-            will result in
-            ``com.audeering.models.foo.bar``
-        private: repository is private
-
-    Returns:
-        available model versions
-
-    Example:
-        >>> versions('voxcnn', subgroup='speakerid')
-        ['0.1.0', '0.2.0', '0.3.0', '0.3.1', '0.3.2']
-
-    """
-    model_id = uid(
-        name,
-        params,
-        subgroup=subgroup,
-        private=private,
-    )
-    vs = audfactory.versions(
-        defaults.ARTIFACTORY_HOST,
-        repository=_repository(private),
-        group_id=_group_id(name, subgroup),
-        name=model_id,
-    )
-    if not vs:
-        vs = legacy.versions(
-            name,
-            params,
-            subgroup=subgroup,
-            private=private,
-        )
-    return vs
-
-
-def _group_id(name: str, subgroup: str) -> str:
-    if subgroup is None:
-        return f'{defaults.GROUP_ID}.{name}'
-    else:
-        return f'{defaults.GROUP_ID}.{subgroup}.{name}'
-
-
-def _repository(private: bool) -> str:
-    if private:
-        return defaults.REPOSITORY_PRIVATE
-    else:
-        return defaults.REPOSITORY_PUBLIC
+    path, _, backend = path_version_backend(uid)
+    return backend.versions(path + '.zip')
