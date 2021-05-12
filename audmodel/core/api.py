@@ -2,11 +2,14 @@ import os
 import tempfile
 import typing
 
+import oyaml as yaml
+
 import audeer
 import audfactory
 
 from audmodel.core.config import config
 from audmodel.core.define import defaults
+import audmodel.core.legacy as legacy
 from audmodel.core.url import (
     name_from_url,
     repository_from_url,
@@ -114,6 +117,25 @@ def exists(uid: str) -> bool:
     return True
 
 
+def header(
+        uid: str,
+        *,
+        version: str = None,
+        verbose: bool = False,
+) -> dict:
+
+    model_url = url(uid, version=version)
+
+    with tempfile.TemporaryDirectory() as root:
+        path = audfactory.download(
+            model_url[:-4] + '.yaml',
+            root,
+            verbose=verbose,
+        )
+        with open(path, 'r') as fp:
+            return yaml.load(fp, Loader=yaml.Loader)
+
+
 def latest_version(
         name: str,
         params: typing.Dict[str, typing.Any] = None,
@@ -148,18 +170,28 @@ def latest_version(
         '1.0.0'
 
     """
-    version = audfactory.Lookup.latest_version(
-        defaults.ARTIFACTORY_HOST,
-        _repository(private),
-        _group_id(name, subgroup),
-        params=params,
+    vs = versions(
+        name,
+        params,
+        subgroup=subgroup,
+        private=private,
     )
-    return version
+    if vs:
+        v = vs[-1]
+    else:
+        v = legacy.latest_version(
+            name,
+            params,
+            subgroup=subgroup,
+            private=private,
+        )
+    return v
 
 
 def load(
         uid: str,
         *,
+        version: str = None,
         root: str = None,
         verbose: bool = False,
 ) -> str:
@@ -173,6 +205,7 @@ def load(
 
     Args:
         uid: unique model identifier
+        version: version string,
         root: store model within this folder
         verbose: show verbose output
 
@@ -185,7 +218,7 @@ def load(
     Example:
         >>> model_folder = load('98ccb530-b162-11ea-8427-ac1f6bac2502')
         >>> '/'.join(model_folder.split('/')[-9:])
-        'audmodel/models-public-local/com/audeering/models/gender/audgender/1.0.0/98ccb530-b162-11ea-8427-ac1f6bac2502'
+        'audmodel/models-public-local/com/audeering/models/gender/audgender/98ccb530-b162-11ea-8427-ac1f6bac2502/1.0.0'
         >>> sorted(os.listdir(model_folder))
         ['data-preprocessing',
          'extractor',
@@ -196,96 +229,38 @@ def load(
          'trainer']
 
     """
-    model_url = url(uid)
+    model_url = url(uid, version=version)
     repository = repository_from_url(model_url)
     group_id = _group_id(
         name_from_url(model_url),
         subgroup_from_url(model_url),
     )
-    version = version_from_url(model_url)
+    if version is None:
+        version = version_from_url(model_url)
 
     root = audeer.safe_path(root or default_cache_root())
     root = os.path.join(
         root or default_cache_root(),
         repository,
         audfactory.group_id_to_path(group_id),
-        version,
         uid,
+        version,
     )
     root = audeer.safe_path(root)
 
-    zip_file = os.path.join(tempfile._get_default_tempdir(), f'{uid}.zip')
     if not os.path.exists(root):
-        audeer.mkdir(root)
-        audfactory.download(model_url, zip_file, verbose=verbose)
+        tmp_root = audeer.mkdir(root + '~')
+        path = audfactory.download(model_url, tmp_root, verbose=verbose)
         audeer.extract_archive(
-            zip_file,
-            root,
+            path,
+            tmp_root,
             keep_archive=False,
             verbose=verbose,
         )
+        audeer.mkdir(root)
+        os.rename(tmp_root, root)
 
     return root
-
-
-def lookup_table(
-        name: str,
-        version: str = None,
-        *,
-        subgroup: str = None,
-        private: bool = False,
-) -> audfactory.Lookup:
-    r"""Lookup table of specified models.
-
-    Models are specified by the ``name``, ``subgroup``, ``version``,
-    and ``private`` arguments.
-    Besides they can vary by having different parameters,
-    which are locked inside a lookup table
-    and assigned to unique model IDs.
-    To get an overview of all different parameters models
-    where trained with,
-    you can download the lookup table and inspect it.
-
-    Args:
-        name: model name
-        version: version string
-        subgroup: extend group ID to
-            ``com.audeering.models.<subgroup>``.
-            You can increase the depth
-            by using dot-notation,
-            e.g. setting ``subgroup=foo.bar``
-            will result in
-            ``com.audeering.models.foo.bar``
-        private: repository is private
-
-    Returns:
-        lookup table of models
-
-    Raises:
-        RuntimeError: if table does not exist
-
-    Example:
-        >>> t = lookup_table('audgender', subgroup='gender', version='1.0.0')
-        >>> t.columns
-        ['classifier', 'experiment', 'features', 'sampling_rate', 'scaler']
-        >>> t.ids
-        ['f4e42076-b160-11ea-8427-ac1f6bac2502',
-         '98ccb530-b162-11ea-8427-ac1f6bac2502']
-        >>> t['98ccb530-b162-11ea-8427-ac1f6bac2502']
-        {'classifier': "LinearSVC(C=0.1, class_weight='balanced', random_state=0)",
-         'experiment': 'msp.msppodcast-1.0.0',
-         'features': 'GeMAPSplus_v01',
-         'sampling_rate': 8000,
-         'scaler': 'StandardScaler()'}
-
-    """  # noqa: E501
-    lookup = audfactory.Lookup(
-        defaults.ARTIFACTORY_HOST,
-        _repository(private),
-        _group_id(name, subgroup),
-        version=version,
-    )
-    return lookup
 
 
 def name(uid: str) -> str:
@@ -327,9 +302,10 @@ def parameters(uid: str) -> typing.Dict:
          'scaler': 'StandardScaler()'}
 
     """  # noqa: E501
-    model_url = url(uid)
-    lookup = _lookup_from_url(model_url)
-    return lookup[uid]
+    try:
+        return header(uid)['params']
+    except RuntimeError:
+        return legacy.parameters(uid)
 
 
 def publish(
@@ -340,17 +316,9 @@ def publish(
         *,
         subgroup: str = None,
         private: bool = False,
-        create: bool = True,
         verbose: bool = False,
 ) -> str:
     r"""Zip model and publish as a new artifact.
-
-    Assigns a unique ID
-    and adds an entry in the lookup table.
-    If the lookup table does not exist,
-    it will be created.
-    If an entry already exists,
-    the operation will fail.
 
     Before publishing a model,
     pick meaningful model ``params``, ``name``, ``subgroup``
@@ -394,7 +362,6 @@ def publish(
             will result in
             ``com.audeering.models.foo.bar``
         private: repository is private
-        create: create lookup table if it does not exist
         verbose: show verbose output
 
     Returns:
@@ -404,58 +371,53 @@ def publish(
         RuntimeError: if an artifact exists already
 
     """
-    server = defaults.ARTIFACTORY_HOST
     group_id = _group_id(name, subgroup)
     repository = _repository(private)
-    if not audfactory.Lookup.exists(server, repository, group_id, version):
-        if create:
-            audfactory.Lookup.create(
-                server,
-                repository,
-                group_id,
-                version,
-                list(params.keys()),
-            )
-        else:
-            raise RuntimeError(f"A lookup table for '{name}' and "
-                               f"'{version}' does not exist yet.")
+    model_id = uid(name, params, subgroup=subgroup, private=private)
 
-    lookup = audfactory.Lookup(
-        server,
-        repository,
-        group_id,
-        version=version,
-    )
+    # publish meta data
 
-    param_keys = list(params.keys())
-    # Extend lookup table if more parameters are given
-    if param_keys not in lookup.columns:
-        lookup.extend(param_keys)
-    # Extend parameters if more are available in lookup table
-    for column in lookup.columns:
-        if column not in param_keys:
-            params[column] = None
+    meta = {
+        'name': name,
+        'subgroup': subgroup,
+        'params': params,
+        'version': version,
+    }
+    with tempfile.TemporaryDirectory() as tmp_root:
+        meta_path = os.path.join(tmp_root, 'header.yaml')
+        with open(meta_path, 'w') as fp:
+            yaml.dump(meta, fp)
+        url = audfactory.url(
+            defaults.ARTIFACTORY_HOST,
+            repository=repository,
+            group_id=group_id,
+            name=model_id,
+            version=version,
+        )
+        meta_url = f'{url}/{model_id}-{version}.yaml'
+        audfactory.deploy(meta_path, meta_url, verbose=verbose)
 
-    uid = lookup.append(params)
-    upload_folder(root, group_id, repository, uid, version, verbose)
+    # upload model
 
-    return uid
+    upload_folder(root, group_id, repository, model_id, version, verbose)
+
+    return model_id
 
 
-def remove(uid: str):
+def remove(
+        uid: str,
+        version: str,
+):
     r"""Remove a model.
 
-    The model will be deleted on Artifactory,
-    and removed from its corresponding lookup table.
+    The model will be deleted on Artifactory.
 
     Args:
         uid: unique model ID
+        version: version string
 
     """
-    model_url = url(uid)
-    lookup = _lookup_from_url(model_url)
-    lookup.remove(lookup[uid])
-    audfactory.path(model_url).parent.parent.rmdir()
+    pass
 
 
 def subgroup(uid: str) -> str:
@@ -478,21 +440,16 @@ def subgroup(uid: str) -> str:
 
 def uid(
         name: str,
-        params: typing.Dict[str, typing.Any],
-        version: str = None,
+        params: typing.Dict[str, typing.Any] = None,
         *,
         subgroup: str = None,
         private: bool = False,
 ) -> str:
     r"""Unique model ID for given model arguments.
 
-    Look for the unique ID of a published model,
-    specified by model ``params``, ``name``, and ``subgroup``.
-
     Args:
         name: model name
         params: dictionary with parameters
-        version: version string
         subgroup: extend group ID to
             ``com.audeering.models.<subgroup>``.
             You can increase the depth
@@ -506,9 +463,6 @@ def uid(
     Returns:
         unique model ID
 
-    Raises:
-        RuntimeError: if no lookup table for the model exists
-
     Example:
         >>> uid(
         ...     'audgender',
@@ -520,34 +474,30 @@ def uid(
         ...         'scaler': 'StandardScaler()',
         ...     },
         ...     subgroup='gender',
-        ...     version='1.0.0',
         ... )
-        '98ccb530-b162-11ea-8427-ac1f6bac2502'
+        '944dcc3e-04f3-5837-f3aa-8d19714b4735'
 
     """  # noqa: E501
-    repository = _repository(private)
     group_id = _group_id(name, subgroup)
-    if version is None:
-        version = audfactory.Lookup.latest_version(
-            defaults.ARTIFACTORY_HOST,
-            repository,
-            group_id,
-            params=params,
-        )
-    lookup = audfactory.Lookup(
-        defaults.ARTIFACTORY_HOST,
-        repository,
-        group_id,
-        version=version,
+    repository = _repository(private)
+    unique_string = (
+        '' if params is None else str(params)
+        + group_id
+        + repository
     )
-    return lookup.find(params)
+    return audeer.uid(from_string=unique_string)
 
 
-def url(uid: str) -> str:
+def url(
+        uid: str,
+        *,
+        version: str = None,
+) -> str:
     r"""Search for model of given ID.
 
     Args:
         uid: unique model ID
+        version: version string
 
     Returns:
         URL of model
@@ -581,18 +531,29 @@ def url(uid: str) -> str:
             if r.status_code != 200:  # pragma: no cover
                 raise RuntimeError(
                     f'Error trying to find model.\n'
-                    f'The REST API query was not succesful:\n'
+                    f'The REST API query was not successful:\n'
                     f'Error code: {r.status_code}\n'
                     f'Error message: {r.text}'
                 )
             urls = r.json()['results']
-            if len(urls) > 1:  # pragma: no cover
-                raise RuntimeError(f'Found more than one model: {urls}')
-            elif len(urls) == 1:
+            if len(urls) > 0:
                 break
         if len(urls) == 0:
-            raise RuntimeError(f"A model with ID '{uid}' does not exist")
-        url = urls[0]['uri']
+            raise RuntimeError(f"A model with ID '{uid}' does not exist.")
+
+        if version is None:
+            url = urls[-1]['uri']
+        else:
+            url = None
+            for u in urls:
+                if u['uri'].endswith(f'{version}.zip'):
+                    url = u['uri']
+                    break
+            if url is None:
+                raise RuntimeError(f"A model with ID '{uid}' "
+                                   f"and version '{version}' "
+                                   f"does not exist.")
+
     except ConnectionError:  # pragma: no cover
         raise ConnectionError(
             'Artifactory is offline.\n\n'
@@ -658,14 +619,26 @@ def versions(
         ['0.1.0', '0.2.0', '0.3.0', '0.3.1', '0.3.2']
 
     """
-    versions = audfactory.Lookup.versions(
-        defaults.ARTIFACTORY_HOST,
-        _repository(private),
-        _group_id(name, subgroup),
-        name=defaults.LOOKUP_TABLE_NAME,
-        params=params,
+    model_id = uid(
+        name,
+        params,
+        subgroup=subgroup,
+        private=private,
     )
-    return versions
+    vs = audfactory.versions(
+        defaults.ARTIFACTORY_HOST,
+        repository=_repository(private),
+        group_id=_group_id(name, subgroup),
+        name=model_id,
+    )
+    if not vs:
+        vs = legacy.versions(
+            name,
+            params,
+            subgroup=subgroup,
+            private=private,
+        )
+    return vs
 
 
 def _group_id(name: str, subgroup: str) -> str:
@@ -673,21 +646,6 @@ def _group_id(name: str, subgroup: str) -> str:
         return f'{defaults.GROUP_ID}.{name}'
     else:
         return f'{defaults.GROUP_ID}.{subgroup}.{name}'
-
-
-def _lookup_from_url(model_url: str) -> audfactory.Lookup:
-    group_id = _group_id(
-        name_from_url(model_url),
-        subgroup_from_url(model_url),
-    )
-    version = version_from_url(model_url)
-    repository = repository_from_url(model_url)
-    return audfactory.Lookup(
-        defaults.ARTIFACTORY_HOST,
-        repository,
-        group_id,
-        version=version,
-    )
 
 
 def _repository(private: bool) -> str:
