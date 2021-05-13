@@ -200,10 +200,10 @@ def load(
         RuntimeError: if model does not exist
 
     Example:
-        >>> model_folder = load('98ccb530-b162-11ea-8427-ac1f6bac2502')
-        >>> '/'.join(model_folder.split('/')[-9:])
-        'audmodel/models-public-local/com/audeering/models/gender/audgender/98ccb530-b162-11ea-8427-ac1f6bac2502/1.0.0'
-        >>> sorted(os.listdir(model_folder))
+        >>> root = load('98ccb530-b162-11ea-8427-ac1f6bac2502')
+        >>> '/'.join(root.split('/')[-8:])
+        'audmodel/com/audeering/models/gender/audgender/98ccb530-b162-11ea-8427-ac1f6bac2502/1.0.0'
+        >>> sorted(os.listdir(root))
         ['data-preprocessing',
          'extractor',
          'feature-preprocessing',
@@ -218,7 +218,6 @@ def load(
     root = audeer.safe_path(root or default_cache_root())
     root = os.path.join(
         root,
-        backend.repository,
         path.replace(backend.sep, os.path.sep),
         version,
     )
@@ -234,6 +233,8 @@ def load(
             dst_path,
             version,
         )
+
+        # extract files
         audeer.extract_archive(
             dst_path,
             tmp_root,
@@ -364,8 +365,13 @@ def path_version_backend(
                             # as it includes /api/storage and port
                             url = '/'.join(url.split('/')[6:])
                             url = f'{host}/{url}'
-                            urls.append(url)
-                    break
+                            v = url.split('/')[-2]
+                            # break early if specific version is requested
+                            if version is None:
+                                urls.append((url, backend))
+                            elif v == version:
+                                urls.append((url, backend))
+                                break
         except ConnectionError:  # pragma: no cover
             raise ConnectionError(
                 'Artifactory is offline.\n\n'
@@ -375,30 +381,35 @@ def path_version_backend(
     else:
         # use glob otherwise
         pattern = f'**/{uid}/*/*.zip'
-        for private in [True, False]:
+        for private in [False, True]:
             backend = get_backend(private)
-            urls = backend.glob(pattern)
-            if urls:
-                break
+            for url in backend.glob(pattern):
+                v = url.split('/')[-2]
+                # break early if specific version is requested
+                if version is None:
+                    urls.append((url, backend))
+                elif v == version:
+                    urls.append((url, backend))
+                    break
 
     if not urls:
-        raise RuntimeError(f"A model with ID '{uid}' does not exist.")
+        if version is None:
+            raise RuntimeError(
+                f"A model with ID "
+                f"'{uid}' "
+                f"does not exist."
+            )
+        else:
+            raise RuntimeError(
+                f"A model with ID "
+                f"'{uid}' "
+                f"and version "
+                f"'{version}' "
+                f"does not exist."
+            )
 
-    url = None
-    if version is None:
-        url = urls[-1]
-        version = url.split('/')[-2]
-    else:
-        for u in urls:
-            if u.endswith(f'{version}.zip'):
-                url = u
-                break
-
-    if url is None:
-        raise RuntimeError(f"A model with ID '{uid}' "
-                           f"and version '{version}' "
-                           f"does not exist.")
-
+    url, backend = urls[-1]
+    version = url.split('/')[-2]
     path = url[len(backend.host) + len(backend.repository) + 2:]
     path = backend.join(*path.split(backend.sep)[:-2])
 
@@ -483,7 +494,7 @@ def publish(
         )
 
     backend = get_backend(private)
-    model_id = uid(name, params, subgroup=subgroup, private=private)
+    model_id = uid(name, params, subgroup=subgroup)
     path = backend.join(
         *config.GROUP_ID.split('.'),
         *subgroup.split('.'),
@@ -491,14 +502,15 @@ def publish(
         model_id,
     )
 
-    if backend.exists(path + '.zip', version):
-        raise RuntimeError(
-            f"A model with ID "
-            f"'{model_id}' "
-            f"and version "
-            f"'{version}' "
-            f"exists already."
-        )
+    for private in [False, True]:
+        if get_backend(private).exists(path + '.zip', version):
+            raise RuntimeError(
+                f"A model with ID "
+                f"'{model_id}' "
+                f"and version "
+                f"'{version}' "
+                f"exists already."
+            )
 
     with tempfile.TemporaryDirectory() as tmp_root:
 
@@ -509,9 +521,11 @@ def publish(
             model_id: {
                 'author': author,
                 'date': str(date),
-                'params': params,
-                'version': version,
                 'meta': meta,
+                'name': name,
+                'params': params,
+                'subgroup': subgroup,
+                'version': version,
             }
         }
         with open(src_path, 'w') as fp:
@@ -570,12 +584,11 @@ def subgroup(uid: str) -> str:
 
 def uid(
         name: str,
-        params: typing.Dict[str, typing.Any] = None,
+        params: typing.Dict[str, typing.Any],
         *,
         subgroup: str = None,
-        private: bool = False,
 ) -> str:
-    r"""Unique model ID for given model arguments.
+    r"""Unique model ID.
 
     Args:
         name: model name
@@ -588,7 +601,6 @@ def uid(
             ``subgroup=foo.bar``
             will result in
             ``com.audeering.models.foo.bar``
-        private: repository is private
 
     Returns:
         unique model ID
@@ -605,27 +617,26 @@ def uid(
         ...     },
         ...     subgroup='gender',
         ... )
-        '944dcc3e-04f3-5837-f3aa-8d19714b4735'
+        'b47015a8-6447-5190-ede6-340c4e70b4cb'
 
     """  # noqa: E501
     group_id = f'{config.GROUP_ID}.{name}' if subgroup is None \
         else f'{config.GROUP_ID}.{subgroup}.{name}'
-    repository = config.REPOSITORY_PRIVATE if private \
-        else config.REPOSITORY_PUBLIC
-    params = '' if params is None else str(params)
-    unique_string = params + group_id + repository
+    unique_string = group_id + str(params)
     return audeer.uid(from_string=unique_string)
 
 
 def url(
         uid: str,
         *,
+        header: bool = False,
         version: str = None,
 ) -> str:
-    r"""Search for model of given ID.
+    r"""Model URL.
 
     Args:
         uid: unique model ID
+        header: return URL of header instead of archive
         version: version string
 
     Returns:
@@ -645,7 +656,8 @@ def url(
 
     """
     path, version, backend = path_version_backend(uid, version=version)
-    return backend.path(path + '.zip', version)
+    ext = '.yaml' if header else '.zip'
+    return backend.path(path + ext, version)
 
 
 def versions(uid: str) -> typing.List[str]:
