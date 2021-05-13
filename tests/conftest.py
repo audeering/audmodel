@@ -1,71 +1,56 @@
+import datetime
+import glob
 import os
+import shutil
+
 import pytest
 
 import audeer
-import audfactory
-import audmodel
-
-pytest.SERVER = 'https://artifactory.audeering.com/artifactory'
-pytest.REPOSITORY = 'unittests-public-local'
-audmodel.config.REPOSITORY_PRIVATE = pytest.REPOSITORY
-pytest.SUBGROUP = f'audmodel.{audeer.uid()}'
-pytest.ROOT = os.path.dirname(os.path.realpath(__file__))
-pytest.NAME = 'audmodel'
-pytest.PRIVATE = True
-pytest.COLUMNS = [
-    'property1',
-    'property2',
-    'property3',
-]
-pytest.PARAMS = [
-    {
-        pytest.COLUMNS[0]: 'foo',
-        pytest.COLUMNS[1]: 'bar',
-        pytest.COLUMNS[2]: idx,
-    } for idx in range(3)
-]
-pytest.VERSION = '1.0.0'
 
 
-def cleanup():
-    group_id = f'{audmodel.core.define.defaults.GROUP_ID}.{pytest.SUBGROUP}'
-    repository = f'{audmodel.core.define.defaults.REPOSITORY_PRIVATE}'
-    url = audfactory.url(
-        pytest.SERVER,
-        repository=repository,
-        group_id=group_id,
-        name=pytest.NAME,
+pytest.ROOT = audeer.mkdir(
+    os.path.join(
+        os.path.dirname(os.path.realpath(__file__)),
+        'tmp',
     )
-    path = audfactory.path(url).parent
-    if path.exists():
-        path.rmdir()
+)
+
+pytest.BACKEND_HOST = ('file-system', os.path.join(pytest.ROOT, 'host'))
+pytest.CACHE_ROOT = os.path.join(pytest.ROOT, 'cache')
+pytest.ID = audeer.uid()
+pytest.NAME = 'test'
+pytest.PARAMS = {
+    'sampling_rate': 16000,
+    'feature': 'spectrogram',
+}
+pytest.AUTHOR = 'A. Uthor'
+pytest.DATE = datetime.datetime.now()
+pytest.META = {
+    'data': {
+        'emodb': {
+            'version': '1.0.0',
+            'format': 'wav',
+            'mixdown': True,
+        }
+    },
+    'feature': {
+        'win_dur': '32ms',
+        'hop_dur': '10ms',
+        'num_fft': 512,
+        'num_bands': 64,
+    }
+}
 
 
 @pytest.fixture(scope='session', autouse=True)
 def cleanup_session():
-    cleanup()
+    path = os.path.join(
+        pytest.ROOT,
+        '..',
+        '.coverage.*',
+    )
+    for file in glob.glob(path):
+        os.remove(file)
     yield
-
-
-@pytest.fixture(scope='module', autouse=True)
-def cleanup_test():
-    yield
-    cleanup()
-
-
-@pytest.fixture(scope='module')
-def create():
-    uids = []
-    for params in pytest.PARAMS:
-        uid = audmodel.publish(
-            pytest.ROOT,
-            pytest.NAME,
-            params,
-            pytest.VERSION,
-            subgroup=pytest.SUBGROUP,
-            private=pytest.PRIVATE,
-            create=True,
-        )
-        uids.append(uid)
-    pytest.UIDS = uids
-    yield
+    if os.path.exists(pytest.ROOT):
+        shutil.rmtree(pytest.ROOT)

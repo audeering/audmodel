@@ -6,6 +6,7 @@ from audmodel.core.api import (
     header,
     latest_version,
     load,
+    meta,
     name,
     parameters,
     publish,

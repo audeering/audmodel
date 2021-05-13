@@ -1,5 +1,6 @@
 import datetime
 import errno
+import getpass
 import os
 import tempfile
 import typing
@@ -16,7 +17,11 @@ import audmodel.core.legacy as legacy
 from audmodel.core.utils import zip_folder
 
 
-def author(uid: str) -> str:
+def author(
+        uid: str,
+        *,
+        version: str = None,
+) -> str:
     r"""Author of model.
 
     The author is defined
@@ -25,6 +30,7 @@ def author(uid: str) -> str:
 
     Args:
         uid: unique model ID
+        version: version string
 
     Returns:
         model author
@@ -35,12 +41,16 @@ def author(uid: str) -> str:
 
     """
     try:
-        return header(uid)['author']
+        return header(uid, version=version)['author']
     except FileNotFoundError:
         return legacy.author(uid)
 
 
-def date(uid: str) -> str:
+def date(
+        uid: str,
+        *,
+        version: str = None,
+) -> str:
     r"""Publication date of model.
 
     The publication date is defined
@@ -49,6 +59,8 @@ def date(uid: str) -> str:
 
     Args:
         uid: unique model ID
+        *,
+        version: str = None,
 
     Returns:
         model publication date
@@ -59,7 +71,7 @@ def date(uid: str) -> str:
 
     """
     try:
-        return header(uid)['date']
+        return header(uid, version=version)['date']
     except FileNotFoundError:
         return legacy.date(uid)
 
@@ -133,14 +145,14 @@ def header(
 
     with tempfile.TemporaryDirectory() as root:
         src_path = path + '.yaml'
-        dst_path = os.path.join(root, 'header.yaml')
+        dst_path = os.path.join(root, 'model.yaml')
         backend.get_file(
             src_path,
             dst_path,
             version,
         )
         with open(dst_path, 'r') as fp:
-            return yaml.load(fp, Loader=yaml.Loader)
+            return yaml.load(fp, Loader=yaml.Loader)[uid]
 
 
 def latest_version(uid: str) -> str:
@@ -234,6 +246,31 @@ def load(
         os.rename(tmp_root, root)
 
     return root
+
+
+def meta(
+        uid: str,
+        *,
+        version: str = None,
+) -> typing.Dict[str, typing.Any]:
+    r"""Meta information of model.
+
+    Args:
+        uid: unique model ID
+        version: version string
+
+    Returns:
+        dictionary with meta information
+
+    Example:
+        >>> meta('98ccb530-b162-11ea-8427-ac1f6bac2502')
+        {}
+
+    """
+    try:
+        return header(uid, version=version)['meta']
+    except FileNotFoundError:
+        return {}
 
 
 def name(uid: str) -> str:
@@ -341,6 +378,8 @@ def path_version_backend(
         for private in [True, False]:
             backend = get_backend(private)
             urls = backend.glob(pattern)
+            if urls:
+                break
 
     if not urls:
         raise RuntimeError(f"A model with ID '{uid}' does not exist.")
@@ -369,10 +408,12 @@ def path_version_backend(
 def publish(
         root: str,
         name: str,
-        author: str,
         params: typing.Dict[str, typing.Any],
         version: str,
         *,
+        author: str = getpass.getuser(),
+        date: datetime = datetime.datetime.now(),
+        meta: typing.Dict[str, typing.Any] = {},
         subgroup: str = None,
         private: bool = False,
         verbose: bool = False,
@@ -410,9 +451,11 @@ def publish(
     Args:
         root: folder with model files
         name: model name
-        author: author name(s)
         params: dictionary with parameters
         version: version string
+        author: author name(s), defaults to user name
+        date: date, defaults to current timestamp
+        meta: dictionary with meta information
         subgroup: extend group ID to
             ``com.audeering.models.<subgroup>``.
             You can increase the depth
@@ -460,15 +503,16 @@ def publish(
     with tempfile.TemporaryDirectory() as tmp_root:
 
         # header
-        src_path = os.path.join(tmp_root, 'header.yaml')
+        src_path = os.path.join(tmp_root, 'model.yaml')
         dst_path = path + '.yaml'
         header = {
-            'name': name,
-            'subgroup': subgroup,
-            'author': author,
-            'date': str(datetime.datetime.now()),
-            'params': params,
-            'version': version,
+            model_id: {
+                'author': author,
+                'date': str(date),
+                'params': params,
+                'version': version,
+                'meta': meta,
+            }
         }
         with open(src_path, 'w') as fp:
             yaml.dump(header, fp)
