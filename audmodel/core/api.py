@@ -14,7 +14,6 @@ import audfactory
 from audmodel.core.backend import get_backend
 from audmodel.core.config import config
 import audmodel.core.legacy as legacy
-from audmodel.core.utils import zip_folder
 
 
 def author(
@@ -427,7 +426,6 @@ def publish(
         meta: typing.Dict[str, typing.Any] = {},
         subgroup: str = None,
         private: bool = False,
-        verbose: bool = False,
 ) -> str:
     r"""Zip model and publish as a new artifact.
 
@@ -476,7 +474,6 @@ def publish(
             will result in
             ``com.audeering.models.foo.bar``
         private: repository is private
-        verbose: show debug messages
 
     Returns:
         unique model ID
@@ -517,6 +514,7 @@ def publish(
         # header
         src_path = os.path.join(tmp_root, 'model.yaml')
         dst_path = path + '.yaml'
+
         header = {
             model_id: {
                 'author': author,
@@ -530,12 +528,16 @@ def publish(
         }
         with open(src_path, 'w') as fp:
             yaml.dump(header, fp)
+
         backend.put_file(src_path, dst_path, version)
 
         # archive
         src_path = os.path.join(tmp_root, 'model.zip')
         dst_path = path + '.zip'
-        zip_folder(root, src_path, verbose=verbose)
+
+        files = scan_files(root)
+        audeer.create_archive(root, files, src_path)
+
         backend.put_file(src_path, dst_path, version)
 
     return model_id
@@ -559,6 +561,19 @@ def remove(
     if backend.exists(path + '.yaml', version):
         backend.remove_file(path + '.yaml', version)
     backend.remove_file(path + '.zip', version)
+
+
+def scan_files(root: str) -> typing.Sequence[str]:
+    r"""Helper function to find all files in directory."""
+
+    def help(root: str, sub_dir: str = ''):
+        for entry in os.scandir(root):
+            if entry.is_dir(follow_symlinks=False):
+                yield from help(entry.path, os.path.join(sub_dir, entry.name))
+            else:
+                yield sub_dir, entry.name
+
+    return [os.path.join(sub, file) for sub, file in help(root, '')]
 
 
 def subgroup(uid: str) -> str:

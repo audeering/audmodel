@@ -1,24 +1,125 @@
+import errno
 import os
 import tempfile
 import typing
-
-import oyaml as yaml
+import zipfile
 
 import audeer
 import audfactory
 
 from audmodel.core.config import config
 from audmodel.core.define import defaults
-from audmodel.core.url import (
-    name_from_url,
-    repository_from_url,
-    subgroup_from_url,
-    version_from_url,
-)
-from audmodel.core.utils import (
-    upload_folder,
-)
 
+
+# helper functions
+
+def scan_files(
+        root: str,
+        sub_dir: str = '',
+) -> (str, str):
+
+    for entry in os.scandir(root):
+        if entry.is_dir(follow_symlinks=False):
+            yield from scan_files(
+                entry.path,
+                os.path.join(sub_dir, entry.name),
+            )
+        else:
+            yield sub_dir, entry.name
+
+
+def upload_folder(
+        root: str,
+        group_id: str,
+        repository: str,
+        name: str,
+        version: str,
+        verbose: bool = False,
+) -> str:
+
+    root = audeer.safe_path(root)
+    if not os.path.isdir(root):
+        raise FileNotFoundError(
+            errno.ENOENT,
+            os.strerror(errno.ENOENT),
+            root,
+        )
+
+    server_url = audfactory.url(
+        defaults.ARTIFACTORY_HOST,
+        repository=repository,
+        group_id=group_id,
+        name=name,
+        version=version,
+    )
+    url = f'{server_url}/{name}-{version}.zip'
+
+    if not audfactory.path(url).exists():
+        src_path = os.path.join(
+            tempfile._get_default_tempdir(),
+            f'{name}-{version}.zip',
+        )
+        zip_folder(root, src_path, verbose=verbose)
+        audfactory.deploy(src_path, url, verbose=verbose)
+        os.remove(src_path)
+
+    return url
+
+
+def zip_folder(src_root: str, dst_path: str, *, verbose: bool = False):
+
+    with zipfile.ZipFile(dst_path, 'w', zipfile.ZIP_DEFLATED) as zf:
+        files = list(scan_files(src_root))
+        if verbose:
+            with audeer.progress_bar(
+                    files,
+                    total=len(files),
+                    desc=''
+            ) as pbar:
+                for base, file in pbar:
+                    path = os.path.join(src_root, base, file)
+                    desc = audeer.format_display_message(
+                        f'Zip {path}',
+                        pbar=True,
+                    )
+                    pbar.set_description_str(desc, refresh=True)
+                    zf.write(path, arcname=os.path.join(base, file))
+        else:
+            for base, file in files:
+                zf.write(
+                    os.path.join(src_root, base, file),
+                    arcname=os.path.join(base, file),
+                )
+
+
+def name_from_url(url: str) -> str:
+    return url.split('/')[-4]
+
+
+def repository_from_url(url: str) -> str:
+    return url.split('/')[4]
+
+
+def subgroup_from_url(url: str) -> typing.Union[None, str]:
+    # Consider length of group ID
+    url_start = (
+        f'{defaults.ARTIFACTORY_HOST}/'
+        f'repo/'
+        f'{audfactory.group_id_to_path(config.GROUP_ID)}'
+    )
+    start_length = len(url_start.split('/'))
+    subgroup = '.'.join(url.split('/')[start_length:-4])
+    if len(subgroup) == 0:
+        return None
+    else:
+        return subgroup
+
+
+def version_from_url(url: str) -> str:
+    return url.split('/')[-2]
+
+
+# legacy api
 
 def author(uid: str) -> str:
     r"""Author of model.

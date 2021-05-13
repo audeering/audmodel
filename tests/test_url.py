@@ -46,10 +46,10 @@ def test_from_url(group_id, subgroup, name):
         f'{name}/'
         f'uid/{version}/uid-{version}.zip'
     )
-    assert audmodel.core.url.subgroup_from_url(url) == subgroup
-    assert audmodel.core.url.name_from_url(url) == name
-    assert audmodel.core.url.version_from_url(url) == version
-    assert audmodel.core.url.repository_from_url(url) == repository
+    assert audmodel.core.legacy.subgroup_from_url(url) == subgroup
+    assert audmodel.core.legacy.name_from_url(url) == name
+    assert audmodel.core.legacy.version_from_url(url) == version
+    assert audmodel.core.legacy.repository_from_url(url) == repository
 
 
 @pytest.mark.usefixtures('create')
