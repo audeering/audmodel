@@ -24,16 +24,18 @@ def author(
 ) -> str:
     r"""Author of model.
 
-    The author is defined
-    by the Artifactory user name
-    of the person that published the model.
-
     Args:
         uid: unique model ID
         version: version string
 
     Returns:
         model author
+        
+    Raises:
+        ValueError: if model ID is not valid
+        ConnectionError: if Artifactory is not available
+        RuntimeError: if Artifactory REST API query fails
+        RuntimeError: if model does not exist
 
     Example:
         >>> author('98ccb530-b162-11ea-8427-ac1f6bac2502')
@@ -53,17 +55,18 @@ def date(
 ) -> str:
     r"""Publication date of model.
 
-    The publication date is defined
-    as the last date the model artifact was modified
-    on Artifactory.
-
     Args:
         uid: unique model ID
-        *,
-        version: str = None,
+        version: version string
 
     Returns:
         model publication date
+        
+    Raises:
+        ValueError: if model ID is not valid
+        ConnectionError: if Artifactory is not available
+        RuntimeError: if Artifactory REST API query fails
+        RuntimeError: if model does not exist
 
     Example:
         >>> date('98ccb530-b162-11ea-8427-ac1f6bac2502')
@@ -106,6 +109,12 @@ def exists(uid: str) -> bool:
 
     Returns:
         ``True`` if a model with this ID is found
+        
+    Raises:
+        ValueError: if model ID is not valid
+        ConnectionError: if Artifactory is not available
+        RuntimeError: if Artifactory REST API query fails
+        RuntimeError: if model does not exist
 
     Example:
         >>> exists('98ccb530-b162-11ea-8427-ac1f6bac2502')
@@ -131,14 +140,20 @@ def header(
         *,
         version: str = None,
 ) -> dict:
-    r"""Download model header.
+    r"""Load model header.
 
     Args:
         uid: unique model ID
         version: version string
+        
+    Raises:
+        ValueError: if model ID is not valid
+        ConnectionError: if Artifactory is not available
+        RuntimeError: if Artifactory REST API query fails
+        RuntimeError: if model does not exist
 
     Returns:
-        dictionary with meta information about model
+        dictionary with information about the model
 
     """
     path, version, backend = path_version_backend(uid, version=version)
@@ -163,6 +178,12 @@ def latest_version(uid: str) -> str:
 
     Returns:
         latest version of model
+        
+    Raises:
+        ValueError: if model ID is not valid
+        ConnectionError: if Artifactory is not available
+        RuntimeError: if Artifactory REST API query fails
+        RuntimeError: if model does not exist
 
     Example:
         >>> latest_version('98ccb530-b162-11ea-8427-ac1f6bac2502')
@@ -197,6 +218,9 @@ def load(
         path to model folder
 
     Raises:
+        ValueError: if model ID is not valid
+        ConnectionError: if Artifactory is not available
+        RuntimeError: if Artifactory REST API query fails
         RuntimeError: if model does not exist
 
     Example:
@@ -265,6 +289,12 @@ def meta(
 
     Returns:
         dictionary with meta information
+        
+    Raises:
+        ValueError: if model ID is not valid
+        ConnectionError: if Artifactory is not available
+        RuntimeError: if Artifactory REST API query fails
+        RuntimeError: if model does not exist
 
     Example:
         >>> meta('98ccb530-b162-11ea-8427-ac1f6bac2502')
@@ -285,6 +315,12 @@ def name(uid: str) -> str:
 
     Returns:
         model name
+        
+    Raises:
+        ValueError: if model ID is not valid
+        ConnectionError: if Artifactory is not available
+        RuntimeError: if Artifactory REST API query fails
+        RuntimeError: if model does not exist
 
     Example:
         >>> name('98ccb530-b162-11ea-8427-ac1f6bac2502')
@@ -306,7 +342,10 @@ def parameters(uid: str) -> typing.Dict:
         model parameters
 
     Raises:
-        RuntimeError: if table does not exist
+        ValueError: if model ID is not valid
+        ConnectionError: if Artifactory is not available
+        RuntimeError: if Artifactory REST API query fails
+        RuntimeError: if model does not exist
 
     Example:
         >>> parameters('98ccb530-b162-11ea-8427-ac1f6bac2502')
@@ -343,10 +382,8 @@ def publish(
 
     For model ``params`` we recommend to encode:
 
-    * data used to train the model
     * sampling rate
-    * feature set(s)
-    * scaling applied to the features
+    * feature set
     * classifier
 
     For ``subgroup`` we recommend to encode:
@@ -475,6 +512,12 @@ def subgroup(uid: str) -> str:
     Returns:
         model subgroup
 
+    Raises:
+        ValueError: if model ID is not valid
+        ConnectionError: if Artifactory is not available
+        RuntimeError: if Artifactory REST API query fails
+        RuntimeError: if model does not exist
+
     Example:
         >>> subgroup('98ccb530-b162-11ea-8427-ac1f6bac2502')
         'gender'
@@ -548,11 +591,10 @@ def url(
         URL of model
 
     Raises:
-        ValueError: if given unique ID is not valid
+        ValueError: if model ID is not valid
         ConnectionError: if Artifactory is not available
-        RuntimeError: if Artifactory REST API query failes
-        RuntimeError: if more than one model is found
-        RuntimeError: if no model is found
+        RuntimeError: if Artifactory REST API query fails
+        RuntimeError: if model does not exist
 
     Example:
         >>> model_url = url('98ccb530-b162-11ea-8427-ac1f6bac2502')
@@ -573,6 +615,12 @@ def versions(uid: str) -> typing.List[str]:
 
     Returns:
         list with versions
+        
+    Raises:
+        ValueError: if model ID is not valid
+        ConnectionError: if Artifactory is not available
+        RuntimeError: if Artifactory REST API query fails
+        RuntimeError: if model does not exist
 
     Example:
         >>> versions('98ccb530-b162-11ea-8427-ac1f6bac2502')
