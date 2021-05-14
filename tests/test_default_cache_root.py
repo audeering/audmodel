@@ -1,8 +1,12 @@
 import os
 
+import pytest
+
 import audmodel
 
 
+os.environ['AUDB_CACHE_ROOT'] = pytest.CACHE_ROOT
+
+
 def test_default_cache_root():
-    root = os.environ.get('CACHE_ROOT') or '~/audmodel'
-    assert root == audmodel.default_cache_root()
+    assert audmodel.default_cache_root() == pytest.CACHE_ROOT

@@ -14,8 +14,7 @@ MODEL_FILES = {
     '1.0.0': ['test', 'sub/test'],
     '2.0.0': ['other', 'sub/test'],
 }
-SUBGROUP = f'{pytest.ID}.publish'
-VERSION = '1.0.0'
+SUBGROUP = f'{pytest.ID}.load'
 
 MODEL_ID = audmodel.uid(pytest.NAME, pytest.PARAMS, subgroup=SUBGROUP)
 
@@ -24,6 +23,7 @@ def clear_root(root: str):
     root = audeer.safe_path(root)
     if os.path.exists(root):
         shutil.rmtree(root)
+    audeer.mkdir(root)
 
 
 @pytest.fixture(

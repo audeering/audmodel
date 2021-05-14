@@ -10,7 +10,6 @@ from audmodel.core.api import (
     name,
     parameters,
     publish,
-    remove,
     subgroup,
     uid,
     url,
