@@ -15,16 +15,11 @@ pytest.ROOT = audeer.mkdir(
     )
 )
 
+pytest.AUTHOR = 'A. Uthor'
 pytest.BACKEND_HOST = ('file-system', os.path.join(pytest.ROOT, 'host'))
 pytest.CACHE_ROOT = os.path.join(pytest.ROOT, 'cache')
-pytest.ID = audeer.uid()
-pytest.NAME = 'test'
-pytest.PARAMS = {
-    'sampling_rate': 16000,
-    'feature': 'spectrogram',
-}
-pytest.AUTHOR = 'A. Uthor'
 pytest.DATE = datetime.datetime.now()
+pytest.ID = audeer.uid()
 pytest.META = {
     'data': {
         'emodb': {
@@ -39,6 +34,12 @@ pytest.META = {
         'num_fft': 512,
         'num_bands': 64,
     }
+}
+pytest.MODEL_ROOT = audeer.mkdir(os.path.join(pytest.ROOT, pytest.ID, 'model'))
+pytest.NAME = 'test'
+pytest.PARAMS = {
+    'sampling_rate': 16000,
+    'feature': 'spectrogram',
 }
 
 

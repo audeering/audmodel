@@ -483,6 +483,8 @@ def publish(
 
     """
     root = audeer.safe_path(root)
+    subgroup = subgroup or ''
+
     if not os.path.isdir(root):
         raise FileNotFoundError(
             errno.ENOENT,

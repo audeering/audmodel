@@ -16,7 +16,7 @@ VERSION = '1.0.0'
     'root, name, params, version, author, date, meta, subgroup, private',
     [
         pytest.param(
-            pytest.ROOT,
+            pytest.MODEL_ROOT,
             pytest.NAME,
             pytest.PARAMS,
             VERSION,
@@ -28,7 +28,7 @@ VERSION = '1.0.0'
         ),
         # different name
         pytest.param(
-            pytest.ROOT,
+            pytest.MODEL_ROOT,
             'other',
             pytest.PARAMS,
             VERSION,
@@ -40,7 +40,7 @@ VERSION = '1.0.0'
         ),
         # different subgroup
         pytest.param(
-            pytest.ROOT,
+            pytest.MODEL_ROOT,
             pytest.NAME,
             pytest.PARAMS,
             VERSION,
@@ -52,9 +52,9 @@ VERSION = '1.0.0'
         ),
         # different parameters
         pytest.param(
-            pytest.ROOT,
+            pytest.MODEL_ROOT,
             pytest.NAME,
-            {'foo': 'bar'},
+            {},
             VERSION,
             pytest.AUTHOR,
             pytest.DATE,
@@ -64,7 +64,7 @@ VERSION = '1.0.0'
         ),
         # new version
         pytest.param(
-            pytest.ROOT,
+            pytest.MODEL_ROOT,
             pytest.NAME,
             pytest.PARAMS,
             '2.0.0',
@@ -76,7 +76,7 @@ VERSION = '1.0.0'
         ),
         # new version in private repository
         pytest.param(
-            pytest.ROOT,
+            pytest.MODEL_ROOT,
             pytest.NAME,
             pytest.PARAMS,
             '3.0.0',
@@ -88,7 +88,7 @@ VERSION = '1.0.0'
         ),
         # already published
         pytest.param(
-            pytest.ROOT,
+            pytest.MODEL_ROOT,
             pytest.NAME,
             pytest.PARAMS,
             VERSION,
@@ -100,7 +100,7 @@ VERSION = '1.0.0'
             marks=pytest.mark.xfail(raises=RuntimeError)
         ),
         pytest.param(
-            pytest.ROOT,
+            pytest.MODEL_ROOT,
             pytest.NAME,
             pytest.PARAMS,
             VERSION,
