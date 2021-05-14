@@ -61,6 +61,10 @@ def fixture_publish_model():
         (MODEL_ID, '1.0.0'),
         (MODEL_ID, '2.0.0'),
         (MODEL_ID, None),
+        pytest.param(
+            MODEL_ID, '3.0.0',
+            marks=pytest.mark.xfail(raises=RuntimeError),
+        )
     ),
 )
 def test_load(uid, version):

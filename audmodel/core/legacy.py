@@ -16,7 +16,7 @@ from audmodel.core.define import defaults
 def scan_files(
         root: str,
         sub_dir: str = '',
-) -> (str, str):
+) -> (str, str):  # pragma: no cover
 
     for entry in os.scandir(root):
         if entry.is_dir(follow_symlinks=False):
@@ -35,7 +35,7 @@ def upload_folder(
         name: str,
         version: str,
         verbose: bool = False,
-) -> str:
+) -> str:  # pragma: no cover
 
     root = audeer.safe_path(root)
     if not os.path.isdir(root):
@@ -66,7 +66,12 @@ def upload_folder(
     return url
 
 
-def zip_folder(src_root: str, dst_path: str, *, verbose: bool = False):
+def zip_folder(
+        src_root: str,
+        dst_path: str,
+        *,
+        verbose: bool = False,
+):  # pragma: no cover
 
     with zipfile.ZipFile(dst_path, 'w', zipfile.ZIP_DEFLATED) as zf:
         files = list(scan_files(src_root))
@@ -92,15 +97,15 @@ def zip_folder(src_root: str, dst_path: str, *, verbose: bool = False):
                 )
 
 
-def name_from_url(url: str) -> str:
+def name_from_url(url: str) -> str:  # pragma: no cover
     return url.split('/')[-4]
 
 
-def repository_from_url(url: str) -> str:
+def repository_from_url(url: str) -> str:  # pragma: no cover
     return url.split('/')[4]
 
 
-def subgroup_from_url(url: str) -> typing.Union[None, str]:
+def subgroup_from_url(url: str) -> typing.Union[None, str]:  # pragma: no cover
     # Consider length of group ID
     url_start = (
         f'{defaults.ARTIFACTORY_HOST}/'
@@ -115,13 +120,13 @@ def subgroup_from_url(url: str) -> typing.Union[None, str]:
         return subgroup
 
 
-def version_from_url(url: str) -> str:
+def version_from_url(url: str) -> str:  # pragma: no cover
     return url.split('/')[-2]
 
 
 # legacy api
 
-def author(uid: str) -> str:
+def author(uid: str) -> str:  # pragma: no cover
     r"""Author of model.
 
     The author is defined
@@ -145,7 +150,7 @@ def author(uid: str) -> str:
     return stats.modified_by
 
 
-def date(uid: str) -> str:
+def date(uid: str) -> str:  # pragma: no cover
     r"""Publication date of model.
 
     The publication date is defined
@@ -175,7 +180,7 @@ def latest_version(
         *,
         subgroup: str = None,
         private: bool = False,
-) -> str:
+) -> str:  # pragma: no cover
     r"""Latest available version of model.
 
     The highest version,
@@ -218,7 +223,7 @@ def lookup_table(
         *,
         subgroup: str = None,
         private: bool = False,
-) -> audfactory.Lookup:
+) -> audfactory.Lookup:  # pragma: no cover
     r"""Lookup table of specified models.
 
     Models are specified by the ``name``, ``subgroup``, ``version``,
@@ -272,7 +277,7 @@ def lookup_table(
     return lookup
 
 
-def parameters(uid: str) -> typing.Dict:
+def parameters(uid: str) -> typing.Dict:  # pragma: no cover
     r"""Parameters of model.
 
     Args:
@@ -308,7 +313,7 @@ def publish(
         private: bool = False,
         create: bool = True,
         verbose: bool = False,
-) -> str:
+) -> str:  # pragma: no cover
     r"""Zip model and publish as a new artifact.
 
     Assigns a unique ID
@@ -408,7 +413,7 @@ def publish(
     return uid
 
 
-def remove(uid: str):
+def remove(uid: str):  # pragma: no cover
     r"""Remove a model.
 
     The model will be deleted on Artifactory,
@@ -431,7 +436,7 @@ def uid(
         *,
         subgroup: str = None,
         private: bool = False,
-) -> str:
+) -> str:  # pragma: no cover
     r"""Unique model ID for given model arguments.
 
     Look for the unique ID of a published model,
@@ -491,7 +496,7 @@ def uid(
     return lookup.find(params)
 
 
-def url(uid: str) -> str:
+def url(uid: str) -> str:  # pragma: no cover
     r"""Search for model of given ID.
 
     Args:
@@ -559,7 +564,7 @@ def versions(
         *,
         subgroup: str = None,
         private: bool = False,
-) -> typing.List[str]:
+) -> typing.List[str]:  # pragma: no cover
     r"""Available model versions.
 
     All versions,
@@ -598,14 +603,14 @@ def versions(
     return versions
 
 
-def _group_id(name: str, subgroup: str) -> str:
+def _group_id(name: str, subgroup: str) -> str:  # pragma: no cover
     if subgroup is None:
         return f'{config.GROUP_ID}.{name}'
     else:
         return f'{config.GROUP_ID}.{subgroup}.{name}'
 
 
-def _lookup_from_url(model_url: str) -> audfactory.Lookup:
+def _lookup_from_url(model_url: str) -> audfactory.Lookup:  # pragma: no cover
     group_id = _group_id(
         name_from_url(model_url),
         subgroup_from_url(model_url),
@@ -620,7 +625,7 @@ def _lookup_from_url(model_url: str) -> audfactory.Lookup:
     )
 
 
-def _repository(private: bool) -> str:
+def _repository(private: bool) -> str:  # pragma: no cover
     if private:
         return config.REPOSITORY_PRIVATE
     else:

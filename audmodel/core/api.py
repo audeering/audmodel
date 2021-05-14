@@ -200,7 +200,10 @@ def load(
         RuntimeError: if model does not exist
 
     Example:
-        >>> root = load('98ccb530-b162-11ea-8427-ac1f6bac2502')
+        >>> root = load(
+        ...    '98ccb530-b162-11ea-8427-ac1f6bac2502',
+        ...    version='1.0.0',
+        ... )
         >>> '/'.join(root.split('/')[-7:])
         'com/audeering/models/gender/audgender/98ccb530-b162-11ea-8427-ac1f6bac2502/1.0.0'
         >>> sorted(os.listdir(root))

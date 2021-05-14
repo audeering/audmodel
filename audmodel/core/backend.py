@@ -36,7 +36,6 @@ def path_version_backend(
     if not audeer.is_uid(uid):
         raise ValueError(f"'{uid}' is not a valid ID")
 
-    backend = None
     urls = []
 
     if config.BACKEND_HOST[0] == 'artifactory':
