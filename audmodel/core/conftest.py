@@ -4,7 +4,7 @@ import audmodel
 
 
 @pytest.fixture(autouse=True)
-def add_audb_with_public_data(doctest_namespace):
+def docstring_examples(doctest_namespace):  # pragma: no cover
     r"""Provide access to the Artifactory repository
     required by some of the docstrings examples.
     As all the unit tests defined under ``tests/*``
@@ -19,5 +19,23 @@ def add_audb_with_public_data(doctest_namespace):
         'https://artifactory.audeering.com/artifactory',
     )
     doctest_namespace['audmodel'] = audmodel
+    subgroup = 'audmodel.docstring'
+    uid = audmodel.uid(
+        pytest.NAME,
+        pytest.PARAMS,
+        subgroup=subgroup,
+    )
+    if not audmodel.exists(uid):
+        audmodel.publish(
+            pytest.MODEL_ROOT,
+            pytest.NAME,
+            pytest.PARAMS,
+            '1.0.0',
+            author=pytest.AUTHOR,
+            date=pytest.DATE,
+            meta=pytest.META,
+            subgroup=subgroup,
+            private=False,
+        )
     yield
     audmodel.config.BACKEND_HOST = pytest.BACKEND_HOST

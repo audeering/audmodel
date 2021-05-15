@@ -30,7 +30,7 @@ def author(
 
     Returns:
         model author
-        
+
     Raises:
         ValueError: if model ID is not valid
         ConnectionError: if Artifactory is not available
@@ -38,8 +38,8 @@ def author(
         RuntimeError: if model does not exist
 
     Example:
-        >>> author('98ccb530-b162-11ea-8427-ac1f6bac2502')
-        'jwagner'
+        >>> author('7d65d639-f8be-b6b3-e789-263cedf559d5')
+        'A. Uthor'
 
     """
     try:
@@ -61,7 +61,7 @@ def date(
 
     Returns:
         model publication date
-        
+
     Raises:
         ValueError: if model ID is not valid
         ConnectionError: if Artifactory is not available
@@ -69,8 +69,8 @@ def date(
         RuntimeError: if model does not exist
 
     Example:
-        >>> date('98ccb530-b162-11ea-8427-ac1f6bac2502')
-        '2020/06/18'
+        >>> date('7d65d639-f8be-b6b3-e789-263cedf559d5')
+        '2021-05-15 23:28:32.491352'
 
     """
     try:
@@ -109,7 +109,7 @@ def exists(uid: str) -> bool:
 
     Returns:
         ``True`` if a model with this ID is found
-        
+
     Raises:
         ValueError: if model ID is not valid
         ConnectionError: if Artifactory is not available
@@ -117,7 +117,7 @@ def exists(uid: str) -> bool:
         RuntimeError: if model does not exist
 
     Example:
-        >>> exists('98ccb530-b162-11ea-8427-ac1f6bac2502')
+        >>> exists('7d65d639-f8be-b6b3-e789-263cedf559d5')
         True
         >>> exists('00000000-0000-0000-0000-000000000000')
         False
@@ -145,7 +145,7 @@ def header(
     Args:
         uid: unique model ID
         version: version string
-        
+
     Raises:
         ValueError: if model ID is not valid
         ConnectionError: if Artifactory is not available
@@ -153,8 +153,31 @@ def header(
         RuntimeError: if model does not exist
 
     Returns:
-        dictionary with information about the model
+        dictionary with header fields
 
+    Examples:
+        >>> d = header('7d65d639-f8be-b6b3-e789-263cedf559d5')
+        >>> print(yaml.dump(d))
+        author: A. Uthor
+        date: '2021-05-15 23:28:32.491352'
+        meta:
+          data:
+            emodb:
+              version: 1.0.0
+              format: wav
+              mixdown: true
+          feature:
+            win_dur: 32ms
+            hop_dur: 10ms
+            num_fft: 512
+            num_bands: 64
+        name: test
+        params:
+          sampling_rate: 16000
+          feature: spectrogram
+        subgroup: audmodel.docstring
+        version: 1.0.0
+        <BLANKLINE>
     """
     path, version, backend = path_version_backend(uid, version=version)
 
@@ -178,7 +201,7 @@ def latest_version(uid: str) -> str:
 
     Returns:
         latest version of model
-        
+
     Raises:
         ValueError: if model ID is not valid
         ConnectionError: if Artifactory is not available
@@ -186,7 +209,7 @@ def latest_version(uid: str) -> str:
         RuntimeError: if model does not exist
 
     Example:
-        >>> latest_version('98ccb530-b162-11ea-8427-ac1f6bac2502')
+        >>> latest_version('7d65d639-f8be-b6b3-e789-263cedf559d5')
         '1.0.0'
 
     """
@@ -225,19 +248,11 @@ def load(
 
     Example:
         >>> root = load(
-        ...    '98ccb530-b162-11ea-8427-ac1f6bac2502',
+        ...    '7d65d639-f8be-b6b3-e789-263cedf559d5',
         ...    version='1.0.0',
         ... )
-        >>> '/'.join(root.split('/')[-7:])
-        'com/audeering/models/gender/audgender/98ccb530-b162-11ea-8427-ac1f6bac2502/1.0.0'
-        >>> sorted(os.listdir(root))
-        ['data-preprocessing',
-         'extractor',
-         'feature-preprocessing',
-         'metrics',
-         'post-processing',
-         'requirements.txt.lock',
-         'trainer']
+        >>> '/'.join(root.split('/')[-8:])
+        'com/audeering/models/audmodel/docstring/test/7d65d639-f8be-b6b3-e789-263cedf559d5/1.0.0'
 
     """
     path, version, backend = path_version_backend(uid, version=version)
@@ -288,8 +303,8 @@ def meta(
         version: version string
 
     Returns:
-        dictionary with meta information
-        
+        dictionary with meta fields
+
     Raises:
         ValueError: if model ID is not valid
         ConnectionError: if Artifactory is not available
@@ -297,8 +312,19 @@ def meta(
         RuntimeError: if model does not exist
 
     Example:
-        >>> meta('98ccb530-b162-11ea-8427-ac1f6bac2502')
-        {}
+        >>> d = meta('7d65d639-f8be-b6b3-e789-263cedf559d5')
+        >>> print(yaml.dump(d))
+        data:
+          emodb:
+            version: 1.0.0
+            format: wav
+            mixdown: true
+        feature:
+          win_dur: 32ms
+          hop_dur: 10ms
+          num_fft: 512
+          num_bands: 64
+        <BLANKLINE>
 
     """
     try:
@@ -315,7 +341,7 @@ def name(uid: str) -> str:
 
     Returns:
         model name
-        
+
     Raises:
         ValueError: if model ID is not valid
         ConnectionError: if Artifactory is not available
@@ -323,8 +349,8 @@ def name(uid: str) -> str:
         RuntimeError: if model does not exist
 
     Example:
-        >>> name('98ccb530-b162-11ea-8427-ac1f6bac2502')
-        'audgender'
+        >>> name('7d65d639-f8be-b6b3-e789-263cedf559d5')
+        'test'
 
     """
     path, _, backend = path_version_backend(uid)
@@ -348,14 +374,10 @@ def parameters(uid: str) -> typing.Dict:
         RuntimeError: if model does not exist
 
     Example:
-        >>> parameters('98ccb530-b162-11ea-8427-ac1f6bac2502')
-        {'classifier': "LinearSVC(C=0.1, class_weight='balanced', random_state=0)",
-         'experiment': 'msp.msppodcast-1.0.0',
-         'features': 'GeMAPSplus_v01',
-         'sampling_rate': 8000,
-         'scaler': 'StandardScaler()'}
+        >>> parameters('7d65d639-f8be-b6b3-e789-263cedf559d5')
+        {'sampling_rate': 16000, 'feature': 'spectrogram'}
 
-    """  # noqa: E501
+    """
     try:
         return header(uid)['params']
     except FileNotFoundError:
@@ -519,8 +541,8 @@ def subgroup(uid: str) -> str:
         RuntimeError: if model does not exist
 
     Example:
-        >>> subgroup('98ccb530-b162-11ea-8427-ac1f6bac2502')
-        'gender'
+        >>> subgroup('7d65d639-f8be-b6b3-e789-263cedf559d5')
+        'audmodel.docstring'
 
     """
     path, _, backend = path_version_backend(uid)
@@ -555,19 +577,16 @@ def uid(
 
     Example:
         >>> uid(
-        ...     'audgender',
+        ...     'test',
         ...     {
-        ...         'classifier': "LinearSVC(C=0.1, class_weight='balanced', random_state=0)",
-        ...         'experiment': 'msp.msppodcast-1.0.0',
-        ...         'features': 'GeMAPSplus_v01',
-        ...         'sampling_rate': 8000,
-        ...         'scaler': 'StandardScaler()',
+        ...         'sampling_rate': 16000,
+        ...         'feature': 'spectrogram',
         ...     },
-        ...     subgroup='gender',
+        ...     subgroup='audmodel.docstring',
         ... )
-        'b47015a8-6447-5190-ede6-340c4e70b4cb'
+        '7d65d639-f8be-b6b3-e789-263cedf559d5'
 
-    """  # noqa: E501
+    """
     group_id = f'{config.GROUP_ID}.{name}' if subgroup is None \
         else f'{config.GROUP_ID}.{subgroup}.{name}'
     unique_string = group_id + str(params)
@@ -597,9 +616,12 @@ def url(
         RuntimeError: if model does not exist
 
     Example:
-        >>> model_url = url('98ccb530-b162-11ea-8427-ac1f6bac2502')
-        >>> '/'.join(model_url.split('/')[4:10])
-        'models-public-local/com/audeering/models/gender/audgender'
+        >>> archive = url('7d65d639-f8be-b6b3-e789-263cedf559d5')
+        >>> archive.split('/')[-1]
+        '7d65d639-f8be-b6b3-e789-263cedf559d5-1.0.0.zip'
+        >>> header = url('7d65d639-f8be-b6b3-e789-263cedf559d5', header=True)
+        >>> header.split('/')[-1]
+        '7d65d639-f8be-b6b3-e789-263cedf559d5-1.0.0.yaml'
 
     """
     path, version, backend = path_version_backend(uid, version=version)
@@ -615,7 +637,7 @@ def versions(uid: str) -> typing.List[str]:
 
     Returns:
         list with versions
-        
+
     Raises:
         ValueError: if model ID is not valid
         ConnectionError: if Artifactory is not available
@@ -623,7 +645,7 @@ def versions(uid: str) -> typing.List[str]:
         RuntimeError: if model does not exist
 
     Example:
-        >>> versions('98ccb530-b162-11ea-8427-ac1f6bac2502')
+        >>> versions('7d65d639-f8be-b6b3-e789-263cedf559d5')
         ['1.0.0']
 
     """
