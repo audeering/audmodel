@@ -47,6 +47,9 @@ def fixture_publish_model():
             pytest.NAME,
             pytest.PARAMS,
             version,
+            author=pytest.AUTHOR,
+            date=pytest.DATE,
+            meta=pytest.META[version],
             subgroup=SUBGROUP,
         )
 

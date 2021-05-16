@@ -9,20 +9,19 @@ audmodel.config.BACKEND_HOST = pytest.BACKEND_HOST
 audmodel.config.CACHE_ROOT = pytest.CACHE_ROOT
 
 SUBGROUP = f'{pytest.ID}.publish'
-VERSION = '1.0.0'
 
 
 @pytest.mark.parametrize(
     'root, name, params, version, author, date, meta, subgroup, private',
-    [
+    (
         pytest.param(
             pytest.MODEL_ROOT,
             pytest.NAME,
             pytest.PARAMS,
-            VERSION,
+            '1.0.0',
             pytest.AUTHOR,
             pytest.DATE,
-            pytest.META,
+            pytest.META['1.0.0'],
             SUBGROUP,
             False,
         ),
@@ -31,10 +30,10 @@ VERSION = '1.0.0'
             pytest.MODEL_ROOT,
             'other',
             pytest.PARAMS,
-            VERSION,
+            '1.0.0',
             pytest.AUTHOR,
             pytest.DATE,
-            pytest.META,
+            pytest.META['1.0.0'],
             SUBGROUP,
             False,
         ),
@@ -43,10 +42,10 @@ VERSION = '1.0.0'
             pytest.MODEL_ROOT,
             pytest.NAME,
             pytest.PARAMS,
-            VERSION,
+            '1.0.0',
             pytest.AUTHOR,
             pytest.DATE,
-            pytest.META,
+            pytest.META['1.0.0'],
             f'{SUBGROUP}.other',
             False,
         ),
@@ -55,10 +54,10 @@ VERSION = '1.0.0'
             pytest.MODEL_ROOT,
             pytest.NAME,
             {},
-            VERSION,
+            '1.0.0',
             pytest.AUTHOR,
             pytest.DATE,
-            pytest.META,
+            pytest.META['1.0.0'],
             SUBGROUP,
             False,
         ),
@@ -70,7 +69,7 @@ VERSION = '1.0.0'
             '2.0.0',
             pytest.AUTHOR,
             pytest.DATE,
-            pytest.META,
+            pytest.META['2.0.0'],
             SUBGROUP,
             False,
         ),
@@ -82,7 +81,7 @@ VERSION = '1.0.0'
             '3.0.0',
             pytest.AUTHOR,
             pytest.DATE,
-            pytest.META,
+            pytest.META['3.0.0'],
             SUBGROUP,
             True,
         ),
@@ -91,10 +90,10 @@ VERSION = '1.0.0'
             pytest.MODEL_ROOT,
             pytest.NAME,
             pytest.PARAMS,
-            VERSION,
+            '1.0.0',
             pytest.AUTHOR,
             pytest.DATE,
-            pytest.META,
+            pytest.META['1.0.0'],
             SUBGROUP,
             False,
             marks=pytest.mark.xfail(raises=RuntimeError)
@@ -103,10 +102,10 @@ VERSION = '1.0.0'
             pytest.MODEL_ROOT,
             pytest.NAME,
             pytest.PARAMS,
-            VERSION,
+            '1.0.0',
             pytest.AUTHOR,
             pytest.DATE,
-            pytest.META,
+            pytest.META['1.0.0'],
             SUBGROUP,
             True,
             marks=pytest.mark.xfail(raises=RuntimeError),
@@ -116,15 +115,15 @@ VERSION = '1.0.0'
             './does-not-exist',
             pytest.NAME,
             pytest.PARAMS,
-            VERSION,
+            '1.0.0',
             pytest.AUTHOR,
             pytest.DATE,
-            pytest.META,
+            pytest.META['1.0.0'],
             SUBGROUP,
             False,
             marks=pytest.mark.xfail(raises=FileNotFoundError)
         ),
-    ]
+    )
 )
 def test_publish(root, name, subgroup, params, author, date, meta, version,
                  private):
@@ -141,6 +140,7 @@ def test_publish(root, name, subgroup, params, author, date, meta, version,
         private=private,
     )
 
+    assert audmodel.exists(uid, version=version)
     assert uid == audmodel.uid(
         name,
         params,
@@ -152,8 +152,8 @@ def test_publish(root, name, subgroup, params, author, date, meta, version,
     assert header['author'] == author
     assert audmodel.author(uid, version=version) == author
 
-    assert header['date'] == str(date)
-    assert audmodel.date(uid, version=version) == str(date)
+    assert header['date'] == date
+    assert audmodel.date(uid, version=version) == date
 
     assert header['meta'] == meta
     assert audmodel.meta(uid, version=version) == meta

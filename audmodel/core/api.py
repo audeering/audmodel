@@ -38,8 +38,8 @@ def author(
         RuntimeError: if model does not exist
 
     Example:
-        >>> author('7d65d639-f8be-b6b3-e789-263cedf559d5')
-        'A. Uthor'
+        >>> author('5a7fd2f6-07da-8b7f-73c5-169fca6aecd2')
+        'Calvin and Hobbes'
 
     """
     try:
@@ -52,7 +52,7 @@ def date(
         uid: str,
         *,
         version: str = None,
-) -> str:
+) -> datetime.date:
     r"""Publication date of model.
 
     Args:
@@ -69,14 +69,14 @@ def date(
         RuntimeError: if model does not exist
 
     Example:
-        >>> date('7d65d639-f8be-b6b3-e789-263cedf559d5')
-        '2021-05-15 23:28:32.491352'
+        >>> date('5a7fd2f6-07da-8b7f-73c5-169fca6aecd2')
+        datetime.date(1985, 11, 18)
 
     """
     try:
         return header(uid, version=version)['date']
     except FileNotFoundError:
-        return legacy.date(uid)
+        return datetime.datetime.strptime(legacy.date(uid), "%Y/%m/%d").date()
 
 
 def default_cache_root() -> str:
@@ -101,11 +101,16 @@ def default_cache_root() -> str:
     return os.environ.get('CACHE_ROOT') or config.CACHE_ROOT
 
 
-def exists(uid: str) -> bool:
+def exists(
+        uid: str,
+        *,
+        version: str = None,
+) -> bool:
     r"""Check if a model with this ID exists.
 
     Args:
         uid: unique model ID
+        version: version string
 
     Returns:
         ``True`` if a model with this ID is found
@@ -117,8 +122,12 @@ def exists(uid: str) -> bool:
         RuntimeError: if model does not exist
 
     Example:
-        >>> exists('7d65d639-f8be-b6b3-e789-263cedf559d5')
+        >>> exists('5a7fd2f6-07da-8b7f-73c5-169fca6aecd2')
         True
+        >>> exists('5a7fd2f6-07da-8b7f-73c5-169fca6aecd2', version='1.0.0')
+        True
+        >>> exists('5a7fd2f6-07da-8b7f-73c5-169fca6aecd2', version='9.9.9')
+        False
         >>> exists('00000000-0000-0000-0000-000000000000')
         False
         >>> exists('bad-id')
@@ -126,7 +135,7 @@ def exists(uid: str) -> bool:
 
     """
     try:
-        url(uid)
+        url(uid, version=version)
     except RuntimeError:
         return False
     except ValueError:
@@ -156,28 +165,33 @@ def header(
         dictionary with header fields
 
     Examples:
-        >>> d = header('7d65d639-f8be-b6b3-e789-263cedf559d5')
+        >>> d = header('5a7fd2f6-07da-8b7f-73c5-169fca6aecd2')
         >>> print(yaml.dump(d))
-        author: A. Uthor
-        date: '2021-05-15 23:28:32.491352'
+        author: Calvin and Hobbes
+        date: 1985-11-18
         meta:
           data:
             emodb:
-              version: 1.0.0
+              version: 1.1.1
               format: wav
               mixdown: true
-          feature:
+          spectrogram:
             win_dur: 32ms
             hop_dur: 10ms
             num_fft: 512
             num_bands: 64
+          cnn:
+            type: pann
+            layers: 14
         name: test
         params:
-          sampling_rate: 16000
           feature: spectrogram
+          model: cnn
+          sampling_rate: 16000
         subgroup: audmodel.docstring
-        version: 1.0.0
+        version: 3.0.0
         <BLANKLINE>
+
     """
     path, version, backend = path_version_backend(uid, version=version)
 
@@ -209,8 +223,8 @@ def latest_version(uid: str) -> str:
         RuntimeError: if model does not exist
 
     Example:
-        >>> latest_version('7d65d639-f8be-b6b3-e789-263cedf559d5')
-        '1.0.0'
+        >>> latest_version('5a7fd2f6-07da-8b7f-73c5-169fca6aecd2')
+        '3.0.0'
 
     """
     return versions(uid)[-1]
@@ -248,11 +262,11 @@ def load(
 
     Example:
         >>> root = load(
-        ...    '7d65d639-f8be-b6b3-e789-263cedf559d5',
+        ...    '5a7fd2f6-07da-8b7f-73c5-169fca6aecd2',
         ...    version='1.0.0',
         ... )
         >>> '/'.join(root.split('/')[-8:])
-        'com/audeering/models/audmodel/docstring/test/7d65d639-f8be-b6b3-e789-263cedf559d5/1.0.0'
+        'com/audeering/models/audmodel/docstring/test/5a7fd2f6-07da-8b7f-73c5-169fca6aecd2/1.0.0'
 
     """
     path, version, backend = path_version_backend(uid, version=version)
@@ -312,18 +326,21 @@ def meta(
         RuntimeError: if model does not exist
 
     Example:
-        >>> d = meta('7d65d639-f8be-b6b3-e789-263cedf559d5')
+        >>> d = meta('5a7fd2f6-07da-8b7f-73c5-169fca6aecd2')
         >>> print(yaml.dump(d))
         data:
           emodb:
-            version: 1.0.0
+            version: 1.1.1
             format: wav
             mixdown: true
-        feature:
+        spectrogram:
           win_dur: 32ms
           hop_dur: 10ms
           num_fft: 512
           num_bands: 64
+        cnn:
+          type: pann
+          layers: 14
         <BLANKLINE>
 
     """
@@ -349,7 +366,7 @@ def name(uid: str) -> str:
         RuntimeError: if model does not exist
 
     Example:
-        >>> name('7d65d639-f8be-b6b3-e789-263cedf559d5')
+        >>> name('5a7fd2f6-07da-8b7f-73c5-169fca6aecd2')
         'test'
 
     """
@@ -374,8 +391,8 @@ def parameters(uid: str) -> typing.Dict:
         RuntimeError: if model does not exist
 
     Example:
-        >>> parameters('7d65d639-f8be-b6b3-e789-263cedf559d5')
-        {'sampling_rate': 16000, 'feature': 'spectrogram'}
+        >>> parameters('5a7fd2f6-07da-8b7f-73c5-169fca6aecd2')
+        {'feature': 'spectrogram', 'model': 'cnn', 'sampling_rate': 16000}
 
     """
     try:
@@ -390,8 +407,8 @@ def publish(
         params: typing.Dict[str, typing.Any],
         version: str,
         *,
-        author: str = getpass.getuser(),
-        date: datetime = datetime.datetime.now(),
+        author: str = None,
+        date: datetime.date = None,
         meta: typing.Dict[str, typing.Any] = {},
         subgroup: str = None,
         private: bool = False,
@@ -449,6 +466,8 @@ def publish(
         RuntimeError: if an artifact exists already
 
     """
+    date = date or datetime.date.today()
+    author = author or getpass.getuser()
     root = audeer.safe_path(root)
     subgroup = subgroup or ''
 
@@ -487,7 +506,7 @@ def publish(
         header = {
             model_id: {
                 'author': author,
-                'date': str(date),
+                'date': date,
                 'meta': meta,
                 'name': name,
                 'params': params,
@@ -541,7 +560,7 @@ def subgroup(uid: str) -> str:
         RuntimeError: if model does not exist
 
     Example:
-        >>> subgroup('7d65d639-f8be-b6b3-e789-263cedf559d5')
+        >>> subgroup('5a7fd2f6-07da-8b7f-73c5-169fca6aecd2')
         'audmodel.docstring'
 
     """
@@ -581,14 +600,26 @@ def uid(
         ...     {
         ...         'sampling_rate': 16000,
         ...         'feature': 'spectrogram',
+        ...         'model': 'cnn',
         ...     },
         ...     subgroup='audmodel.docstring',
         ... )
-        '7d65d639-f8be-b6b3-e789-263cedf559d5'
+        '5a7fd2f6-07da-8b7f-73c5-169fca6aecd2'
+        >>> uid(
+        ...     'test',
+        ...     {
+        ...         'feature': 'spectrogram',
+        ...         'model': 'cnn',
+        ...         'sampling_rate': 16000,
+        ...     },
+        ...     subgroup='audmodel.docstring',
+        ... )
+        '5a7fd2f6-07da-8b7f-73c5-169fca6aecd2'
 
     """
     group_id = f'{config.GROUP_ID}.{name}' if subgroup is None \
         else f'{config.GROUP_ID}.{subgroup}.{name}'
+    params = {key: params[key] for key in sorted(params)}
     unique_string = group_id + str(params)
     return audeer.uid(from_string=unique_string)
 
@@ -616,12 +647,12 @@ def url(
         RuntimeError: if model does not exist
 
     Example:
-        >>> archive = url('7d65d639-f8be-b6b3-e789-263cedf559d5')
+        >>> archive = url('5a7fd2f6-07da-8b7f-73c5-169fca6aecd2')
         >>> archive.split('/')[-1]
-        '7d65d639-f8be-b6b3-e789-263cedf559d5-1.0.0.zip'
-        >>> header = url('7d65d639-f8be-b6b3-e789-263cedf559d5', header=True)
+        '5a7fd2f6-07da-8b7f-73c5-169fca6aecd2-3.0.0.zip'
+        >>> header = url('5a7fd2f6-07da-8b7f-73c5-169fca6aecd2', header=True)
         >>> header.split('/')[-1]
-        '7d65d639-f8be-b6b3-e789-263cedf559d5-1.0.0.yaml'
+        '5a7fd2f6-07da-8b7f-73c5-169fca6aecd2-3.0.0.yaml'
 
     """
     path, version, backend = path_version_backend(uid, version=version)
@@ -645,8 +676,8 @@ def versions(uid: str) -> typing.List[str]:
         RuntimeError: if model does not exist
 
     Example:
-        >>> versions('7d65d639-f8be-b6b3-e789-263cedf559d5')
-        ['1.0.0']
+        >>> versions('5a7fd2f6-07da-8b7f-73c5-169fca6aecd2')
+        ['1.0.0', '2.0.0', '3.0.0']
 
     """
     path, _, backend = path_version_backend(uid)

@@ -25,17 +25,18 @@ def docstring_examples(doctest_namespace):  # pragma: no cover
         pytest.PARAMS,
         subgroup=subgroup,
     )
-    if not audmodel.exists(uid):
-        audmodel.publish(
-            pytest.MODEL_ROOT,
-            pytest.NAME,
-            pytest.PARAMS,
-            '1.0.0',
-            author=pytest.AUTHOR,
-            date=pytest.DATE,
-            meta=pytest.META,
-            subgroup=subgroup,
-            private=False,
-        )
+    for version, meta in pytest.META.items():
+        if not audmodel.exists(uid, version=version):
+            audmodel.publish(
+                pytest.MODEL_ROOT,
+                pytest.NAME,
+                pytest.PARAMS,
+                version,
+                author=pytest.AUTHOR,
+                date=pytest.DATE,
+                meta=meta,
+                subgroup=subgroup,
+                private=False,
+            )
     yield
     audmodel.config.BACKEND_HOST = pytest.BACKEND_HOST

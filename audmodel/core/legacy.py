@@ -8,7 +8,19 @@ import audeer
 import audfactory
 
 from audmodel.core.config import config
-from audmodel.core.define import defaults
+
+
+class defaults():
+
+    ARTIFACTORY_HOST = 'https://artifactory.audeering.com/artifactory'
+    r"""Server address of Artifactory server."""
+
+    LOOKUP_TABLE_NAME = 'lookup'
+    r"""Name of lookup table."""
+    LOOKUP_TABLE_EXT = 'csv'
+    r"""Extension of lookup table."""
+    LOOKUP_TABLE_INDEX = 'id'
+    r"""Name of lookup table index."""
 
 
 # helper functions
@@ -139,10 +151,6 @@ def author(uid: str) -> str:  # pragma: no cover
     Returns:
         model author
 
-    Example:
-        >>> author('98ccb530-b162-11ea-8427-ac1f6bac2502')
-        'jwagner'
-
     """
     model_url = url(uid)
     path = audfactory.path(model_url)
@@ -162,10 +170,6 @@ def date(uid: str) -> str:  # pragma: no cover
 
     Returns:
         model publication date
-
-    Example:
-        >>> date('98ccb530-b162-11ea-8427-ac1f6bac2502')
-        '2020/06/18'
 
     """
     model_url = url(uid)
@@ -202,10 +206,6 @@ def latest_version(
 
     Returns:
         latest version of model
-
-    Example:
-        >>> latest_version('audgender', subgroup='gender')
-        '1.0.0'
 
     """
     version = audfactory.Lookup.latest_version(
@@ -253,21 +253,7 @@ def lookup_table(
     Raises:
         RuntimeError: if table does not exist
 
-    Example:
-        >>> t = lookup_table('audgender', subgroup='gender', version='1.0.0')
-        >>> t.columns
-        ['classifier', 'experiment', 'features', 'sampling_rate', 'scaler']
-        >>> t.ids
-        ['f4e42076-b160-11ea-8427-ac1f6bac2502',
-         '98ccb530-b162-11ea-8427-ac1f6bac2502']
-        >>> t['98ccb530-b162-11ea-8427-ac1f6bac2502']
-        {'classifier': "LinearSVC(C=0.1, class_weight='balanced', random_state=0)",
-         'experiment': 'msp.msppodcast-1.0.0',
-         'features': 'GeMAPSplus_v01',
-         'sampling_rate': 8000,
-         'scaler': 'StandardScaler()'}
-
-    """  # noqa: E501
+    """
     lookup = audfactory.Lookup(
         defaults.ARTIFACTORY_HOST,
         _repository(private),
@@ -289,15 +275,7 @@ def parameters(uid: str) -> typing.Dict:  # pragma: no cover
     Raises:
         RuntimeError: if table does not exist
 
-    Example:
-        >>> parameters('98ccb530-b162-11ea-8427-ac1f6bac2502')
-        {'classifier': "LinearSVC(C=0.1, class_weight='balanced', random_state=0)",
-         'experiment': 'msp.msppodcast-1.0.0',
-         'features': 'GeMAPSplus_v01',
-         'sampling_rate': 8000,
-         'scaler': 'StandardScaler()'}
-
-    """  # noqa: E501
+    """
     model_url = url(uid)
     lookup = _lookup_from_url(model_url)
     return lookup[uid]
@@ -462,22 +440,7 @@ def uid(
     Raises:
         RuntimeError: if no lookup table for the model exists
 
-    Example:
-        >>> uid(
-        ...     'audgender',
-        ...     {
-        ...         'classifier': "LinearSVC(C=0.1, class_weight='balanced', random_state=0)",
-        ...         'experiment': 'msp.msppodcast-1.0.0',
-        ...         'features': 'GeMAPSplus_v01',
-        ...         'sampling_rate': 8000,
-        ...         'scaler': 'StandardScaler()',
-        ...     },
-        ...     subgroup='gender',
-        ...     version='1.0.0',
-        ... )
-        '98ccb530-b162-11ea-8427-ac1f6bac2502'
-
-    """  # noqa: E501
+    """
     repository = _repository(private)
     group_id = _group_id(name, subgroup)
     if version is None:
@@ -511,11 +474,6 @@ def url(uid: str) -> str:  # pragma: no cover
         RuntimeError: if Artifactory REST API query failes
         RuntimeError: if more than one model is found
         RuntimeError: if no model is found
-
-    Example:
-        >>> model_url = url('98ccb530-b162-11ea-8427-ac1f6bac2502')
-        >>> '/'.join(model_url.split('/')[4:10])
-        'models-public-local/com/audeering/models/gender/audgender'
 
     """
     if not audeer.is_uid(uid):
@@ -587,10 +545,6 @@ def versions(
 
     Returns:
         available model versions
-
-    Example:
-        >>> versions('voxcnn', subgroup='speakerid')
-        ['0.1.0', '0.2.0', '0.3.0', '0.3.1', '0.3.2']
 
     """
     versions = audfactory.Lookup.versions(
