@@ -29,6 +29,11 @@ exists
 
 .. autofunction:: exists
 
+header
+------
+
+.. autofunction:: header
+
 latest_version
 --------------
 
@@ -39,10 +44,10 @@ load
 
 .. autofunction:: load
 
-lookup_table
-------------
+meta
+----
 
-.. autofunction:: lookup_table
+.. autofunction:: meta
 
 name
 ----
@@ -59,11 +64,6 @@ publish
 
 .. autofunction:: publish
 
-remove
-------
-
-.. autofunction:: remove
-
 subgroup
 --------
 
@@ -78,11 +78,6 @@ url
 ---
 
 .. autofunction:: url
-
-version
--------
-
-.. autofunction:: version
 
 versions
 --------

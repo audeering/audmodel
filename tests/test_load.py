@@ -72,7 +72,7 @@ def fixture_publish_model():
 )
 def test_load(uid, version):
 
-    root = audmodel.load(uid, version=version)
+    root = audmodel.load(uid, version)
 
     if version is None:
         version = audmodel.latest_version(uid)

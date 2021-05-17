@@ -10,20 +10,11 @@ Usage
     :hide-code:
 
     import os
-    import shutil
     import glob
-    import audeer
-    import audfactory
-    import audmodel
 
-
-    audmodel.core.define.defaults.REPOSITORY_PUBLIC = 'unittests-public-local'
-    # Create a unique group iD
-    # to not interrupt if another process is running in parallel
-    audmodel.core.define.defaults.GROUP_ID += '.audmodel.' + audeer.uid()
 
     def create_model(name, files):
-        root = os.path.join(os.getcwd(), 'models', name)
+        root = os.path.join(ROOT, 'models', name)
         audeer.mkdir(root)
         for file in files:
             path = os.path.join(root, file)
@@ -41,6 +32,28 @@ Usage
             subindent = ' ' * 4 * (level + 1)
             for f in files:
                 print('{}{}'.format(subindent, f))
+
+
+To avoid publishing the
+following examples on Artifactory,
+we replace the default backend
+with a folder on the local file system.
+
+.. jupyter-execute::
+
+    import audeer
+    import audmodel
+
+
+    ROOT = audeer.mkdir('./docs/tmp')
+    audmodel.config.BACKEND_HOST = (
+        'file-system',
+        ROOT,
+    )
+    audmodel.config.CACHE_ROOT = os.path.join(
+        ROOT,
+        'cache',
+    )
 
 
 Introduction
@@ -74,17 +87,17 @@ needs to be passed, e.g.:
 .. code-block:: python
 
     params = {
-        'data': 'emodb',
-        'rate': 8000,
+        'feature': 'spectrogram',
+        'model': 'cnn',
+        'sampling_rate': 16000,
     }
 
 When publishing the model,
 :mod:`audmodel`
 
 1. creates a unique ``<id>``
-2. zips the model folder and publishes it as artifact ``<id>-<version>.zip``
-3. adds a row to a lookup table with ``<id>`` as index
-   and ``params`` as values
+2. publishes model header as artifact ``<id>-<version>.yaml``
+3. zips the model folder and publishes it as artifact ``<id>-<version>.zip``
 
 When downloading the model,
 :mod:`audmodel`
@@ -97,22 +110,24 @@ When downloading the model,
 Publish a model
 ---------------
 
-Let’s assume we have a model folder ``root_mlp``,
+Let’s assume we have a model folder ``root_v1``,
 consisting of the following files:
 
 .. jupyter-execute::
     :hide-code:
 
-    files = ['meta.yaml', 'network.txt', 'bin/mlp-weights.pkl']
-    root_mlp = create_model('mymodel-mlp', files)
-    show_model(root_mlp)
+    files = ['meta.yaml', 'network.txt', 'bin/weights_v1.pkl']
+    root_v1 = create_model('cnn-v1', files)
+    show_model(root_v1)
 
 Before we can publish a model,
-we have to define four different arguments:
+we have to define several arguments:
 
+* ``author``, name of the author
+* ``name``, name of the model, e.g ``cnn``
+* ``meta``, dictionary with meta information
 * ``params``, parameters of the model
-* ``name``, name of the model, e.g ``voxcnn``
-* ``subgroup``, subgroup of the model, e.g. ``anger.autrainer``
+* ``subgroup``, subgroup of the model, e.g. ``emotion.onnx``
 * ``version``, version of the model, e.g. ``1.0.0``
 
 For a discussion on how to select those arguments,
@@ -123,13 +138,33 @@ Let's define the four arguments for our example model:
 
 .. jupyter-execute::
 
-    params_mlp = {
-        'data': 'emodb',
-        'sampling_rate': 16000,
-        'network': 'mlp',
+    author='sphinx'
+    name = 'cnn'
+    meta_v1 = {
+        'data': {
+            'emodb': {
+                'version': '1.1.1',
+                'format': 'wav',
+                'mixdown': True,
+            }
+        },
+        'spectrogram': {
+            'win_dur': '32ms',
+            'hop_dur': '10ms',
+            'num_fft': 512,
+            'num_bands': 64,
+        },
+        'cnn': {
+            'type': 'pann',
+            'layers': 10,
+        }
     }
-    name = 'voxcnn'
-    subgroup = 'anger.autrainer'
+    params = {
+        'feature': 'spectrogram',
+        'model': 'cnn',
+        'sampling_rate': 16000,
+    }
+    subgroup = 'emotion.onnx'
     version = '1.0.0'
 
 Now we can publish the model with
@@ -137,10 +172,12 @@ Now we can publish the model with
 .. jupyter-execute::
 
     uid = audmodel.publish(
-        root=root_mlp,
+        author=author,
         name=name,
+        meta=meta_v1,
+        params=params,
         subgroup=subgroup,
-        params=params_mlp,
+        root=root_v1,
         version=version,
     )
     uid
@@ -148,7 +185,7 @@ Now we can publish the model with
 The publishing process returns a unique model ID,
 that can be used to access the model.
 The model ID is derived from
-``name``, ``version``, ``subgroup``, ``params``
+``name``, ``params``, ``subgroup``
 and can always be used to safely identify a model.
 
 
@@ -161,13 +198,7 @@ With the model ID we can check if a model exists:
 
     audmodel.exists(uid)
 
-And we can find its actual URL on Artifactory:
-
-.. jupyter-execute::
-
-    audmodel.url(uid)
-
-Or get information, about its name or its parameters:
+Or get information, about its name, parameters or meta fields:
 
 .. jupyter-execute::
 
@@ -177,124 +208,85 @@ Or get information, about its name or its parameters:
 
     audmodel.parameters(uid)
 
-To load a model from Artifactory_ to a model folder
-is that simple as well:
+.. jupyter-execute::
+
+    audmodel.meta(uid)
+
+To actually load the actual model, we do
 
 .. jupyter-execute::
 
-    model_folder = audmodel.load(uid)
-    os.listdir(model_folder)
+    model_root = audmodel.load(uid)
+    show_model(model_root)
 
 
 Publish another model
 ---------------------
 
 Let's assume our published model wasn't very successful.
-Hence, we decide to train another model using LSTMs.
-To differentiate it from the first model,
-we just need to update the parameters accordingly.
+Hence, we decide to train the model on more data.
 
 Let's again assume we have a model folder,
-this time called ``root_lstm``:
+this time called ``root_v2``:
 
 .. jupyter-execute::
     :hide-code:
 
-    files = ['meta.yaml', 'network.txt', 'bin/lstm-weights.pkl']
-    root_lstm = create_model('mymodel-lstm', files)
-    show_model(root_lstm)
+    files = ['meta.yaml', 'network.txt', 'bin/weights_v2.pkl']
+    root_v2 = create_model('cnn-v2', files)
+    show_model(root_v2)
 
-We can then publish it with
+We include information about the new data
+in the meta dictionary:
 
 .. jupyter-execute::
 
-    params_lstm = {
-        'data': 'emodb',
-        'sampling_rate': 16000,
-        'network': 'lstm',
+    meta_v2 = meta_v1.copy()
+    meta_v2['data']['msppodcast'] = {
+        'version': '2.3.1',
+        'format': 'wav',
+        'mixdown': True,
     }
+
+And publish it with
+
+.. jupyter-execute::
+
     uid = audmodel.publish(
-        root=root_lstm,
         name=name,
+        meta=meta_v2,
+        params=params,
+        root=root_v2,
         subgroup=subgroup,
-        params=params_lstm,
-        version=version,
+        version='2.0.0',
     )
     uid
 
-Now we published two different models with the same name,
-subgroup, and version.
-
-For a given name, subgroup, and version,
-you can check which model IDs and parameters were used
-by requesting the model lookup table.
+Since we did not change
+``name``, ``params``, and ``subgroup``
+we get the same model ID.
+Now we have published two versions of the model:
 
 .. jupyter-execute::
 
-    audmodel.lookup_table(
-        name=name,
-        subgroup=subgroup,
-        version=version,
-    )
+    audmodel.versions(uid)
 
-
-Different model parameters
---------------------------
-
-After some analysis,
-you find out the model will improve
-if you normalize the audio data during training.
-You therefore introduce a new parameter ``normalize``,
-which is either ``True`` or ``False``.
+By default,
+always the latest version is returned,
+e.g. the following request
+returns meta information
+for version ``'2.0.0'``.
 
 .. jupyter-execute::
 
-    params_lstm = {
-        'data': 'emodb',
-        'sampling_rate': 16000,
-        'network': 'lstm',
-        'normalize': True,
-    }
-    audmodel.publish(
-        root=root_lstm,
-        name=name,
-        subgroup=subgroup,
-        params=params_lstm,
-        version=version,
-    )
-    audmodel.lookup_table(
-        name=name,
-        subgroup=subgroup,
-        version=version,
-    )
+    audmodel.header(uid)
 
-The new parameter is added to the lookup table,
-and set to ``None`` for already submitted models.
-
-If you submit another model,
-but this time omitting one of the parameters inside the lookup table,
-the parameter is set to ``None`` as well:
+If we want a particular version,
+we can do:
 
 .. jupyter-execute::
 
-    params_lstm = {
-        'data': 'emodb',
-        'sampling_rate': 8000,
-        'network': 'lstm',
-    }
-    audmodel.publish(
-        root=root_lstm,
-        name=name,
-        subgroup=subgroup,
-        params=params_lstm,
-        version=version,
-    )
-    audmodel.lookup_table(
-        name=name,
-        subgroup=subgroup,
-        version=version,
-    )
-    
+    audmodel.header(uid, '1.0.0')
 
 
 Cache folder
@@ -318,7 +310,7 @@ Or by changing it inside :class:`audmodel.config`:
 
 .. code-block:: python
 
-    audmodel.config.AUDMODEL_CACHE_ROOT='/path/to/your/cache'
+    audmodel.config.CACHE_ROOT='/path/to/your/cache'
 
 Or individually,
 by calling :func:`audmodel.load`
@@ -326,27 +318,16 @@ with a non empty ``root`` argument.
 
 Within the model cache folder
 the model is placed in a unique sub-folder, namely
-``com/audeering/models/<subgroup>/<name>/<version>/<uid>``.
+``com/audeering/models/<subgroup>/<name>/<uid>/<version>``.
 
 
 .. jupyter-execute::
     :hide-code:
 
-    def cleanup():
-        root = os.path.join(os.getcwd(), 'models')
-        if os.path.exists(root):
-            shutil.rmtree(root)
-        url = audfactory.url(
-            audmodel.core.define.defaults.ARTIFACTORY_HOST,
-            repository='models-public-local',
-            group_id=audmodel.core.define.defaults.GROUP_ID,
-            name='mymodel',
-        )
-        path = audfactory.path(url).parent
-        if path.exists():
-            path.rmdir()
+    import shutil
 
-    cleanup()
+
+    shutil.rmtree(ROOT)
 
 
 .. _Artifactory:

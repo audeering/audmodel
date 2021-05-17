@@ -19,7 +19,6 @@ import audmodel.core.legacy as legacy
 
 def author(
         uid: str,
-        *,
         version: str = None,
 ) -> str:
     r"""Author of model.
@@ -50,7 +49,6 @@ def author(
 
 def date(
         uid: str,
-        *,
         version: str = None,
 ) -> datetime.date:
     r"""Publication date of model.
@@ -83,12 +81,12 @@ def default_cache_root() -> str:
     r"""Default path under which models are stored.
 
     It first looks for the environment variable
-    ``CACHE_ROOT``,
+    ``AUDMODEL_CACHE_ROOT``,
     which can be set in bash:
 
     .. code-block:: bash
 
-        export CACHE_ROOT=/path/to/your/cache
+        export AUDMODEL_CACHE_ROOT=/path/to/your/cache
 
     If it the environment variable is not set,
     :attr:`config.CACHE_ROOT`
@@ -103,7 +101,6 @@ def default_cache_root() -> str:
 
 def exists(
         uid: str,
-        *,
         version: str = None,
 ) -> bool:
     r"""Check if a model with this ID exists.
@@ -146,7 +143,6 @@ def exists(
 
 def header(
         uid: str,
-        *,
         version: str = None,
 ) -> dict:
     r"""Load model header.
@@ -232,8 +228,8 @@ def latest_version(uid: str) -> str:
 
 def load(
         uid: str,
-        *,
         version: str = None,
+        *,
         root: str = None,
         verbose: bool = False,
 ) -> str:
@@ -307,7 +303,6 @@ def load(
 
 def meta(
         uid: str,
-        *,
         version: str = None,
 ) -> typing.Dict[str, typing.Any]:
     r"""Meta information of model.
@@ -419,27 +414,28 @@ def publish(
     pick meaningful model ``params``, ``name``, ``subgroup``
     values.
 
+    For ``name``  we recommend to encode
+    the package that was used for training,
+    e.g. ``audpann``.
+
     For model ``params`` we recommend to encode:
 
-    * sampling rate
     * feature set
-    * classifier
+    * model type
+    * sampling rate
 
     For ``subgroup`` we recommend to encode:
 
     * task the model was trained for, e.g. ``gender``
-    * maybe also project, e.g. ``projectsmile.agent-tone4``
-    * package that was used for training,
-      if not encoded in name,
-      e.g. ``projectsmile.agent-tone4.autrainer``
+    * maybe also project, e.g. ``projectsmile.client``
 
-    For ``name`` we recommend to encode:
+    All other details that are relevant to the model
+    can be stored as ``meta`` information, e.g.
 
-    * package that was used for training, e.g. ``autrainer``
-    * or if the package contains different sub-routines,
-      encode package in ``subgroup`` and the sub-routine
-      in ``name``,
-      e.g. ``sklearn``
+    * class names
+    * data the model was trained on
+    * frame and hop size used for feature extraction
+    * model hyper parameters
 
     Args:
         root: folder with model files
@@ -626,9 +622,9 @@ def uid(
 
 def url(
         uid: str,
+        version: str = None,
         *,
         header: bool = False,
-        version: str = None,
 ) -> str:
     r"""Model URL.
 
