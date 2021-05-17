@@ -393,7 +393,7 @@ def parameters(uid: str) -> typing.Dict:
 
     """
     try:
-        return header(uid)['params']
+        return header(uid)['parameters']
     except FileNotFoundError:
         return legacy.parameters(uid)
 
@@ -506,7 +506,7 @@ def publish(
                 'date': date,
                 'meta': meta,
                 'name': name,
-                'params': params,
+                'parameters': params,
                 'subgroup': subgroup,
                 'version': version,
             }
