@@ -140,23 +140,24 @@ def test_publish(root, name, subgroup, params, author, date, meta, version,
         private=private,
     )
 
-    assert audmodel.exists(uid, version)
+    assert audmodel.exists(uid)
     assert uid == audmodel.uid(
         name,
         params,
+        version,
         subgroup=subgroup,
     )
 
-    header = audmodel.header(uid, version)
+    header = audmodel.header(uid)
 
     assert header['author'] == author
-    assert audmodel.author(uid, version) == author
+    assert audmodel.author(uid) == author
 
     assert header['date'] == date
-    assert audmodel.date(uid, version) == date
+    assert audmodel.date(uid) == date
 
     assert header['meta'] == meta
-    assert audmodel.meta(uid, version) == meta
+    assert audmodel.meta(uid) == meta
 
     assert header['name'] == name
     assert audmodel.name(uid) == name
@@ -168,7 +169,6 @@ def test_publish(root, name, subgroup, params, author, date, meta, version,
     assert audmodel.subgroup(uid) == subgroup
 
     assert header['version'] == version
-    assert version in audmodel.versions(uid)
 
-    assert os.path.exists(audmodel.url(uid, version))
-    assert os.path.exists(audmodel.url(uid, version, header=True))
+    assert os.path.exists(audmodel.url(uid))
+    assert os.path.exists(audmodel.url(uid, header=True))

@@ -87,8 +87,8 @@ needs to be passed, e.g.:
 .. code-block:: python
 
     params = {
-        'feature': 'spectrogram',
-        'model': 'cnn',
+        'feature': 'melspec64',
+        'model': 'cnn10',
         'sampling_rate': 16000,
     }
 
@@ -148,20 +148,19 @@ Let's define the four arguments for our example model:
                 'mixdown': True,
             }
         },
-        'spectrogram': {
+        'melspec64': {
             'win_dur': '32ms',
             'hop_dur': '10ms',
             'num_fft': 512,
-            'num_bands': 64,
         },
-        'cnn': {
-            'type': 'pann',
-            'layers': 10,
+        'cnn10': {
+            'learning-rate': 1e-2,
+            'optimizer': 'adam',
         }
     }
     params = {
-        'feature': 'spectrogram',
-        'model': 'cnn',
+        'feature': 'melspec64',
+        'model': 'cnn10',
         'sampling_rate': 16000,
     }
     subgroup = 'emotion.onnx'
@@ -262,31 +261,25 @@ And publish it with
     )
     uid
 
-Since we did not change
-``name``, ``params``, and ``subgroup``
-we get the same model ID.
 Now we have published two versions of the model:
 
 .. jupyter-execute::
 
-    audmodel.versions(uid)
+    audmodel.versions(
+        name=name,
+        params=params,
+        subgroup=subgroup,
+    )
 
-By default,
-always the latest version is returned,
-e.g. the following request
-returns meta information
-for version ``'2.0.0'``.
-
-.. jupyter-execute::
-
-    audmodel.header(uid)
-
-If we want a particular version,
-we can do:
+To get only the the latest version of a model we can do:
 
 .. jupyter-execute::
 
-    audmodel.header(uid, '1.0.0')
+    audmodel.latest_version(
+        name=name,
+        params=params,
+        subgroup=subgroup,
+    )
 
 
 Cache folder

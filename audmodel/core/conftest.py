@@ -20,13 +20,14 @@ def docstring_examples(doctest_namespace):  # pragma: no cover
     )
     doctest_namespace['audmodel'] = audmodel
     subgroup = 'audmodel.docstring'
-    uid = audmodel.uid(
-        pytest.NAME,
-        pytest.PARAMS,
-        subgroup=subgroup,
-    )
     for version, meta in pytest.META.items():
-        if not audmodel.exists(uid, version=version):
+        uid = audmodel.uid(
+            pytest.NAME,
+            pytest.PARAMS,
+            version,
+            subgroup=subgroup,
+        )
+        if not audmodel.exists(uid):
             audmodel.publish(
                 pytest.MODEL_ROOT,
                 pytest.NAME,

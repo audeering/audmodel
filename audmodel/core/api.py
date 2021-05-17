@@ -11,7 +11,7 @@ import audeer
 
 from audmodel.core.backend import (
     get_backend,
-    path_version_backend,
+    search_backend,
 )
 from audmodel.core.config import config
 import audmodel.core.legacy as legacy
@@ -19,60 +19,54 @@ import audmodel.core.legacy as legacy
 
 def author(
         uid: str,
-        version: str = None,
 ) -> str:
     r"""Author of model.
 
     Args:
         uid: unique model ID
-        version: version string
 
     Returns:
         model author
 
     Raises:
-        ValueError: if model ID is not valid
         ConnectionError: if Artifactory is not available
         RuntimeError: if Artifactory REST API query fails
         RuntimeError: if model does not exist
 
     Example:
-        >>> author('5a7fd2f6-07da-8b7f-73c5-169fca6aecd2')
+        >>> author('2f992552-3.0.0')
         'Calvin and Hobbes'
 
     """
     try:
-        return header(uid, version=version)['author']
+        return header(uid)['author']
     except FileNotFoundError:
         return legacy.author(uid)
 
 
 def date(
         uid: str,
-        version: str = None,
 ) -> datetime.date:
     r"""Publication date of model.
 
     Args:
         uid: unique model ID
-        version: version string
 
     Returns:
         model publication date
 
     Raises:
-        ValueError: if model ID is not valid
         ConnectionError: if Artifactory is not available
         RuntimeError: if Artifactory REST API query fails
         RuntimeError: if model does not exist
 
     Example:
-        >>> date('5a7fd2f6-07da-8b7f-73c5-169fca6aecd2')
+        >>> date('2f992552-3.0.0')
         datetime.date(1985, 11, 18)
 
     """
     try:
-        return header(uid, version=version)['date']
+        return header(uid)['date']
     except FileNotFoundError:
         return datetime.datetime.strptime(legacy.date(uid), "%Y/%m/%d").date()
 
@@ -101,41 +95,29 @@ def default_cache_root() -> str:
 
 def exists(
         uid: str,
-        version: str = None,
 ) -> bool:
     r"""Check if a model with this ID exists.
 
     Args:
         uid: unique model ID
-        version: version string
 
     Returns:
         ``True`` if a model with this ID is found
 
     Raises:
-        ValueError: if model ID is not valid
         ConnectionError: if Artifactory is not available
         RuntimeError: if Artifactory REST API query fails
-        RuntimeError: if model does not exist
 
     Example:
-        >>> exists('5a7fd2f6-07da-8b7f-73c5-169fca6aecd2')
+        >>> exists('2f992552-3.0.0')
         True
-        >>> exists('5a7fd2f6-07da-8b7f-73c5-169fca6aecd2', version='1.0.0')
-        True
-        >>> exists('5a7fd2f6-07da-8b7f-73c5-169fca6aecd2', version='9.9.9')
-        False
-        >>> exists('00000000-0000-0000-0000-000000000000')
-        False
-        >>> exists('bad-id')
+        >>> exists('2f992552-9.9.9')
         False
 
     """
     try:
-        url(uid, version=version)
+        url(uid)
     except RuntimeError:
-        return False
-    except ValueError:
         return False
 
     return True
@@ -143,16 +125,13 @@ def exists(
 
 def header(
         uid: str,
-        version: str = None,
 ) -> dict:
     r"""Load model header.
 
     Args:
         uid: unique model ID
-        version: version string
 
     Raises:
-        ValueError: if model ID is not valid
         ConnectionError: if Artifactory is not available
         RuntimeError: if Artifactory REST API query fails
         RuntimeError: if model does not exist
@@ -161,7 +140,7 @@ def header(
         dictionary with header fields
 
     Examples:
-        >>> d = header('5a7fd2f6-07da-8b7f-73c5-169fca6aecd2')
+        >>> d = header('2f992552-3.0.0')
         >>> print(yaml.dump(d))
         author: Calvin and Hobbes
         date: 1985-11-18
@@ -171,25 +150,25 @@ def header(
               version: 1.1.1
               format: wav
               mixdown: true
-          spectrogram:
+          melspec64:
             win_dur: 32ms
             hop_dur: 10ms
             num_fft: 512
-            num_bands: 64
-          cnn:
-            type: pann
-            layers: 14
+          cnn10:
+            learning-rate: 0.01
+            optimizer: adam
         name: test
         params:
-          feature: spectrogram
-          model: cnn
+          feature: melspec64
+          model: cnn10
           sampling_rate: 16000
         subgroup: audmodel.docstring
         version: 3.0.0
         <BLANKLINE>
 
     """
-    path, version, backend = path_version_backend(uid, version=version)
+    short_id, version = split_uid(uid)
+    backend, path = search_backend(short_id, version)
 
     with tempfile.TemporaryDirectory() as root:
         src_path = path + '.yaml'
@@ -203,32 +182,63 @@ def header(
             return yaml.load(fp, Loader=yaml.Loader)[uid]
 
 
-def latest_version(uid: str) -> str:
+def latest_version(
+        name: str,
+        params: typing.Dict[str, typing.Any],
+        *,
+        subgroup: str = None,
+) -> str:
     r"""Latest available version of model.
 
     Args:
-        uid: unique model ID
+        name: model name
+        params: dictionary with parameters
+        subgroup: extend group ID to
+            ``com.audeering.models.<subgroup>``.
+            You can increase the depth
+            by using dot-notation,
+            e.g. setting
+            ``subgroup=foo.bar``
+            will result in
+            ``com.audeering.models.foo.bar``
 
     Returns:
         latest version of model
 
     Raises:
-        ValueError: if model ID is not valid
         ConnectionError: if Artifactory is not available
         RuntimeError: if Artifactory REST API query fails
         RuntimeError: if model does not exist
 
     Example:
-        >>> latest_version('5a7fd2f6-07da-8b7f-73c5-169fca6aecd2')
+        >>> latest_version(
+        ...     'test',
+        ...     {
+        ...         'sampling_rate': 16000,
+        ...         'feature': 'melspec64',
+        ...         'model': 'cnn10',
+        ...     },
+        ...     subgroup='audmodel.docstring',
+        ... )
         '3.0.0'
 
     """
-    return versions(uid)[-1]
+    vs = versions(name, params, subgroup=subgroup)
+    if not vs:
+        if subgroup is not None:
+            name = f'{subgroup}.{name}'
+        raise RuntimeError(
+            f"A model "
+            f"{name} "
+            f"with parameters "
+            f"{params} "
+            f"does not exist."
+        )
+    return vs[-1]
 
 
 def load(
         uid: str,
-        version: str = None,
         *,
         root: str = None,
         verbose: bool = False,
@@ -243,7 +253,6 @@ def load(
 
     Args:
         uid: unique model ID
-        version: version string
         root: store model within this folder
         verbose: show debug messages
 
@@ -251,21 +260,18 @@ def load(
         path to model folder
 
     Raises:
-        ValueError: if model ID is not valid
         ConnectionError: if Artifactory is not available
         RuntimeError: if Artifactory REST API query fails
         RuntimeError: if model does not exist
 
     Example:
-        >>> root = load(
-        ...    '5a7fd2f6-07da-8b7f-73c5-169fca6aecd2',
-        ...    version='1.0.0',
-        ... )
+        >>> root = load('2f992552-3.0.0')
         >>> '/'.join(root.split('/')[-8:])
-        'com/audeering/models/audmodel/docstring/test/5a7fd2f6-07da-8b7f-73c5-169fca6aecd2/1.0.0'
+        'com/audeering/models/audmodel/docstring/test/2f992552/3.0.0'
 
     """
-    path, version, backend = path_version_backend(uid, version=version)
+    short_id, version = split_uid(uid)
+    backend, path = search_backend(short_id, version)
 
     root = audeer.safe_path(root or default_cache_root())
     root = os.path.join(
@@ -303,7 +309,6 @@ def load(
 
 def meta(
         uid: str,
-        version: str = None,
 ) -> typing.Dict[str, typing.Any]:
     r"""Meta information of model.
 
@@ -315,32 +320,30 @@ def meta(
         dictionary with meta fields
 
     Raises:
-        ValueError: if model ID is not valid
         ConnectionError: if Artifactory is not available
         RuntimeError: if Artifactory REST API query fails
         RuntimeError: if model does not exist
 
     Example:
-        >>> d = meta('5a7fd2f6-07da-8b7f-73c5-169fca6aecd2')
+        >>> d = meta('2f992552-3.0.0')
         >>> print(yaml.dump(d))
         data:
           emodb:
             version: 1.1.1
             format: wav
             mixdown: true
-        spectrogram:
+        melspec64:
           win_dur: 32ms
           hop_dur: 10ms
           num_fft: 512
-          num_bands: 64
-        cnn:
-          type: pann
-          layers: 14
+        cnn10:
+          learning-rate: 0.01
+          optimizer: adam
         <BLANKLINE>
 
     """
     try:
-        return header(uid, version=version)['meta']
+        return header(uid)['meta']
     except FileNotFoundError:
         return {}
 
@@ -355,17 +358,17 @@ def name(uid: str) -> str:
         model name
 
     Raises:
-        ValueError: if model ID is not valid
         ConnectionError: if Artifactory is not available
         RuntimeError: if Artifactory REST API query fails
         RuntimeError: if model does not exist
 
     Example:
-        >>> name('5a7fd2f6-07da-8b7f-73c5-169fca6aecd2')
+        >>> name('2f992552-3.0.0')
         'test'
 
     """
-    path, _, backend = path_version_backend(uid)
+    short_id, version = split_uid(uid)
+    backend, path = search_backend(short_id, version)
     path = backend.split(path)[0]
     return backend.split(path)[1]
 
@@ -380,14 +383,13 @@ def parameters(uid: str) -> typing.Dict:
         model parameters
 
     Raises:
-        ValueError: if model ID is not valid
         ConnectionError: if Artifactory is not available
         RuntimeError: if Artifactory REST API query fails
         RuntimeError: if model does not exist
 
     Example:
-        >>> parameters('5a7fd2f6-07da-8b7f-73c5-169fca6aecd2')
-        {'feature': 'spectrogram', 'model': 'cnn', 'sampling_rate': 16000}
+        >>> parameters('2f992552-3.0.0')
+        {'feature': 'melspec64', 'model': 'cnn10', 'sampling_rate': 16000}
 
     """
     try:
@@ -427,7 +429,7 @@ def publish(
     For ``subgroup`` we recommend to encode:
 
     * task the model was trained for, e.g. ``gender``
-    * maybe also project, e.g. ``projectsmile.client``
+    * maybe also project, e.g. ``projectsmile.client-tone-4``
 
     All other details that are relevant to the model
     can be stored as ``meta`` information, e.g.
@@ -475,12 +477,13 @@ def publish(
         )
 
     backend = get_backend(private)
-    model_id = uid(name, params, subgroup=subgroup)
+    model_id = uid(name, params, version, subgroup=subgroup)
+    short_id, _ = split_uid(model_id)
     path = backend.join(
         *config.GROUP_ID.split('.'),
         *subgroup.split('.'),
         name,
-        model_id,
+        short_id,
     )
 
     for private in [False, True]:
@@ -488,9 +491,7 @@ def publish(
             raise RuntimeError(
                 f"A model with ID "
                 f"'{model_id}' "
-                f"and version "
-                f"'{version}' "
-                f"exists already."
+                "exists already."
             )
 
     with tempfile.TemporaryDirectory() as tmp_root:
@@ -540,6 +541,19 @@ def scan_files(root: str) -> typing.Sequence[str]:
     return [os.path.join(sub, file) for sub, file in help(root, '')]
 
 
+def short_uid(
+        name: str,
+        params: typing.Dict[str, typing.Any],
+        subgroup: typing.Optional[str],
+) -> str:
+    r"""Return short model ID."""
+    group_id = f'{config.GROUP_ID}.{name}' if subgroup is None \
+        else f'{config.GROUP_ID}.{subgroup}.{name}'
+    params = {key: params[key] for key in sorted(params)}
+    unique_string = group_id + str(params)
+    return audeer.uid(from_string=unique_string)[-8:]
+
+
 def subgroup(uid: str) -> str:
     r"""Subgroup of model.
 
@@ -550,17 +564,17 @@ def subgroup(uid: str) -> str:
         model subgroup
 
     Raises:
-        ValueError: if model ID is not valid
         ConnectionError: if Artifactory is not available
         RuntimeError: if Artifactory REST API query fails
         RuntimeError: if model does not exist
 
     Example:
-        >>> subgroup('5a7fd2f6-07da-8b7f-73c5-169fca6aecd2')
+        >>> subgroup('2f992552-3.0.0')
         'audmodel.docstring'
 
     """
-    path, _, backend = path_version_backend(uid)
+    short_id, version = split_uid(uid)
+    backend, path = search_backend(short_id, version)
     path = backend.split(path)[0]
     path = path[len(config.GROUP_ID) + 1:]
     path = backend.split(path)[0]
@@ -570,6 +584,7 @@ def subgroup(uid: str) -> str:
 def uid(
         name: str,
         params: typing.Dict[str, typing.Any],
+        version: str,
         *,
         subgroup: str = None,
 ) -> str:
@@ -578,6 +593,7 @@ def uid(
     Args:
         name: model name
         params: dictionary with parameters
+        version: version string
         subgroup: extend group ID to
             ``com.audeering.models.<subgroup>``.
             You can increase the depth
@@ -595,34 +611,20 @@ def uid(
         ...     'test',
         ...     {
         ...         'sampling_rate': 16000,
-        ...         'feature': 'spectrogram',
-        ...         'model': 'cnn',
+        ...         'feature': 'melspec64',
+        ...         'model': 'cnn10',
         ...     },
+        ...     version='3.0.0',
         ...     subgroup='audmodel.docstring',
         ... )
-        '5a7fd2f6-07da-8b7f-73c5-169fca6aecd2'
-        >>> uid(
-        ...     'test',
-        ...     {
-        ...         'feature': 'spectrogram',
-        ...         'model': 'cnn',
-        ...         'sampling_rate': 16000,
-        ...     },
-        ...     subgroup='audmodel.docstring',
-        ... )
-        '5a7fd2f6-07da-8b7f-73c5-169fca6aecd2'
+        '2f992552-3.0.0'
 
     """
-    group_id = f'{config.GROUP_ID}.{name}' if subgroup is None \
-        else f'{config.GROUP_ID}.{subgroup}.{name}'
-    params = {key: params[key] for key in sorted(params)}
-    unique_string = group_id + str(params)
-    return audeer.uid(from_string=unique_string)
+    return f'{short_uid(name, params, subgroup)}-{version}'
 
 
 def url(
         uid: str,
-        version: str = None,
         *,
         header: bool = False,
 ) -> str:
@@ -631,50 +633,101 @@ def url(
     Args:
         uid: unique model ID
         header: return URL of header instead of archive
-        version: version string
 
     Returns:
         URL of model
 
     Raises:
-        ValueError: if model ID is not valid
         ConnectionError: if Artifactory is not available
         RuntimeError: if Artifactory REST API query fails
         RuntimeError: if model does not exist
 
     Example:
-        >>> archive = url('5a7fd2f6-07da-8b7f-73c5-169fca6aecd2')
+        >>> archive = url('2f992552-3.0.0')
         >>> archive.split('/')[-1]
-        '5a7fd2f6-07da-8b7f-73c5-169fca6aecd2-3.0.0.zip'
-        >>> header = url('5a7fd2f6-07da-8b7f-73c5-169fca6aecd2', header=True)
+        '2f992552-3.0.0.zip'
+        >>> header = url('2f992552-3.0.0', header=True)
         >>> header.split('/')[-1]
-        '5a7fd2f6-07da-8b7f-73c5-169fca6aecd2-3.0.0.yaml'
+        '2f992552-3.0.0.yaml'
 
     """
-    path, version, backend = path_version_backend(uid, version=version)
+    short_id, version = split_uid(uid)
+    backend, path = search_backend(short_id, version)
     ext = '.yaml' if header else '.zip'
     return backend.path(path + ext, version)
 
 
-def versions(uid: str) -> typing.List[str]:
-    r"""Available model versions.
+def split_uid(uid: str) -> (str, str):
+    r"""Split uid into short id and version."""
+    tokens = uid.split('-')
+    short_id = tokens[0]
+    version = '-'.join(tokens[1:])
+    if audeer.is_semantic_version(version):
+        return short_id, version
+    else:
+        return uid, legacy.version(uid)
+
+
+def version(
+        uid: str
+) -> str:
+    r"""Version of model.
 
     Args:
         uid: unique model ID
 
     Returns:
+        model version
+
+    Example:
+        >>> version('2f992552-3.0.0')
+        '3.0.0'
+
+    """
+    return split_uid(uid)[1]
+
+
+def versions(
+        name: str,
+        params: typing.Dict[str, typing.Any],
+        *,
+        subgroup: str = None,
+) -> typing.List[str]:
+    r"""Available model versions.
+
+    Args:
+        name: model name
+        params: dictionary with parameters
+        subgroup: extend group ID to
+            ``com.audeering.models.<subgroup>``.
+            You can increase the depth
+            by using dot-notation,
+            e.g. setting
+            ``subgroup=foo.bar``
+            will result in
+            ``com.audeering.models.foo.bar``
+
+    Returns:
         list with versions
 
     Raises:
-        ValueError: if model ID is not valid
         ConnectionError: if Artifactory is not available
         RuntimeError: if Artifactory REST API query fails
         RuntimeError: if model does not exist
 
     Example:
-        >>> versions('5a7fd2f6-07da-8b7f-73c5-169fca6aecd2')
+        >>> versions(
+        ...     'test',
+        ...     {
+        ...         'sampling_rate': 16000,
+        ...         'feature': 'melspec64',
+        ...         'model': 'cnn10',
+        ...     },
+        ...     subgroup='audmodel.docstring',
+        ... )
         ['1.0.0', '2.0.0', '3.0.0']
 
     """
-    path, _, backend = path_version_backend(uid)
-    return backend.versions(path + '.zip')
+    short_id = short_uid(name, params, subgroup)
+    matches = search_backend(short_id)
+    return [match[2] for match in matches]

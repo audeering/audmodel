@@ -29,15 +29,14 @@ pytest.META = {
                 'mixdown': True,
             }
         },
-        'spectrogram': {
+        'melspec64': {
             'win_dur': '32ms',
             'hop_dur': '10ms',
             'num_fft': 512,
-            'num_bands': 64,
         },
-        'cnn': {
-            'type': 'pann',
-            'layers': 10,
+        'cnn10': {
+            'learning-rate': 1e-3,
+            'optimizer': 'sgd',
         }
     },
     '2.0.0': {
@@ -48,15 +47,14 @@ pytest.META = {
                 'mixdown': True,
             }
         },
-        'spectrogram': {
+        'melspec64': {
             'win_dur': '32ms',
             'hop_dur': '10ms',
             'num_fft': 512,
-            'num_bands': 64,
         },
-        'cnn': {
-            'type': 'pann',
-            'layers': 10,
+        'cnn10': {
+            'learning-rate': 1e-3,
+            'optimizer': 'sgd',
         }
     },
     '3.0.0': {
@@ -67,23 +65,22 @@ pytest.META = {
                 'mixdown': True,
             }
         },
-        'spectrogram': {
+        'melspec64': {
             'win_dur': '32ms',
             'hop_dur': '10ms',
             'num_fft': 512,
-            'num_bands': 64,
         },
-        'cnn': {
-            'type': 'pann',
-            'layers': 14,
+        'cnn10': {
+            'learning-rate': 1e-2,
+            'optimizer': 'adam',
         }
     }
 }
 pytest.MODEL_ROOT = audeer.mkdir(os.path.join(pytest.ROOT, pytest.ID, 'model'))
 pytest.NAME = 'test'
 pytest.PARAMS = {
-    'feature': 'spectrogram',
-    'model': 'cnn',
+    'feature': 'melspec64',
+    'model': 'cnn10',
     'sampling_rate': 16000,
 }
 

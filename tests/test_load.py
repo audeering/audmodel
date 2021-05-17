@@ -16,8 +16,6 @@ MODEL_FILES = {
 }
 SUBGROUP = f'{pytest.ID}.load'
 
-MODEL_ID = audmodel.uid(pytest.NAME, pytest.PARAMS, subgroup=SUBGROUP)
-
 
 def clear_root(root: str):
     root = audeer.safe_path(root)
@@ -59,23 +57,20 @@ def fixture_publish_model():
 
 
 @pytest.mark.parametrize(
-    'uid, version',
+    'name, params, subgroup, version',
     (
-        (MODEL_ID, '1.0.0'),
-        (MODEL_ID, '2.0.0'),
-        (MODEL_ID, None),
+        (pytest.NAME, pytest.PARAMS, SUBGROUP, '1.0.0'),
+        (pytest.NAME, pytest.PARAMS, SUBGROUP, '2.0.0'),
         pytest.param(
-            MODEL_ID, '3.0.0',
+            pytest.NAME, pytest.PARAMS, SUBGROUP, '3.0.0',
             marks=pytest.mark.xfail(raises=RuntimeError),
         )
     ),
 )
-def test_load(uid, version):
+def test_load(name, params, subgroup, version):
 
-    root = audmodel.load(uid, version)
-
-    if version is None:
-        version = audmodel.latest_version(uid)
-
+    uid = audmodel.uid(name, params, version, subgroup=subgroup)
+    root = audmodel.load(uid)
     files = audmodel.core.api.scan_files(root)
+
     assert sorted(MODEL_FILES[version]) == sorted(files)

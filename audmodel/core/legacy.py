@@ -516,6 +516,20 @@ def url(uid: str) -> str:  # pragma: no cover
     return url
 
 
+def version(uid: str) -> str:  # pragma: no cover
+    r"""Version of model.
+
+    Args:
+        uid: unique model ID
+
+    Returns:
+        model version
+
+    """
+    model_url = url(uid)
+    return version_from_url(model_url)
+
+
 def versions(
         name: str,
         params: typing.Dict[str, typing.Any] = None,
