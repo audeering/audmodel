@@ -158,7 +158,7 @@ def header(
             learning-rate: 0.01
             optimizer: adam
         name: test
-        params:
+        parameters:
           feature: melspec64
           model: cnn10
           sampling_rate: 16000

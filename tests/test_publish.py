@@ -162,7 +162,7 @@ def test_publish(root, name, subgroup, params, author, date, meta, version,
     assert header['name'] == name
     assert audmodel.name(uid) == name
 
-    assert header['params'] == params
+    assert header['parameters'] == params
     assert audmodel.parameters(uid) == params
 
     assert header['subgroup'] == subgroup
