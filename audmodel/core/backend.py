@@ -1,7 +1,6 @@
 import typing
 
 import audbackend
-import audeer
 import audfactory
 
 from audmodel.core.config import config

@@ -182,25 +182,11 @@ def header(
             return yaml.load(fp, Loader=yaml.Loader)[uid]
 
 
-def latest_version(
-        name: str,
-        params: typing.Dict[str, typing.Any],
-        *,
-        subgroup: str = None,
-) -> str:
+def latest_version(uid: str) -> str:
     r"""Latest available version of model.
 
     Args:
-        name: model name
-        params: dictionary with parameters
-        subgroup: extend group ID to
-            ``com.audeering.models.<subgroup>``.
-            You can increase the depth
-            by using dot-notation,
-            e.g. setting
-            ``subgroup=foo.bar``
-            will result in
-            ``com.audeering.models.foo.bar``
+        uid: unique or short model ID
 
     Returns:
         latest version of model
@@ -211,27 +197,18 @@ def latest_version(
         RuntimeError: if model does not exist
 
     Example:
-        >>> latest_version(
-        ...     'test',
-        ...     {
-        ...         'sampling_rate': 16000,
-        ...         'feature': 'melspec64',
-        ...         'model': 'cnn10',
-        ...     },
-        ...     subgroup='audmodel.docstring',
-        ... )
+        >>> latest_version('2f992552')
+        '3.0.0'
+        >>> latest_version('2f992552-1.0.0')
         '3.0.0'
 
     """
-    vs = versions(name, params, subgroup=subgroup)
+    short_id = uid.split('-')[0]
+    vs = versions(short_id)
     if not vs:
-        if subgroup is not None:
-            name = f'{subgroup}.{name}'
         raise RuntimeError(
-            f"A model "
-            f"{name} "
-            f"with parameters "
-            f"{params} "
+            f"A model with short ID "
+            f"'{short_id}' "
             f"does not exist."
         )
     return vs[-1]
@@ -584,7 +561,7 @@ def subgroup(uid: str) -> str:
 def uid(
         name: str,
         params: typing.Dict[str, typing.Any],
-        version: str,
+        version: str = None,
         *,
         subgroup: str = None,
 ) -> str:
@@ -593,7 +570,7 @@ def uid(
     Args:
         name: model name
         params: dictionary with parameters
-        version: version string
+        version: version string, if not given the short ID is returned
         subgroup: extend group ID to
             ``com.audeering.models.<subgroup>``.
             You can increase the depth
@@ -604,9 +581,19 @@ def uid(
             ``com.audeering.models.foo.bar``
 
     Returns:
-        unique model ID
+        unique or short model ID
 
     Example:
+        >>> uid(
+        ...     'test',
+        ...     {
+        ...         'sampling_rate': 16000,
+        ...         'feature': 'melspec64',
+        ...         'model': 'cnn10',
+        ...     },
+        ...     subgroup='audmodel.docstring',
+        ... )
+        '2f992552'
         >>> uid(
         ...     'test',
         ...     {
@@ -620,7 +607,11 @@ def uid(
         '2f992552-3.0.0'
 
     """
-    return f'{short_uid(name, params, subgroup)}-{version}'
+    sid = short_uid(name, params, subgroup)
+    if version is None:
+        return sid
+    else:
+        return f'{sid}-{version}'
 
 
 def url(
@@ -688,24 +679,12 @@ def version(
 
 
 def versions(
-        name: str,
-        params: typing.Dict[str, typing.Any],
-        *,
-        subgroup: str = None,
+        uid: str,
 ) -> typing.List[str]:
     r"""Available model versions.
 
     Args:
-        name: model name
-        params: dictionary with parameters
-        subgroup: extend group ID to
-            ``com.audeering.models.<subgroup>``.
-            You can increase the depth
-            by using dot-notation,
-            e.g. setting
-            ``subgroup=foo.bar``
-            will result in
-            ``com.audeering.models.foo.bar``
+        uid: unique or short model ID
 
     Returns:
         list with versions
@@ -716,18 +695,12 @@ def versions(
         RuntimeError: if model does not exist
 
     Example:
-        >>> versions(
-        ...     'test',
-        ...     {
-        ...         'sampling_rate': 16000,
-        ...         'feature': 'melspec64',
-        ...         'model': 'cnn10',
-        ...     },
-        ...     subgroup='audmodel.docstring',
-        ... )
+        >>> versions('2f992552')
+        ['1.0.0', '2.0.0', '3.0.0']
+        >>> versions('2f992552-1.0.0')
         ['1.0.0', '2.0.0', '3.0.0']
 
     """
-    short_id = short_uid(name, params, subgroup)
+    short_id = uid.split('-')[0]
     matches = search_backend(short_id)
     return [match[2] for match in matches]
