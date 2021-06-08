@@ -46,7 +46,7 @@ def author(
 
 def date(
         uid: str,
-) -> datetime.date:
+) -> str:
     r"""Publication date of model.
 
     Args:
@@ -62,13 +62,13 @@ def date(
 
     Example:
         >>> date('2f992552-3.0.0')
-        datetime.date(1985, 11, 18)
+        '1985-11-18'
 
     """
     try:
-        return header(uid)['date']
+        return str(header(uid)['date'])
     except FileNotFoundError:
-        return datetime.datetime.strptime(legacy.date(uid), "%Y/%m/%d").date()
+        return legacy.date(uid)
 
 
 def default_cache_root() -> str:

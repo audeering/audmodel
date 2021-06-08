@@ -154,7 +154,7 @@ def test_publish(root, name, subgroup, params, author, date, meta, version,
     assert audmodel.author(uid) == author
 
     assert header['date'] == date
-    assert audmodel.date(uid) == date
+    assert audmodel.date(uid) == str(date)
 
     assert header['meta'] == meta
     assert audmodel.meta(uid) == meta

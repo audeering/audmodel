@@ -30,7 +30,7 @@ def test_legacy():
     )
 
     assert isinstance(audmodel.author(uid), str)
-    assert isinstance(audmodel.date(uid), datetime.date)
+    assert isinstance(audmodel.date(uid), str)
     assert audmodel.exists(uid)
     assert audmodel.meta(uid) == {}
     assert audmodel.parameters(uid) == PARAMS
