@@ -265,21 +265,13 @@ Now we have published two versions of the model:
 
 .. jupyter-execute::
 
-    audmodel.versions(
-        name=name,
-        params=params,
-        subgroup=subgroup,
-    )
+    audmodel.versions(uid)
 
-To get only the the latest version of a model we can do:
+To find the latest version we can do:
 
 .. jupyter-execute::
 
-    audmodel.latest_version(
-        name=name,
-        params=params,
-        subgroup=subgroup,
-    )
+    audmodel.latest_version(uid)
 
 
 Cache folder
