@@ -614,10 +614,10 @@ def url(
 
     Example:
         >>> archive = url('2f992552-3.0.0')
-        >>> archive.split('/')[-1]
+        >>> os.path.basename(archive)
         '2f992552-3.0.0.zip'
         >>> header = url('2f992552-3.0.0', header=True)
-        >>> header.split('/')[-1]
+        >>> os.path.basename(header)
         '2f992552-3.0.0.yaml'
 
     """
