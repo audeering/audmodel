@@ -229,6 +229,48 @@ def latest_version(uid: str) -> str:
         return vs[-1]
 
 
+def legacy_uid(
+        name: str,
+        params: typing.Dict[str, typing.Any],
+        version: str,
+        *,
+        subgroup: str = None,
+        private: bool = False,
+) -> str:
+    r"""Unique model ID in legacy format.
+
+    Args:
+        name: model name
+        params: dictionary with parameters
+        version: version string
+        subgroup: extend group ID to
+            ``com.audeering.models.<subgroup>``.
+            You can increase the depth
+            by using dot-notation,
+            e.g. setting
+            ``subgroup=foo.bar``
+            will result in
+            ``com.audeering.models.foo.bar``
+        private: repository is private
+
+    Returns:
+        unique model ID
+
+    """
+    group_id = f'{config.GROUP_ID}.{name}' if subgroup is None \
+        else f'{config.GROUP_ID}.{subgroup}.{name}'
+    repository = config.REPOSITORY_PRIVATE if private \
+        else config.REPOSITORY_PUBLIC
+    unique_string = (
+        str(params)
+        + group_id
+        + 'lookup'
+        + version
+        + repository
+    )
+    return audeer.uid(from_string=unique_string)
+
+
 def load(
         uid: str,
         *,

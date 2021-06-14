@@ -5,6 +5,7 @@ from audmodel.core.api import (
     exists,
     header,
     latest_version,
+    legacy_uid,
     load,
     meta,
     name,

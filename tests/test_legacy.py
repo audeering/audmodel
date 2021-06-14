@@ -28,6 +28,12 @@ def test_legacy():
         VERSION,
         subgroup=SUBGROUP,
     )
+    assert uid == audmodel.legacy_uid(
+        pytest.NAME,
+        PARAMS,
+        VERSION,
+        subgroup=SUBGROUP,
+    )
 
     assert isinstance(audmodel.author(uid), str)
     assert isinstance(audmodel.date(uid), str)
