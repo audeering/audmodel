@@ -39,6 +39,11 @@ latest_version
 
 .. autofunction:: latest_version
 
+legacy_uid
+----------
+
+.. autofunction:: legacy_uid
+
 load
 ----
 
@@ -78,6 +83,11 @@ url
 ---
 
 .. autofunction:: url
+
+version
+-------
+
+.. autofunction:: version
 
 versions
 --------
