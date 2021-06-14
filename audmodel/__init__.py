@@ -13,6 +13,7 @@ from audmodel.core.api import (
     subgroup,
     uid,
     url,
+    version,
     versions,
 )
 from audmodel.core.config import config

@@ -8,6 +8,11 @@ from audmodel.core.config import config
 import audmodel.core.legacy as legacy
 
 
+def is_legacy_uid(uid: str) -> bool:
+    r"""Check if uid has old format."""
+    return len(uid) == 36
+
+
 def scan_files(root: str) -> typing.Sequence[str]:
     r"""Helper function to find all files in directory."""
 

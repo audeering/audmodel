@@ -16,6 +16,7 @@ from audmodel.core.backend import (
 from audmodel.core.config import config
 import audmodel.core.legacy as legacy
 from audmodel.core.utils import (
+    is_legacy_uid,
     scan_files,
     short_uid,
     split_uid,
@@ -208,15 +209,24 @@ def latest_version(uid: str) -> str:
         '3.0.0'
 
     """
-    short_id = uid.split('-')[0]
-    vs = versions(short_id)
-    if not vs:
-        raise RuntimeError(
-            f"A model with short ID "
-            f"'{short_id}' "
-            f"does not exist."
+    if is_legacy_uid(uid):
+        url = legacy.url(uid)
+        return legacy.latest_version(
+            legacy.name_from_url(url),
+            legacy.parameters(uid),
+            subgroup=legacy.subgroup_from_url(url),
+            private=legacy.private_from_url(url),
         )
-    return vs[-1]
+    else:
+        short_id = uid.split('-')[0]
+        vs = versions(short_id)
+        if not vs:
+            raise RuntimeError(
+                f"A model with short ID "
+                f"'{short_id}' "
+                f"does not exist."
+            )
+        return vs[-1]
 
 
 def load(
@@ -643,7 +653,10 @@ def version(
         '3.0.0'
 
     """
-    return split_uid(uid)[1]
+    if is_legacy_uid(uid):
+        return legacy.version(uid)
+    else:
+        return split_uid(uid)[1]
 
 
 def versions(
@@ -669,6 +682,15 @@ def versions(
         ['1.0.0', '2.0.0', '3.0.0']
 
     """
-    short_id = uid.split('-')[0]
-    matches = search_backend(short_id)
-    return [match[2] for match in matches]
+    if is_legacy_uid(uid):
+        url = legacy.url(uid)
+        return legacy.versions(
+            legacy.name_from_url(url),
+            legacy.parameters(uid),
+            subgroup=legacy.subgroup_from_url(url),
+            private=legacy.private_from_url(url),
+        )
+    else:
+        short_id = uid.split('-')[0]
+        matches = search_backend(short_id)
+        return [match[2] for match in matches]

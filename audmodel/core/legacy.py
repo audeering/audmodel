@@ -113,6 +113,11 @@ def name_from_url(url: str) -> str:  # pragma: no cover
     return url.split('/')[-4]
 
 
+def private_from_url(url: str) -> bool:  # pragma: no cover
+    repository = repository_from_url(url)
+    return repository == 'models-private-local'
+
+
 def repository_from_url(url: str) -> str:  # pragma: no cover
     return url.split('/')[4]
 
