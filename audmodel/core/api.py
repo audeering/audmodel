@@ -10,8 +10,12 @@ import oyaml as yaml
 import audeer
 
 from audmodel.core.backend import (
+    archive_path,
     get_backend,
-    search_backend,
+    header_path,
+    header_versions,
+    load_archive,
+    load_header,
 )
 from audmodel.core.config import config
 import audmodel.core.legacy as legacy
@@ -44,10 +48,7 @@ def author(
         'Calvin and Hobbes'
 
     """
-    try:
-        return header(uid)['author']
-    except FileNotFoundError:
-        return legacy.author(uid)
+    return header(uid)['author']
 
 
 def date(
@@ -71,10 +72,7 @@ def date(
         '1985-11-18'
 
     """
-    try:
-        return str(header(uid)['date'])
-    except FileNotFoundError:
-        return legacy.date(uid)
+    return str(header(uid)['date'])
 
 
 def default_cache_root() -> str:
@@ -131,7 +129,7 @@ def exists(
 
 def header(
         uid: str,
-) -> dict:
+) -> typing.Dict[str, typing.Any]:
     r"""Load model header.
 
     Args:
@@ -173,22 +171,23 @@ def header(
         <BLANKLINE>
 
     """
-    short_id, version = split_uid(uid)
-    backend, path = search_backend(short_id, version)
+    if is_legacy_uid(uid):
+        return {
+            'author': legacy.author(uid),
+            'date': legacy.date(uid),
+            'name': legacy.name(uid),
+            'meta': {},
+            'parameters': legacy.parameters(uid),
+            'subgroup': legacy.subgroup(uid),
+            'version': legacy.version(uid),
+        }
 
-    with tempfile.TemporaryDirectory() as root:
-        src_path = path + '.yaml'
-        dst_path = os.path.join(root, 'model.yaml')
-        backend.get_file(
-            src_path,
-            dst_path,
-            version,
-        )
-        with open(dst_path, 'r') as fp:
-            return yaml.load(fp, Loader=yaml.Loader)[uid]
+    return load_header(uid)[1]
 
 
-def latest_version(uid: str) -> str:
+def latest_version(
+        uid: str,
+) -> str:
     r"""Latest available version of model.
 
     Args:
@@ -304,41 +303,12 @@ def load(
         'com/audeering/models/audmodel/docstring/test/2f992552/3.0.0'
 
     """
-    short_id, version = split_uid(uid)
-    backend, path = search_backend(short_id, version)
-
     root = audeer.safe_path(root or default_cache_root())
-    root = os.path.join(
-        root,
-        path.replace(backend.sep, os.path.sep),
-        version,
-    )
 
-    if not os.path.exists(root):
-        tmp_root = audeer.mkdir(root + '~')
+    if is_legacy_uid(uid):
+        return legacy.load(uid, root, verbose=verbose)
 
-        # get archive
-        src_path = path + '.zip'
-        dst_path = os.path.join(tmp_root, 'model.zip')
-        backend.get_file(
-            src_path,
-            dst_path,
-            version,
-        )
-
-        # extract files
-        audeer.extract_archive(
-            dst_path,
-            tmp_root,
-            keep_archive=False,
-            verbose=verbose,
-        )
-
-        # move folder
-        audeer.mkdir(root)
-        os.rename(tmp_root, root)
-
-    return root
+    return load_archive(uid, root, verbose)[1]
 
 
 def meta(
@@ -348,7 +318,6 @@ def meta(
 
     Args:
         uid: unique model ID
-        version: version string
 
     Returns:
         dictionary with meta fields
@@ -376,10 +345,7 @@ def meta(
         <BLANKLINE>
 
     """
-    try:
-        return header(uid)['meta']
-    except FileNotFoundError:
-        return {}
+    return header(uid)['meta']
 
 
 def name(uid: str) -> str:
@@ -401,10 +367,7 @@ def name(uid: str) -> str:
         'test'
 
     """
-    short_id, version = split_uid(uid)
-    backend, path = search_backend(short_id, version)
-    path = backend.split(path)[0]
-    return backend.split(path)[1]
+    return header(uid)['name']
 
 
 def parameters(uid: str) -> typing.Dict:
@@ -426,10 +389,7 @@ def parameters(uid: str) -> typing.Dict:
         {'feature': 'melspec64', 'model': 'cnn10', 'sampling_rate': 16000}
 
     """
-    try:
-        return header(uid)['parameters']
-    except FileNotFoundError:
-        return legacy.parameters(uid)
+    return header(uid)['parameters']
 
 
 def publish(
@@ -513,15 +473,20 @@ def publish(
     backend = get_backend(private)
     model_id = uid(name, params, version, subgroup=subgroup)
     short_id, _ = split_uid(model_id)
-    path = backend.join(
+
+    archive_path = backend.join(
         *config.GROUP_ID.split('.'),
         *subgroup.split('.'),
         name,
-        short_id,
+        short_id + '.zip',
+    )
+    header_path = backend.join(
+        *config.GROUP_ID.split('.'),
+        short_id + '.yaml',
     )
 
     for private in [False, True]:
-        if get_backend(private).exists(path + '.zip', version):
+        if get_backend(private).exists(archive_path, version):
             raise RuntimeError(
                 f"A model with ID "
                 f"'{model_id}' "
@@ -532,7 +497,7 @@ def publish(
 
         # header
         src_path = os.path.join(tmp_root, 'model.yaml')
-        dst_path = path + '.yaml'
+        dst_path = header_path
 
         header = {
             model_id: {
@@ -552,7 +517,7 @@ def publish(
 
         # archive
         src_path = os.path.join(tmp_root, 'model.zip')
-        dst_path = path + '.zip'
+        dst_path = archive_path
 
         files = scan_files(root)
         audeer.create_archive(root, files, src_path)
@@ -581,12 +546,7 @@ def subgroup(uid: str) -> str:
         'audmodel.docstring'
 
     """
-    short_id, version = split_uid(uid)
-    backend, path = search_backend(short_id, version)
-    path = backend.split(path)[0]
-    path = path[len(config.GROUP_ID) + 1:]
-    path = backend.split(path)[0]
-    return path.replace(backend.sep, '.')
+    return header(uid)['subgroup']
 
 
 def uid(
@@ -657,7 +617,7 @@ def url(
         header: return URL of header instead of archive
 
     Returns:
-        URL of model
+        URL
 
     Raises:
         ConnectionError: if Artifactory is not available
@@ -673,10 +633,15 @@ def url(
         '2f992552-3.0.0.yaml'
 
     """
-    short_id, version = split_uid(uid)
-    backend, path = search_backend(short_id, version)
-    ext = '.yaml' if header else '.zip'
-    return backend.path(path + ext, version)
+    if is_legacy_uid(uid):
+        return legacy.url(uid)
+
+    if header:
+        backend, path, version = header_path(uid)
+    else:
+        backend, path, version = archive_path(uid)
+
+    return backend.path(path, version)
 
 
 def version(
@@ -720,7 +685,7 @@ def versions(
     Example:
         >>> versions('2f992552')
         ['1.0.0', '2.0.0', '3.0.0']
-        >>> versions('2f992552-1.0.0')
+        >>> versions('2f992552-2.0.0')
         ['1.0.0', '2.0.0', '3.0.0']
 
     """
@@ -734,5 +699,5 @@ def versions(
         )
     else:
         short_id = uid.split('-')[0]
-        matches = search_backend(short_id)
+        matches = header_versions(short_id)
         return [match[2] for match in matches]

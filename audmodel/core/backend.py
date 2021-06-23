@@ -1,21 +1,35 @@
+import os
+import tempfile
 import typing
+import oyaml as yaml
 
 import audbackend
-import audfactory
+import audeer
 
 from audmodel.core.config import config
+from audmodel.core.utils import split_uid
 
 
-def get_backend(private: bool) -> audbackend.Backend:
-    r"""Get backend.
+def archive_path(
+        uid: str,
+) -> typing.Tuple[audbackend.Backend, str, str]:
+    r"""Return backend, archive path and version."""
 
-    Args:
-        private: private repository
+    short_id, version = split_uid(uid)
+    backend, header = load_header(uid)
+    name = header['name']
+    subgroup = header['subgroup'].split('.')
+    group_id = config.GROUP_ID.split('.')
+    path = backend.join(*group_id, *subgroup, name, short_id + '.zip')
 
-    Returns:
-        backend object
+    return backend, path, version
 
-    """
+
+def get_backend(
+        private: bool,
+) -> audbackend.Backend:
+    r"""Return backend."""
+
     if private:  # pragma: no cover
         repository = config.REPOSITORY_PRIVATE
     else:
@@ -27,109 +41,110 @@ def get_backend(private: bool) -> audbackend.Backend:
     )
 
 
-def search_backend(
-        short_uid: str,
-        version: str = None,
+def header_path(
+        uid: str,
 ) -> typing.Union[
-    typing.Tuple[audbackend.Backend, str],
-    typing.Sequence[typing.Tuple[audbackend.Backend, str, str]]
+    typing.Tuple[audbackend.Backend, str, str],
 ]:
-    r"""Find all or specific version of a model.
+    r"""Return backend, header path and version."""
 
-    If no match is found:
-    -> raise error if specific version is requested
-    -> return empty list otherwise
+    short_id, version = split_uid(uid)
 
-    """
-    urls = []
-
-    if config.BACKEND_HOST[0] == 'artifactory':
-        # use REST API on Artifactory
-        try:
-            host = config.BACKEND_HOST[1]
-            pattern = f'artifact?name={short_uid}'
-            for repository in [
-                config.REPOSITORY_PUBLIC,
-                config.REPOSITORY_PRIVATE,
-            ]:
-                search_url = (
-                    f'{host}/'
-                    f'api/search/{pattern}&repos={repository}'
-                )
-                r = audfactory.rest_api_get(search_url)
-                if r.status_code != 200:  # pragma: no cover
-                    raise RuntimeError(
-                        f'Error trying to find model.\n'
-                        f'The REST API query was not successful:\n'
-                        f'Error code: {r.status_code}\n'
-                        f'Error message: {r.text}'
-                    )
-                results = r.json()['results']
-                if results:
-                    private = repository == config.REPOSITORY_PRIVATE
-                    backend = get_backend(private)
-                    for result in results:
-                        url = result['uri']
-                        if url.endswith('.zip'):
-                            # Replace beginning of URI
-                            # as it includes /api/storage and port
-                            url = '/'.join(url.split('/')[6:])
-                            url = f'{host}/{url}'
-                            v = url.split('/')[-2]
-                            # break early if specific version is requested
-                            if version is None:
-                                urls.append((url, backend))
-                            elif v == version:
-                                urls.append((url, backend))
-                                break
-        except ConnectionError:  # pragma: no cover
-            raise ConnectionError(
-                'Artifactory is offline.\n\n'
-                'Please make sure https://artifactory.audeering.com '
-                'is reachable.'
-            )
-    else:
-        # use glob otherwise
-        if version is None:
-            pattern = f'**/{short_uid}/*/*.zip'
-        else:
-            pattern = f'**/{short_uid}/{version}/{short_uid}-{version}.zip'
-        for private in [False, True]:
-            backend = get_backend(private)
-            for url in backend.glob(pattern):
-                v = url.split('/')[-2]
-                # break early if specific version is requested
-                if version is None:
-                    urls.append((url, backend))
-                elif v == version:
-                    urls.append((url, backend))
-                    break
-
-    if not urls and version is not None:
-        uid = short_uid if len(short_uid) != 8 else f'{short_uid}-{version}'
-        raise RuntimeError(
-            f"A model with ID "
-            f"'{uid}' "
-            f"does not exist."
+    for private in [False, True]:
+        backend = get_backend(private)
+        path = backend.join(
+            *config.GROUP_ID.split('.'),
+            short_id + '.yaml',
         )
+        if backend.exists(path, version=version):
+            return backend, path, version
 
-    if version is not None:
-        url, backend = urls[-1]
-        path = url_to_path(backend, url)
-        return backend, path
+    raise RuntimeError(
+        f"No header found for a model with ID "
+        f"'{uid}'."
+    )
+
+
+def header_versions(
+        short_id: str,
+) -> typing.Sequence[typing.Tuple[audbackend.Backend, str, str]]:
+    r"""Return list of backend, header path and version."""
 
     matches = []
-    for url, backend in urls:
-        path = url_to_path(backend, url)
-        v = url.split('/')[-2]
-        matches.append((backend, path, v))
+
+    for private in [False, True]:
+        backend = get_backend(private)
+        path = backend.join(
+            *config.GROUP_ID.split('.'),
+            short_id + '.yaml',
+        )
+        versions = backend.versions(path)
+        for version in versions:
+            matches.append((backend, path, version))
+
     return matches
 
 
-def url_to_path(
-        backend: audbackend.Backend,
-        url: str,
-) -> str:
-    path = url[len(backend.host) + len(backend.repository) + 2:]
-    path = backend.join(*path.split(backend.sep)[:-2])
-    return path
+def load_archive(
+        uid: str,
+        root: str,
+        verbose: bool,
+) -> typing.Tuple[audbackend.Backend, str]:
+    r"""Return backend and local archive path."""
+
+    backend, path, version = archive_path(uid)
+    sub_root = os.path.splitext(path)[0]
+    sub_root = sub_root.replace(backend.sep, os.path.sep)
+
+    root = os.path.join(
+        root,
+        sub_root,
+        version,
+    )
+
+    if not os.path.exists(root):
+        tmp_root = audeer.mkdir(root + '~')
+
+        # get archive
+        src_path = path
+        dst_path = os.path.join(tmp_root, 'model.zip')
+        backend.get_file(
+            src_path,
+            dst_path,
+            version,
+        )
+
+        # extract files
+        audeer.extract_archive(
+            dst_path,
+            tmp_root,
+            keep_archive=False,
+            verbose=verbose,
+        )
+
+        # move folder
+        audeer.mkdir(root)
+        os.rename(tmp_root, root)
+
+    return backend, root
+
+
+def load_header(
+        uid: str
+) -> typing.Tuple[audbackend.Backend, typing.Dict[str, typing.Any]]:
+    r"""Return backend and header content."""
+
+    backend, path, version = header_path(uid)
+
+    with tempfile.TemporaryDirectory() as root:
+        src_path = path
+        dst_path = os.path.join(root, 'model.yaml')
+        backend.get_file(
+            src_path,
+            dst_path,
+            version,
+        )
+        with open(dst_path, 'r') as fp:
+            header = yaml.load(fp, Loader=yaml.Loader)[uid]
+
+    return backend, header

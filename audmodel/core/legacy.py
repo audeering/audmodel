@@ -222,6 +222,63 @@ def latest_version(
     return version
 
 
+def load(
+        uid: str,
+        root: str,
+        *,
+        verbose: bool = False,
+) -> str:  # pragma: no cover
+    r"""Download a model by its unique ID.
+
+    If ``root`` is not set,
+    the model is downloaded to the default cache folder,
+    see :meth:`audmodel.default_cache_root`.
+    If the model already exists in the cache folder,
+    the download is skipped.
+
+    Args:
+        uid: unique model identifier
+        root: store model within this folder
+        verbose: show verbose output
+
+    Returns:
+        path to model folder
+
+    Raises:
+        RuntimeError: if model does not exist
+
+    """
+    model_url = url(uid)
+    repository = repository_from_url(model_url)
+    group_id = _group_id(
+        name_from_url(model_url),
+        subgroup_from_url(model_url),
+    )
+    version = version_from_url(model_url)
+
+    root = os.path.join(
+        root,
+        repository,
+        audfactory.group_id_to_path(group_id),
+        version,
+        uid,
+    )
+    root = audeer.safe_path(root)
+
+    zip_file = os.path.join(tempfile._get_default_tempdir(), f'{uid}.zip')
+    if not os.path.exists(root):
+        audeer.mkdir(root)
+        audfactory.download(model_url, zip_file, verbose=verbose)
+        audeer.extract_archive(
+            zip_file,
+            root,
+            keep_archive=False,
+            verbose=verbose,
+        )
+
+    return root
+
+
 def lookup_table(
         name: str,
         version: str = None,
@@ -266,6 +323,20 @@ def lookup_table(
         version=version,
     )
     return lookup
+
+
+def name(uid: str) -> str:  # pragma: no cover
+    r"""Name of model.
+
+    Args:
+        uid: unique model ID
+
+    Returns:
+        model name
+
+    """
+    model_url = url(uid)
+    return name_from_url(model_url)
 
 
 def parameters(uid: str) -> typing.Dict:  # pragma: no cover
@@ -410,6 +481,20 @@ def remove(uid: str):  # pragma: no cover
     lookup = _lookup_from_url(model_url)
     lookup.remove(lookup[uid])
     audfactory.path(model_url).parent.parent.rmdir()
+
+
+def subgroup(uid: str) -> str:  # pragma: no cover
+    r"""Subgroup of model.
+
+    Args:
+        uid: unique model ID
+
+    Returns:
+        model subgroup
+
+    """
+    model_url = url(uid)
+    return subgroup_from_url(model_url)
 
 
 def uid(

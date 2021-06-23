@@ -5,7 +5,6 @@ import typing
 import audeer
 
 from audmodel.core.config import config
-import audmodel.core.legacy as legacy
 
 
 def is_legacy_uid(uid: str) -> bool:
@@ -44,7 +43,4 @@ def split_uid(uid: str) -> (str, str):
     tokens = uid.split('-')
     short_id = tokens[0]
     version = '-'.join(tokens[1:])
-    if audeer.is_semantic_version(version):
-        return short_id, version
-    else:
-        return uid, legacy.version(uid)
+    return short_id, version
