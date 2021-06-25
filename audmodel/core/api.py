@@ -29,18 +29,21 @@ from audmodel.core.utils import (
 
 def author(
         uid: str,
+        *,
+        cache_root: str = None,
 ) -> str:
     r"""Author of model.
 
     Args:
         uid: unique model ID
+        cache_root: cache folder where models and headers are stored.
+            If not set :meth:`aumodel.default_cache_root` is used
 
     Returns:
         model author
 
     Raises:
         ConnectionError: if Artifactory is not available
-        RuntimeError: if Artifactory REST API query fails
         RuntimeError: if model does not exist
 
     Example:
@@ -48,23 +51,27 @@ def author(
         'Calvin and Hobbes'
 
     """
-    return header(uid)['author']
+    cache_root = audeer.safe_path(cache_root or default_cache_root())
+    return header(uid, cache_root=cache_root)['author']
 
 
 def date(
         uid: str,
+        *,
+        cache_root: str = None,
 ) -> str:
     r"""Publication date of model.
 
     Args:
         uid: unique model ID
+        cache_root: cache folder where models and headers are stored.
+            If not set :meth:`aumodel.default_cache_root` is used
 
     Returns:
         model publication date
 
     Raises:
         ConnectionError: if Artifactory is not available
-        RuntimeError: if Artifactory REST API query fails
         RuntimeError: if model does not exist
 
     Example:
@@ -72,7 +79,8 @@ def date(
         '1985-11-18'
 
     """
-    return str(header(uid)['date'])
+    cache_root = audeer.safe_path(cache_root or default_cache_root())
+    return str(header(uid, cache_root=cache_root)['date'])
 
 
 def default_cache_root() -> str:
@@ -129,16 +137,19 @@ def exists(
 
 def header(
         uid: str,
+        *,
+        cache_root: str = None,
 ) -> typing.Dict[str, typing.Any]:
     r"""Load model header.
 
     Args:
         uid: unique model ID
+        cache_root: cache folder where models and headers are stored.
+            If not set :meth:`aumodel.default_cache_root` is used
 
     Raises:
         ConnectionError: if Artifactory is not available
-        RuntimeError: if Artifactory REST API query fails
-        RuntimeError: if model does not exist
+        RuntimeError: if header does not exist
 
     Returns:
         dictionary with header fields
@@ -182,7 +193,35 @@ def header(
             'version': legacy.version(uid),
         }
 
-    return load_header(uid)[1]
+    cache_root = audeer.safe_path(cache_root or default_cache_root())
+    return load_header(uid, cache_root)[1]
+
+
+def header_url(
+        uid: str,
+) -> str:
+    r"""Header URL.
+
+    Args:
+        uid: unique model ID
+
+    Returns:
+        URL
+
+    Raises:
+        ConnectionError: if Artifactory is not available
+        RuntimeError: if model does not exist
+
+    Example:
+        >>> path = header_url('2f992552-3.0.0')
+        >>> os.path.basename(path)
+        '2f992552-3.0.0.yaml'
+
+    """
+    if is_legacy_uid(uid):
+        raise NotImplementedError()
+    backend, path, version = header_path(uid)
+    return backend.path(path, version)
 
 
 def latest_version(
@@ -198,7 +237,6 @@ def latest_version(
 
     Raises:
         ConnectionError: if Artifactory is not available
-        RuntimeError: if Artifactory REST API query fails
         RuntimeError: if model does not exist
 
     Example:
@@ -270,10 +308,16 @@ def legacy_uid(
     return audeer.uid(from_string=unique_string)
 
 
+@audeer.deprecated_keyword_argument(
+    deprecated_argument='root',
+    new_argument='cache_root',
+    mapping=lambda value: value,
+    removal_version='1.0.0',
+)
 def load(
         uid: str,
         *,
-        root: str = None,
+        cache_root: str = None,
         verbose: bool = False,
 ) -> str:
     r"""Download a model by its unique ID.
@@ -286,7 +330,8 @@ def load(
 
     Args:
         uid: unique model ID
-        root: store model within this folder
+        cache_root: cache folder where models and headers are stored.
+            If not set :meth:`aumodel.default_cache_root` is used
         verbose: show debug messages
 
     Returns:
@@ -294,7 +339,6 @@ def load(
 
     Raises:
         ConnectionError: if Artifactory is not available
-        RuntimeError: if Artifactory REST API query fails
         RuntimeError: if model does not exist
 
     Example:
@@ -303,28 +347,31 @@ def load(
         'com/audeering/models/audmodel/docstring/test/2f992552/3.0.0'
 
     """
-    root = audeer.safe_path(root or default_cache_root())
+    cache_root = audeer.safe_path(cache_root or default_cache_root())
 
     if is_legacy_uid(uid):
-        return legacy.load(uid, root, verbose=verbose)
+        return legacy.load(uid, cache_root, verbose=verbose)
 
-    return load_archive(uid, root, verbose)[1]
+    return load_archive(uid, cache_root, verbose)[1]
 
 
 def meta(
         uid: str,
+        *,
+        cache_root: str = None,
 ) -> typing.Dict[str, typing.Any]:
     r"""Meta information of model.
 
     Args:
         uid: unique model ID
+        cache_root: cache folder where models and headers are stored.
+            If not set :meth:`aumodel.default_cache_root` is used
 
     Returns:
         dictionary with meta fields
 
     Raises:
         ConnectionError: if Artifactory is not available
-        RuntimeError: if Artifactory REST API query fails
         RuntimeError: if model does not exist
 
     Example:
@@ -345,21 +392,27 @@ def meta(
         <BLANKLINE>
 
     """
-    return header(uid)['meta']
+    cache_root = audeer.safe_path(cache_root or default_cache_root())
+    return header(uid, cache_root=cache_root)['meta']
 
 
-def name(uid: str) -> str:
+def name(
+        uid: str,
+        *,
+        cache_root: str = None,
+) -> str:
     r"""Name of model.
 
     Args:
         uid: unique model ID
+        cache_root: cache folder where models and headers are stored.
+            If not set :meth:`aumodel.default_cache_root` is used
 
     Returns:
         model name
 
     Raises:
         ConnectionError: if Artifactory is not available
-        RuntimeError: if Artifactory REST API query fails
         RuntimeError: if model does not exist
 
     Example:
@@ -367,21 +420,27 @@ def name(uid: str) -> str:
         'test'
 
     """
-    return header(uid)['name']
+    cache_root = audeer.safe_path(cache_root or default_cache_root())
+    return header(uid, cache_root=cache_root)['name']
 
 
-def parameters(uid: str) -> typing.Dict:
+def parameters(
+        uid: str,
+        *,
+        cache_root: str = None,
+) -> typing.Dict:
     r"""Parameters of model.
 
     Args:
         uid: unique model ID
+        cache_root: cache folder where models and headers are stored.
+            If not set :meth:`aumodel.default_cache_root` is used
 
     Returns:
         model parameters
 
     Raises:
         ConnectionError: if Artifactory is not available
-        RuntimeError: if Artifactory REST API query fails
         RuntimeError: if model does not exist
 
     Example:
@@ -389,7 +448,8 @@ def parameters(uid: str) -> typing.Dict:
         {'feature': 'melspec64', 'model': 'cnn10', 'sampling_rate': 16000}
 
     """
-    return header(uid)['parameters']
+    cache_root = audeer.safe_path(cache_root or default_cache_root())
+    return header(uid, cache_root=cache_root)['parameters']
 
 
 def publish(
@@ -527,18 +587,23 @@ def publish(
     return model_id
 
 
-def subgroup(uid: str) -> str:
+def subgroup(
+        uid: str,
+        *,
+        cache_root: str = None,
+) -> str:
     r"""Subgroup of model.
 
     Args:
         uid: unique model ID
+        cache_root: cache folder where models and headers are stored.
+            If not set :meth:`aumodel.default_cache_root` is used
 
     Returns:
         model subgroup
 
     Raises:
         ConnectionError: if Artifactory is not available
-        RuntimeError: if Artifactory REST API query fails
         RuntimeError: if model does not exist
 
     Example:
@@ -546,7 +611,8 @@ def subgroup(uid: str) -> str:
         'audmodel.docstring'
 
     """
-    return header(uid)['subgroup']
+    cache_root = audeer.safe_path(cache_root or default_cache_root())
+    return header(uid, cache_root=cache_root)['subgroup']
 
 
 def uid(
@@ -608,39 +674,33 @@ def uid(
 def url(
         uid: str,
         *,
-        header: bool = False,
+        cache_root: str = None,
 ) -> str:
     r"""Model URL.
 
     Args:
         uid: unique model ID
-        header: return URL of header instead of archive
+        cache_root: cache folder where models and headers are stored.
+            If not set :meth:`aumodel.default_cache_root` is used
 
     Returns:
         URL
 
     Raises:
         ConnectionError: if Artifactory is not available
-        RuntimeError: if Artifactory REST API query fails
         RuntimeError: if model does not exist
 
     Example:
-        >>> archive = url('2f992552-3.0.0')
-        >>> os.path.basename(archive)
+        >>> path = url('2f992552-3.0.0')
+        >>> os.path.basename(path)
         '2f992552-3.0.0.zip'
-        >>> header = url('2f992552-3.0.0', header=True)
-        >>> os.path.basename(header)
-        '2f992552-3.0.0.yaml'
 
     """
     if is_legacy_uid(uid):
         return legacy.url(uid)
 
-    if header:
-        backend, path, version = header_path(uid)
-    else:
-        backend, path, version = archive_path(uid)
-
+    cache_root = audeer.safe_path(cache_root or default_cache_root())
+    backend, path, version = archive_path(uid, cache_root=cache_root)
     return backend.path(path, version)
 
 
@@ -679,7 +739,6 @@ def versions(
 
     Raises:
         ConnectionError: if Artifactory is not available
-        RuntimeError: if Artifactory REST API query fails
         RuntimeError: if model does not exist
 
     Example:

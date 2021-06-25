@@ -43,6 +43,8 @@ def test_legacy():
     assert audmodel.parameters(uid) == PARAMS
     assert audmodel.version(uid) == VERSION
     assert audmodel.versions(uid) == [VERSION]
+    with pytest.raises(NotImplementedError):
+        audmodel.header_url(uid)
 
     root = audmodel.load(uid)
     assert os.path.exists(root)

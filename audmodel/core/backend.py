@@ -1,4 +1,5 @@
 import os
+import shutil
 import tempfile
 import typing
 import oyaml as yaml
@@ -12,11 +13,12 @@ from audmodel.core.utils import split_uid
 
 def archive_path(
         uid: str,
+        cache_root: str,
 ) -> typing.Tuple[audbackend.Backend, str, str]:
     r"""Return backend, archive path and version."""
 
     short_id, version = split_uid(uid)
-    backend, header = load_header(uid)
+    backend, header = load_header(uid, cache_root)
     name = header['name']
     subgroup = header['subgroup'].split('.')
     group_id = config.GROUP_ID.split('.')
@@ -87,17 +89,17 @@ def header_versions(
 
 def load_archive(
         uid: str,
-        root: str,
+        cache_root: str,
         verbose: bool,
 ) -> typing.Tuple[audbackend.Backend, str]:
     r"""Return backend and local archive path."""
 
-    backend, path, version = archive_path(uid)
+    backend, path, version = archive_path(uid, cache_root)
     sub_root = os.path.splitext(path)[0]
     sub_root = sub_root.replace(backend.sep, os.path.sep)
 
     root = os.path.join(
-        root,
+        cache_root,
         sub_root,
         version,
     )
@@ -130,21 +132,42 @@ def load_archive(
 
 
 def load_header(
-        uid: str
+        uid: str,
+        cache_root: str,
 ) -> typing.Tuple[audbackend.Backend, typing.Dict[str, typing.Any]]:
     r"""Return backend and header content."""
 
-    backend, path, version = header_path(uid)
+    local_path = os.path.join(
+        cache_root,
+        config.GROUP_ID.replace('.', os.sep),
+        f'{uid}.yaml',
+    )
+    backend, remote_path, version = header_path(uid)
 
-    with tempfile.TemporaryDirectory() as root:
-        src_path = path
-        dst_path = os.path.join(root, 'model.yaml')
-        backend.get_file(
-            src_path,
-            dst_path,
-            version,
-        )
-        with open(dst_path, 'r') as fp:
-            header = yaml.load(fp, Loader=yaml.Loader)[uid]
+    # if header in cache,
+    # figure out if it matches remote version
+    # and delete it if this is not the case
+    if os.path.exists(local_path):
+        local_checksum = audbackend.md5(local_path)
+        remote_checksum = backend.checksum(remote_path, version)
+        # TODO: remove pragma once we have a function to update the header
+        if local_checksum != remote_checksum:  # pragma: no cover
+            os.remove(local_path)
+
+    # download header if it is not in cache yet
+    if not os.path.exists(local_path):
+        audeer.mkdir(os.path.dirname(local_path))
+        with tempfile.TemporaryDirectory() as root:
+            tmp_path = os.path.join(root, 'model.yaml')
+            backend.get_file(
+                remote_path,
+                tmp_path,
+                version,
+            )
+            shutil.move(tmp_path, local_path)
+
+    # read header from local file
+    with open(local_path, 'r') as fp:
+        header = yaml.load(fp, Loader=yaml.Loader)[uid]
 
     return backend, header

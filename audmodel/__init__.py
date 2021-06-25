@@ -4,6 +4,7 @@ from audmodel.core.api import (
     default_cache_root,
     exists,
     header,
+    header_url,
     latest_version,
     legacy_uid,
     load,
@@ -19,7 +20,7 @@ from audmodel.core.api import (
 )
 from audmodel.core.config import config
 
-# Disencourage from audmodel import *
+# Discourage from audmodel import *
 __all__ = []
 
 
