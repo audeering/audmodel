@@ -317,8 +317,8 @@ def load(
 
     Example:
         >>> root = load('2f992552-3.0.0')
-        >>> '/'.join(root.split('/')[-8:])
-        'com/audeering/models/audmodel/docstring/test/2f992552/3.0.0'
+        >>> '/'.join(root.split('/')[-2:])
+        '2f992552/3.0.0'
 
     """
     cache_root = audeer.safe_path(cache_root or default_cache_root())
