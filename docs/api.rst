@@ -34,11 +34,6 @@ header
 
 .. autofunction:: header
 
-header_url
-----------
-
-.. autofunction:: header_url
-
 latest_version
 --------------
 

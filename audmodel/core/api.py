@@ -198,33 +198,6 @@ def header(
     return load_header(uid, cache_root)[1]
 
 
-def header_url(
-        uid: str,
-) -> str:
-    r"""Header URL.
-
-    Args:
-        uid: unique model ID
-
-    Returns:
-        URL
-
-    Raises:
-        ConnectionError: if Artifactory is not available
-        RuntimeError: if model does not exist
-
-    Example:
-        >>> path = header_url('2f992552-3.0.0')
-        >>> os.path.basename(path)
-        '2f992552-3.0.0.yaml'
-
-    """
-    if is_legacy_uid(uid):
-        raise NotImplementedError()
-    backend, path, version = header_path(uid)
-    return backend.path(path, version)
-
-
 def latest_version(
         uid: str,
 ) -> str:
@@ -683,12 +656,14 @@ def uid(
 def url(
         uid: str,
         *,
+        header: bool = False,
         cache_root: str = None,
 ) -> str:
-    r"""Model URL.
+    r"""URL to model archive or header.
 
     Args:
         uid: unique model ID
+        header: return URL to header instead of archive
         cache_root: cache folder where models and headers are stored.
             If not set :meth:`aumodel.default_cache_root` is used
 
@@ -703,13 +678,22 @@ def url(
         >>> path = url('2f992552-3.0.0')
         >>> os.path.basename(path)
         '2f992552-3.0.0.zip'
+        >>> path = url('2f992552-3.0.0', header=True)
+        >>> os.path.basename(path)
+        '2f992552-3.0.0.yaml'
 
     """
-    if is_legacy_uid(uid):
-        return legacy.url(uid)
-
     cache_root = audeer.safe_path(cache_root or default_cache_root())
-    backend, path, version = archive_path(uid, cache_root=cache_root)
+
+    if header:
+        if is_legacy_uid(uid):
+            raise NotImplementedError()
+        backend, path, version = header_path(uid)
+    else:
+        if is_legacy_uid(uid):
+            return legacy.url(uid)
+        backend, path, version = archive_path(uid, cache_root=cache_root)
+
     return backend.path(path, version)
 
 

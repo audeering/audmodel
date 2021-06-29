@@ -44,7 +44,7 @@ def test_legacy():
     assert audmodel.version(uid) == VERSION
     assert audmodel.versions(uid) == [VERSION]
     with pytest.raises(NotImplementedError):
-        audmodel.header_url(uid)
+        audmodel.url(uid, header=True)
 
     root = audmodel.load(uid)
     assert os.path.exists(root)

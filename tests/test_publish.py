@@ -184,4 +184,4 @@ def test_publish(root, name, subgroup, params, author, date, meta, version,
     assert header['version'] == version
 
     assert os.path.exists(audmodel.url(uid))
-    assert os.path.exists(audmodel.header_url(uid))
+    assert os.path.exists(audmodel.url(uid, header=True))

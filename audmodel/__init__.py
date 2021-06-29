@@ -4,7 +4,6 @@ from audmodel.core.api import (
     default_cache_root,
     exists,
     header,
-    header_url,
     latest_version,
     legacy_uid,
     load,

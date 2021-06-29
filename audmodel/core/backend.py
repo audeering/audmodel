@@ -98,12 +98,11 @@ def load_archive(
     r"""Return backend and local archive path."""
 
     backend, path, version = archive_path(uid, cache_root)
-    sub_root = os.path.splitext(path)[0]
-    sub_root = sub_root.replace(backend.sep, os.path.sep)
+    short_id, _ = split_uid(uid)
 
     root = os.path.join(
         cache_root,
-        sub_root,
+        short_id,
         version,
     )
 
@@ -140,12 +139,13 @@ def load_header(
 ) -> typing.Tuple[audbackend.Backend, typing.Dict[str, typing.Any]]:
     r"""Return backend and header content."""
 
+    backend, remote_path, version = header_path(uid)
+    short_id, _ = split_uid(uid)
     local_path = os.path.join(
         cache_root,
-        config.GROUP_ID.replace('.', os.sep),
-        f'{uid}.yaml',
+        short_id,
+        f'{version}.yaml',
     )
-    backend, remote_path, version = header_path(uid)
 
     # if header in cache,
     # figure out if it matches remote version
