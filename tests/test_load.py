@@ -70,7 +70,33 @@ def fixture_publish_model():
 def test_load(name, params, subgroup, version):
 
     uid = audmodel.uid(name, params, version, subgroup=subgroup)
+
+    # load from backend
+
     root = audmodel.load(uid)
+    header = root + '.yaml'
     files = audmodel.core.api.scan_files(root)
+    paths = [os.path.join(root, file) for file in files]
 
     assert sorted(MODEL_FILES[version]) == sorted(files)
+
+    # store modification times
+
+    mtimes = {
+        path: os.path.getmtime(path) for path in paths
+    }
+    mtimes[header] = os.path.getmtime(header)
+
+    # load again from cache and assert modification times have not changed
+
+    audmodel.load(uid)
+    for path, mtime in mtimes.items():
+        assert os.path.getmtime(path) == mtime
+
+    # load again from backend and assert modification times have changed
+
+    shutil.rmtree(root)
+    os.remove(header)
+    audmodel.load(uid)
+    for path, mtime in mtimes.items():
+        assert os.path.getmtime(path) != mtime
