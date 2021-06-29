@@ -1,5 +1,6 @@
 import os
 import shutil
+import time
 
 import pytest
 
@@ -95,6 +96,7 @@ def test_load(name, params, subgroup, version):
 
     # load again from backend and assert modification times have changed
 
+    time.sleep(0.1)  # sleep to get a new modification time
     shutil.rmtree(root)
     os.remove(header)
     audmodel.load(uid)

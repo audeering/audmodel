@@ -515,20 +515,20 @@ def publish(
     model_id = uid(name, params, version, subgroup=subgroup)
     short_id, _ = split_uid(model_id)
 
-    archive_path = backend.join(
+    local_archive_path = backend.join(
         *config.GROUP_ID.split('.'),
         *subgroup.split('.'),
         name,
         short_id + '.zip',
     )
-    header_path = backend.join(
+    local_header_path = backend.join(
         *config.GROUP_ID.split('.'),
         define.HEADER_FOLDER,
         short_id + '.yaml',
     )
 
     for private in [False, True]:
-        if get_backend(private).exists(archive_path, version):
+        if get_backend(private).exists(local_archive_path, version):
             raise RuntimeError(
                 f"A model with ID "
                 f"'{model_id}' "
@@ -539,7 +539,7 @@ def publish(
 
         # header
         src_path = os.path.join(tmp_root, 'model.yaml')
-        dst_path = header_path
+        dst_path = local_header_path
 
         header = {
             model_id: {
@@ -559,7 +559,7 @@ def publish(
 
         # archive
         src_path = os.path.join(tmp_root, 'model.zip')
-        dst_path = archive_path
+        dst_path = local_archive_path
 
         files = scan_files(root)
         audeer.create_archive(root, files, src_path)

@@ -11,7 +11,7 @@ import audeer
 pytest.ROOT = audeer.mkdir(
     os.path.join(
         os.path.dirname(os.path.realpath(__file__)),
-        'tmp',
+        audeer.uid(),
     )
 )
 
