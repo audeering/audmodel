@@ -123,6 +123,19 @@ SUBGROUP = f'{pytest.ID}.publish'
             False,
             marks=pytest.mark.xfail(raises=FileNotFoundError)
         ),
+        # invalid subgroup
+        pytest.param(
+            pytest.MODEL_ROOT,
+            pytest.NAME,
+            pytest.PARAMS,
+            '1.0.0',
+            pytest.AUTHOR,
+            pytest.DATE,
+            pytest.META['1.0.0'],
+            '_uid',
+            False,
+            marks=pytest.mark.xfail(raises=ValueError)
+        ),
     )
 )
 def test_publish(root, name, subgroup, params, author, date, meta, version,

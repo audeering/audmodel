@@ -517,12 +517,19 @@ def publish(
 
     Raises:
         RuntimeError: if an artifact exists already
+        ValueError: if subgroup is set to ``'_uid'``
 
     """
     date = date or datetime.date.today()
     author = author or getpass.getuser()
     root = audeer.safe_path(root)
     subgroup = subgroup or ''
+
+    if subgroup == define.HEADER_FOLDER:
+        raise ValueError(
+            f"It is not allowed to set subgroup to "
+            f"'{define.HEADER_FOLDER}'."
+        )
 
     if not os.path.isdir(root):
         raise FileNotFoundError(
