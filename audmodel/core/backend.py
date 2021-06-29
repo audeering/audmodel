@@ -8,6 +8,7 @@ import audbackend
 import audeer
 
 from audmodel.core.config import config
+import audmodel.core.define as define
 from audmodel.core.utils import split_uid
 
 
@@ -56,6 +57,7 @@ def header_path(
         backend = get_backend(private)
         path = backend.join(
             *config.GROUP_ID.split('.'),
+            define.HEADER_FOLDER,
             short_id + '.yaml',
         )
         if backend.exists(path, version=version):
@@ -78,6 +80,7 @@ def header_versions(
         backend = get_backend(private)
         path = backend.join(
             *config.GROUP_ID.split('.'),
+            define.HEADER_FOLDER,
             short_id + '.yaml',
         )
         versions = backend.versions(path)

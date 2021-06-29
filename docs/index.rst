@@ -19,7 +19,7 @@
     :caption: API Documentation
     :hidden:
 
-    api-audmodel
+    api
     genindex
 
 .. toctree::

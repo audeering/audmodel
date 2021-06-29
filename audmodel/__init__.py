@@ -20,6 +20,7 @@ from audmodel.core.api import (
 )
 from audmodel.core.config import config
 
+
 # Discourage from audmodel import *
 __all__ = []
 

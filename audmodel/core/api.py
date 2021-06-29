@@ -18,6 +18,7 @@ from audmodel.core.backend import (
     load_header,
 )
 from audmodel.core.config import config
+import audmodel.core.define as define
 import audmodel.core.legacy as legacy
 from audmodel.core.utils import (
     is_legacy_uid,
@@ -542,6 +543,7 @@ def publish(
     )
     header_path = backend.join(
         *config.GROUP_ID.split('.'),
+        define.HEADER_FOLDER,
         short_id + '.yaml',
     )
 
