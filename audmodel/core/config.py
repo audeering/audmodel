@@ -10,9 +10,6 @@ class config:
     CACHE_ROOT = '~/audmodel'
     r"""Default cache folder for storing models."""
 
-    GROUP_ID = 'com.audeering.models'
-    r"""Default group ID."""
-
     REPOSITORY_PRIVATE = 'models-private-local'
     r"""Default private repository."""
     REPOSITORY_PUBLIC = 'models-public-local'

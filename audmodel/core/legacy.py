@@ -127,7 +127,7 @@ def subgroup_from_url(url: str) -> typing.Union[None, str]:  # pragma: no cover
     url_start = (
         f'{defaults.ARTIFACTORY_HOST}/'
         f'repo/'
-        f'{audfactory.group_id_to_path(config.GROUP_ID)}'
+        f'{audfactory.group_id_to_path("com.audeering.models")}'
     )
     start_length = len(url_start.split('/'))
     subgroup = '.'.join(url.split('/')[start_length:-4])
@@ -663,9 +663,9 @@ def versions(
 
 def _group_id(name: str, subgroup: str) -> str:  # pragma: no cover
     if subgroup is None:
-        return f'{config.GROUP_ID}.{name}'
+        return f'com.audeering.models.{name}'
     else:
-        return f'{config.GROUP_ID}.{subgroup}.{name}'
+        return f'com.audeering.models.{subgroup}.{name}'
 
 
 def _lookup_from_url(model_url: str) -> audfactory.Lookup:  # pragma: no cover

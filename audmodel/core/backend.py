@@ -22,8 +22,7 @@ def archive_path(
     backend, header = load_header(uid, cache_root)
     name = header['name']
     subgroup = header['subgroup'].split('.')
-    group_id = config.GROUP_ID.split('.')
-    path = backend.join(*group_id, *subgroup, name, short_id + '.zip')
+    path = backend.join(*subgroup, name, short_id + '.zip')
 
     return backend, path, version
 
@@ -56,7 +55,6 @@ def header_path(
     for private in [False, True]:
         backend = get_backend(private)
         path = backend.join(
-            *config.GROUP_ID.split('.'),
             define.HEADER_FOLDER,
             short_id + '.yaml',
         )
@@ -79,7 +77,6 @@ def header_versions(
     for private in [False, True]:
         backend = get_backend(private)
         path = backend.join(
-            *config.GROUP_ID.split('.'),
             define.HEADER_FOLDER,
             short_id + '.yaml',
         )

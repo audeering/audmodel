@@ -48,7 +48,7 @@ def author(
         RuntimeError: if model does not exist
 
     Example:
-        >>> author('2f992552-3.0.0')
+        >>> author('5fbbaf38-3.0.0')
         'Calvin and Hobbes'
 
     """
@@ -76,7 +76,7 @@ def date(
         RuntimeError: if model does not exist
 
     Example:
-        >>> date('2f992552-3.0.0')
+        >>> date('5fbbaf38-3.0.0')
         '1985-11-18'
 
     """
@@ -122,9 +122,9 @@ def exists(
         RuntimeError: if Artifactory REST API query fails
 
     Example:
-        >>> exists('2f992552-3.0.0')
+        >>> exists('5fbbaf38-3.0.0')
         True
-        >>> exists('2f992552-9.9.9')
+        >>> exists('5fbbaf38-9.9.9')
         False
 
     """
@@ -156,7 +156,7 @@ def header(
         dictionary with header fields
 
     Examples:
-        >>> d = header('2f992552-3.0.0')
+        >>> d = header('5fbbaf38-3.0.0')
         >>> print(yaml.dump(d))
         author: Calvin and Hobbes
         date: 1985-11-18
@@ -214,9 +214,9 @@ def latest_version(
         RuntimeError: if model does not exist
 
     Example:
-        >>> latest_version('2f992552')
+        >>> latest_version('5fbbaf38')
         '3.0.0'
-        >>> latest_version('2f992552-1.0.0')
+        >>> latest_version('5fbbaf38-1.0.0')
         '3.0.0'
 
     """
@@ -268,8 +268,8 @@ def legacy_uid(
         unique model ID
 
     """
-    group_id = f'{config.GROUP_ID}.{name}' if subgroup is None \
-        else f'{config.GROUP_ID}.{subgroup}.{name}'
+    group_id = f'com.audeering.models.{name}' if subgroup is None \
+        else f'com.audeering.models.{subgroup}.{name}'
     repository = config.REPOSITORY_PRIVATE if private \
         else config.REPOSITORY_PUBLIC
     unique_string = (
@@ -316,9 +316,9 @@ def load(
         RuntimeError: if model does not exist
 
     Example:
-        >>> root = load('2f992552-3.0.0')
+        >>> root = load('5fbbaf38-3.0.0')
         >>> '/'.join(root.split('/')[-2:])
-        '2f992552/3.0.0'
+        '5fbbaf38/3.0.0'
 
     """
     cache_root = audeer.safe_path(cache_root or default_cache_root())
@@ -349,7 +349,7 @@ def meta(
         RuntimeError: if model does not exist
 
     Example:
-        >>> d = meta('2f992552-3.0.0')
+        >>> d = meta('5fbbaf38-3.0.0')
         >>> print(yaml.dump(d))
         data:
           emodb:
@@ -390,7 +390,7 @@ def name(
         RuntimeError: if model does not exist
 
     Example:
-        >>> name('2f992552-3.0.0')
+        >>> name('5fbbaf38-3.0.0')
         'test'
 
     """
@@ -418,7 +418,7 @@ def parameters(
         RuntimeError: if model does not exist
 
     Example:
-        >>> parameters('2f992552-3.0.0')
+        >>> parameters('5fbbaf38-3.0.0')
         {'feature': 'melspec64', 'model': 'cnn10', 'sampling_rate': 16000}
 
     """
@@ -515,20 +515,18 @@ def publish(
     model_id = uid(name, params, version, subgroup=subgroup)
     short_id, _ = split_uid(model_id)
 
-    local_archive_path = backend.join(
-        *config.GROUP_ID.split('.'),
+    backend_archive_path = backend.join(
         *subgroup.split('.'),
         name,
         short_id + '.zip',
     )
-    local_header_path = backend.join(
-        *config.GROUP_ID.split('.'),
+    backend_header_path = backend.join(
         define.HEADER_FOLDER,
         short_id + '.yaml',
     )
 
     for private in [False, True]:
-        if get_backend(private).exists(local_archive_path, version):
+        if get_backend(private).exists(backend_archive_path, version):
             raise RuntimeError(
                 f"A model with ID "
                 f"'{model_id}' "
@@ -539,7 +537,7 @@ def publish(
 
         # header
         src_path = os.path.join(tmp_root, 'model.yaml')
-        dst_path = local_header_path
+        dst_path = backend_header_path
 
         header = {
             model_id: {
@@ -559,7 +557,7 @@ def publish(
 
         # archive
         src_path = os.path.join(tmp_root, 'model.zip')
-        dst_path = local_archive_path
+        dst_path = backend_archive_path
 
         files = scan_files(root)
         audeer.create_archive(root, files, src_path)
@@ -589,7 +587,7 @@ def subgroup(
         RuntimeError: if model does not exist
 
     Example:
-        >>> subgroup('2f992552-3.0.0')
+        >>> subgroup('5fbbaf38-3.0.0')
         'audmodel.docstring'
 
     """
@@ -632,7 +630,7 @@ def uid(
         ...     },
         ...     subgroup='audmodel.docstring',
         ... )
-        '2f992552'
+        '5fbbaf38'
         >>> uid(
         ...     'test',
         ...     {
@@ -643,7 +641,7 @@ def uid(
         ...     version='3.0.0',
         ...     subgroup='audmodel.docstring',
         ... )
-        '2f992552-3.0.0'
+        '5fbbaf38-3.0.0'
 
     """
     sid = short_uid(name, params, subgroup)
@@ -675,12 +673,12 @@ def url(
         RuntimeError: if model does not exist
 
     Example:
-        >>> path = url('2f992552-3.0.0')
+        >>> path = url('5fbbaf38-3.0.0')
         >>> os.path.basename(path)
-        '2f992552-3.0.0.zip'
-        >>> path = url('2f992552-3.0.0', header=True)
+        '5fbbaf38-3.0.0.zip'
+        >>> path = url('5fbbaf38-3.0.0', header=True)
         >>> os.path.basename(path)
-        '2f992552-3.0.0.yaml'
+        '5fbbaf38-3.0.0.yaml'
 
     """
     cache_root = audeer.safe_path(cache_root or default_cache_root())
@@ -709,7 +707,7 @@ def version(
         model version
 
     Example:
-        >>> version('2f992552-3.0.0')
+        >>> version('5fbbaf38-3.0.0')
         '3.0.0'
 
     """
@@ -735,9 +733,9 @@ def versions(
         RuntimeError: if model does not exist
 
     Example:
-        >>> versions('2f992552')
+        >>> versions('5fbbaf38')
         ['1.0.0', '2.0.0', '3.0.0']
-        >>> versions('2f992552-2.0.0')
+        >>> versions('5fbbaf38-2.0.0')
         ['1.0.0', '2.0.0', '3.0.0']
 
     """
