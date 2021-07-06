@@ -1,8 +1,6 @@
 import datetime
 import errno
-import getpass
 import os
-import tempfile
 import typing
 
 import oyaml as yaml
@@ -11,21 +9,19 @@ import audeer
 
 from audmodel.core.backend import (
     archive_path,
+    get_archive,
     get_backend,
+    get_header,
     header_path,
     header_versions,
-    load_archive,
-    load_header,
+    put_archive,
+    put_header,
+    split_uid,
 )
 from audmodel.core.config import config
 import audmodel.core.define as define
 import audmodel.core.legacy as legacy
-from audmodel.core.utils import (
-    is_legacy_uid,
-    scan_files,
-    short_uid,
-    split_uid,
-)
+import audmodel.core.utils as utils
 
 
 def author(
@@ -52,7 +48,6 @@ def author(
         'Calvin and Hobbes'
 
     """
-    cache_root = audeer.safe_path(cache_root or default_cache_root())
     return header(uid, cache_root=cache_root)['author']
 
 
@@ -80,7 +75,6 @@ def date(
         '1985-11-18'
 
     """
-    cache_root = audeer.safe_path(cache_root or default_cache_root())
     return str(header(uid, cache_root=cache_root)['date'])
 
 
@@ -183,19 +177,9 @@ def header(
         <BLANKLINE>
 
     """
-    if is_legacy_uid(uid):
-        return {
-            'author': legacy.author(uid),
-            'date': legacy.date(uid),
-            'name': legacy.name(uid),
-            'meta': {},
-            'parameters': legacy.parameters(uid),
-            'subgroup': legacy.subgroup(uid),
-            'version': legacy.version(uid),
-        }
-
     cache_root = audeer.safe_path(cache_root or default_cache_root())
-    return load_header(uid, cache_root)[1]
+    short_id, version = split_uid(uid)
+    return get_header(short_id, version, cache_root)[1]
 
 
 def latest_version(
@@ -220,7 +204,7 @@ def latest_version(
         '3.0.0'
 
     """
-    if is_legacy_uid(uid):
+    if utils.is_legacy_uid(uid):
         url = legacy.url(uid)
         return legacy.latest_version(
             legacy.name_from_url(url),
@@ -322,11 +306,8 @@ def load(
 
     """
     cache_root = audeer.safe_path(cache_root or default_cache_root())
-
-    if is_legacy_uid(uid):
-        return legacy.load(uid, cache_root, verbose=verbose)
-
-    return load_archive(uid, cache_root, verbose)[1]
+    short_id, version = split_uid(uid)
+    return get_archive(short_id, version, cache_root, verbose)
 
 
 def meta(
@@ -366,7 +347,6 @@ def meta(
         <BLANKLINE>
 
     """
-    cache_root = audeer.safe_path(cache_root or default_cache_root())
     return header(uid, cache_root=cache_root)['meta']
 
 
@@ -394,7 +374,6 @@ def name(
         'test'
 
     """
-    cache_root = audeer.safe_path(cache_root or default_cache_root())
     return header(uid, cache_root=cache_root)['name']
 
 
@@ -422,7 +401,6 @@ def parameters(
         {'feature': 'melspec64', 'model': 'cnn10', 'sampling_rate': 16000}
 
     """
-    cache_root = audeer.safe_path(cache_root or default_cache_root())
     return header(uid, cache_root=cache_root)['parameters']
 
 
@@ -434,7 +412,7 @@ def publish(
         *,
         author: str = None,
         date: datetime.date = None,
-        meta: typing.Dict[str, typing.Any] = {},
+        meta: typing.Dict[str, typing.Any] = None,
         subgroup: str = None,
         private: bool = False,
 ) -> str:
@@ -493,8 +471,6 @@ def publish(
         ValueError: if subgroup is set to ``'_uid'``
 
     """
-    date = date or datetime.date.today()
-    author = author or getpass.getuser()
     root = audeer.safe_path(root)
     subgroup = subgroup or ''
 
@@ -511,60 +487,31 @@ def publish(
             root,
         )
 
+    short_id = utils.short_id(name, params, subgroup)
+    uid = f'{short_id}-{version}'
+
+    if exists(uid):
+        raise RuntimeError(
+            f"A model with ID "
+            f"'{uid}' "
+            "exists already."
+        )
+
     backend = get_backend(private)
-    model_id = uid(name, params, version, subgroup=subgroup)
-    short_id, _ = split_uid(model_id)
-
-    backend_archive_path = backend.join(
-        *subgroup.split('.'),
-        name,
-        short_id + '.zip',
+    header = utils.create_header(
+        uid,
+        author=author,
+        date=date,
+        meta=meta,
+        name=name,
+        parameters=params,
+        subgroup=subgroup,
+        version=version,
     )
-    backend_header_path = backend.join(
-        define.HEADER_FOLDER,
-        short_id + '.yaml',
-    )
+    put_header(short_id, version, header, backend)
+    put_archive(short_id, version, name, subgroup, root, backend)
 
-    for private in [False, True]:
-        if get_backend(private).exists(backend_archive_path, version):
-            raise RuntimeError(
-                f"A model with ID "
-                f"'{model_id}' "
-                "exists already."
-            )
-
-    with tempfile.TemporaryDirectory() as tmp_root:
-
-        # header
-        src_path = os.path.join(tmp_root, 'model.yaml')
-        dst_path = backend_header_path
-
-        header = {
-            model_id: {
-                'author': author,
-                'date': date,
-                'meta': meta,
-                'name': name,
-                'parameters': params,
-                'subgroup': subgroup,
-                'version': version,
-            }
-        }
-        with open(src_path, 'w') as fp:
-            yaml.dump(header, fp)
-
-        backend.put_file(src_path, dst_path, version)
-
-        # archive
-        src_path = os.path.join(tmp_root, 'model.zip')
-        dst_path = backend_archive_path
-
-        files = scan_files(root)
-        audeer.create_archive(root, files, src_path)
-
-        backend.put_file(src_path, dst_path, version)
-
-    return model_id
+    return uid
 
 
 def subgroup(
@@ -591,7 +538,6 @@ def subgroup(
         'audmodel.docstring'
 
     """
-    cache_root = audeer.safe_path(cache_root or default_cache_root())
     return header(uid, cache_root=cache_root)['subgroup']
 
 
@@ -644,7 +590,7 @@ def uid(
         '5fbbaf38-3.0.0'
 
     """
-    sid = short_uid(name, params, subgroup)
+    sid = utils.short_id(name, params, subgroup)
     if version is None:
         return sid
     else:
@@ -682,15 +628,12 @@ def url(
 
     """
     cache_root = audeer.safe_path(cache_root or default_cache_root())
+    short_id, version = split_uid(uid)
 
     if header:
-        if is_legacy_uid(uid):
-            raise NotImplementedError()
-        backend, path, version = header_path(uid)
+        backend, path = header_path(short_id, version)
     else:
-        if is_legacy_uid(uid):
-            return legacy.url(uid)
-        backend, path, version = archive_path(uid, cache_root=cache_root)
+        backend, path = archive_path(short_id, version, cache_root=cache_root)
 
     return backend.path(path, version)
 
@@ -711,10 +654,7 @@ def version(
         '3.0.0'
 
     """
-    if is_legacy_uid(uid):
-        return legacy.version(uid)
-    else:
-        return split_uid(uid)[1]
+    return split_uid(uid)[1]
 
 
 def versions(
@@ -739,7 +679,7 @@ def versions(
         ['1.0.0', '2.0.0', '3.0.0']
 
     """
-    if is_legacy_uid(uid):
+    if utils.is_legacy_uid(uid):
         url = legacy.url(uid)
         return legacy.versions(
             legacy.name_from_url(url),
@@ -748,6 +688,6 @@ def versions(
             private=legacy.private_from_url(url),
         )
     else:
-        short_id = uid.split('-')[0]
+        short_id, _ = split_uid(uid)
         matches = header_versions(short_id)
         return [match[2] for match in matches]

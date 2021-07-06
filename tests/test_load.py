@@ -76,7 +76,7 @@ def test_load(name, params, subgroup, version):
 
     root = audmodel.load(uid)
     header = root + '.yaml'
-    files = audmodel.core.api.scan_files(root)
+    files = audmodel.core.utils.scan_files(root)
     paths = [os.path.join(root, file) for file in files]
 
     assert sorted(MODEL_FILES[version]) == sorted(files)

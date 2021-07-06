@@ -576,17 +576,21 @@ def url(uid: str) -> str:  # pragma: no cover
         ]:
             search_url = (
                 f'{defaults.ARTIFACTORY_HOST}/'
-                f'api/search/{pattern}&repos={repository}'
+                f'api/search/{pattern}'
+                f'&repos={repository}'
             )
             r = audfactory.rest_api_get(search_url)
             if r.status_code != 200:  # pragma: no cover
                 raise RuntimeError(
                     f'Error trying to find model.\n'
-                    f'The REST API query was not succesful:\n'
+                    f'The REST API query was not successful:\n'
                     f'Error code: {r.status_code}\n'
                     f'Error message: {r.text}'
                 )
             urls = r.json()['results']
+            # TODO: remove line if we can limit search to
+            #  'com.audeering.models'
+            urls = [u for u in urls if u['uri'].endswith('.zip')]
             if len(urls) > 1:  # pragma: no cover
                 raise RuntimeError(f'Found more than one model: {urls}')
             elif len(urls) == 1:

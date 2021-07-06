@@ -1,10 +1,34 @@
-
+import datetime
+import getpass
 import os
 import typing
 
 import audeer
 
-from audmodel.core.config import config
+
+def create_header(
+        uid: str,
+        *,
+        author: typing.Optional[str],
+        date: typing.Optional[datetime.date],
+        meta: typing.Optional[typing.Dict[str, typing.Any]],
+        name: str,
+        parameters: typing.Dict[str, typing.Any],
+        subgroup: str,
+        version: str,
+) -> typing.Dict[str, typing.Dict[str, typing.Any]]:
+    r"""Create header dictionary."""
+    return {
+        uid: {
+            'author': author or getpass.getuser(),
+            'date': date or datetime.date.today(),
+            'meta': meta or {},
+            'name': name,
+            'parameters': parameters,
+            'subgroup': subgroup,
+            'version': version,
+        }
+    }
 
 
 def is_legacy_uid(uid: str) -> bool:
@@ -25,7 +49,7 @@ def scan_files(root: str) -> typing.Sequence[str]:
     return [os.path.join(sub, file) for sub, file in help(root, '')]
 
 
-def short_uid(
+def short_id(
         name: str,
         params: typing.Dict[str, typing.Any],
         subgroup: typing.Optional[str],
@@ -36,11 +60,3 @@ def short_uid(
     params = {key: params[key] for key in sorted(params)}
     unique_string = group_id + str(params)
     return audeer.uid(from_string=unique_string)[-8:]
-
-
-def split_uid(uid: str) -> (str, str):
-    r"""Split uid into short id and version."""
-    tokens = uid.split('-')
-    short_id = tokens[0]
-    version = '-'.join(tokens[1:])
-    return short_id, version
