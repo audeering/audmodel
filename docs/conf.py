@@ -1,9 +1,10 @@
+from datetime import date
 from subprocess import check_output
 
 
 # Project -----------------------------------------------------------------
 project = 'audmodel'
-copyright = '2019-2020 audEERING GmbH'
+copyright = f'2019-{date.today().year} audEERING GmbH'
 author = 'Johannes Wagner, Hagen Wierstorf'
 # The x.y.z version read from tags
 try:
