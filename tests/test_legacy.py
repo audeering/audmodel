@@ -1,8 +1,8 @@
-import datetime
 import os
 
 import pytest
 
+import audbackend
 import audfactory
 import audmodel
 
@@ -15,11 +15,14 @@ VERSION = '1.0.0'
 def test_legacy():
 
     audmodel.config.CACHE_ROOT = pytest.CACHE_ROOT
-    audmodel.config.BACKEND_HOST = (
-        'artifactory',
-        'https://artifactory.audeering.com/artifactory',
-    )
-    audmodel.config.REPOSITORY_PUBLIC = 'unittests-public-local'
+    audmodel.config.LEGACY_REPOSITORY_PUBLIC = 'unittests-public-local'
+    audmodel.config.REPOSITORIES = [
+        audbackend.Repository(
+            'unittests-public-local',
+            'https://artifactory.audeering.com/artifactory',
+            'artifactory',
+        ),
+    ]
 
     uid = audmodel.core.legacy.publish(
         pytest.MODEL_ROOT,
@@ -53,5 +56,4 @@ def test_legacy():
     if path.exists():
         path.rmdir()
 
-    audmodel.config.BACKEND_HOST = pytest.BACKEND_HOST
-    audmodel.config.REPOSITORY_PUBLIC = 'models-public-local'
+    audmodel.config.REPOSITORIES = pytest.REPOSITORIES

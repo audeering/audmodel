@@ -73,18 +73,14 @@ def get_archive(
 
 
 def get_backend(
-        private: bool,
+        repository: audbackend.Repository,
 ) -> audbackend.Backend:
     r"""Return backend."""
 
-    if private:  # pragma: no cover
-        repository = config.REPOSITORY_PRIVATE
-    else:
-        repository = config.REPOSITORY_PUBLIC
     return audbackend.create(
-        name=config.BACKEND_HOST[0],
-        host=config.BACKEND_HOST[1],
-        repository=repository,
+        name=repository.backend,
+        host=repository.host,
+        repository=repository.name,
     )
 
 
@@ -144,8 +140,8 @@ def header_path(
 ]:
     r"""Return backend, header path and version."""
 
-    for private in [False, True]:
-        backend = get_backend(private)
+    for repository in config.REPOSITORIES:
+        backend = get_backend(repository)
         path = backend.join(
             define.HEADER_FOLDER,
             short_id + '.yaml',
@@ -169,8 +165,8 @@ def header_versions(
 
     matches = []
 
-    for private in [False, True]:
-        backend = get_backend(private)
+    for repository in config.REPOSITORIES:
+        backend = get_backend(repository)
         path = backend.join(
             define.HEADER_FOLDER,
             short_id + '.yaml',
@@ -236,8 +232,8 @@ def split_uid(uid: str) -> (str, str):
         # if a header was created for the model already,
         # we can derive the version from it (fast!)
 
-        for private in [False, True]:
-            backend = get_backend(private)
+        for repository in config.REPOSITORIES:
+            backend = get_backend(repository)
             remote_path = backend.join(
                 define.HEADER_FOLDER,
                 uid + '.yaml',
@@ -254,9 +250,7 @@ def split_uid(uid: str) -> (str, str):
             # otherwise use old api to get the version (slow!)
             # and publish a header to speed up in future
 
-            url = legacy.url(uid)
-            private = legacy.private_from_url(url)
-            backend = get_backend(private)
+            backend = get_backend(config.REPOSITORIES[0])
             version = legacy.version(uid)
 
             header = utils.create_header(

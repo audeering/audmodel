@@ -41,15 +41,18 @@ with a folder on the local file system.
 
 .. jupyter-execute::
 
+    import audbackend
     import audeer
     import audmodel
 
 
     ROOT = audeer.mkdir('./docs/tmp')
-    audmodel.config.BACKEND_HOST = (
-        'file-system',
+    repository = audbackend.Repository(
+        'models',
         ROOT,
+        'file-system',
     )
+    audmodel.config.REPOSITORIES = [repository]
     audmodel.config.CACHE_ROOT = os.path.join(
         ROOT,
         'cache',
@@ -175,8 +178,9 @@ Now we can publish the model with
         name=name,
         meta=meta_v1,
         params=params,
-        subgroup=subgroup,
+        repository=repository,
         root=root_v1,
+        subgroup=subgroup,
         version=version,
     )
     uid
@@ -255,6 +259,7 @@ And publish it with
         name=name,
         meta=meta_v2,
         params=params,
+        repository=repository,
         root=root_v2,
         subgroup=subgroup,
         version='2.0.0',

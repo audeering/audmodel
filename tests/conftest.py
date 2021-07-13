@@ -5,6 +5,7 @@ import shutil
 
 import pytest
 
+import audbackend
 import audeer
 
 
@@ -16,9 +17,9 @@ pytest.ROOT = audeer.mkdir(
 )
 
 pytest.AUTHOR = 'Calvin and Hobbes'
-pytest.BACKEND_HOST = ('file-system', os.path.join(pytest.ROOT, 'host'))
 pytest.CACHE_ROOT = os.path.join(pytest.ROOT, 'cache')
 pytest.DATE = datetime.date(1985, 11, 18)
+pytest.HOST = os.path.join(pytest.ROOT, 'host')
 pytest.ID = audeer.uid()
 pytest.META = {
     '1.0.0': {
@@ -83,6 +84,18 @@ pytest.PARAMS = {
     'model': 'cnn10',
     'sampling_rate': 16000,
 }
+pytest.REPOSITORIES = [
+    audbackend.Repository(
+        'repo1',
+        pytest.HOST,
+        'file-system',
+    ),
+    audbackend.Repository(
+        'repo2',
+        pytest.HOST,
+        'file-system',
+    ),
+]
 
 
 @pytest.fixture(scope='session', autouse=True)

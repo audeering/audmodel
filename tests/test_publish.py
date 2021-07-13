@@ -5,14 +5,14 @@ import pytest
 import audmodel
 
 
-audmodel.config.BACKEND_HOST = pytest.BACKEND_HOST
 audmodel.config.CACHE_ROOT = pytest.CACHE_ROOT
+audmodel.config.REPOSITORIES = pytest.REPOSITORIES
 
 SUBGROUP = f'{pytest.ID}.publish'
 
 
 @pytest.mark.parametrize(
-    'root, name, params, version, author, date, meta, subgroup, private',
+    'root, name, params, version, author, date, meta, subgroup, repository',
     (
         pytest.param(
             pytest.MODEL_ROOT,
@@ -23,7 +23,7 @@ SUBGROUP = f'{pytest.ID}.publish'
             pytest.DATE,
             pytest.META['1.0.0'],
             SUBGROUP,
-            False,
+            audmodel.config.REPOSITORIES[0],
         ),
         # different name
         pytest.param(
@@ -35,7 +35,7 @@ SUBGROUP = f'{pytest.ID}.publish'
             pytest.DATE,
             pytest.META['1.0.0'],
             SUBGROUP,
-            False,
+            audmodel.config.REPOSITORIES[0],
         ),
         # different subgroup
         pytest.param(
@@ -47,7 +47,7 @@ SUBGROUP = f'{pytest.ID}.publish'
             pytest.DATE,
             pytest.META['1.0.0'],
             f'{SUBGROUP}.other',
-            False,
+            audmodel.config.REPOSITORIES[0],
         ),
         # different parameters
         pytest.param(
@@ -59,7 +59,7 @@ SUBGROUP = f'{pytest.ID}.publish'
             pytest.DATE,
             pytest.META['1.0.0'],
             SUBGROUP,
-            False,
+            audmodel.config.REPOSITORIES[0],
         ),
         # new version
         pytest.param(
@@ -71,9 +71,9 @@ SUBGROUP = f'{pytest.ID}.publish'
             pytest.DATE,
             pytest.META['2.0.0'],
             SUBGROUP,
-            False,
+            audmodel.config.REPOSITORIES[0],
         ),
-        # new version in private repository
+        # new version in second repository
         pytest.param(
             pytest.MODEL_ROOT,
             pytest.NAME,
@@ -83,7 +83,7 @@ SUBGROUP = f'{pytest.ID}.publish'
             pytest.DATE,
             pytest.META['3.0.0'],
             SUBGROUP,
-            True,
+            audmodel.config.REPOSITORIES[1],
         ),
         # already published
         pytest.param(
@@ -95,7 +95,7 @@ SUBGROUP = f'{pytest.ID}.publish'
             pytest.DATE,
             pytest.META['1.0.0'],
             SUBGROUP,
-            False,
+            audmodel.config.REPOSITORIES[0],
             marks=pytest.mark.xfail(raises=RuntimeError)
         ),
         pytest.param(
@@ -107,7 +107,7 @@ SUBGROUP = f'{pytest.ID}.publish'
             pytest.DATE,
             pytest.META['1.0.0'],
             SUBGROUP,
-            True,
+            audmodel.config.REPOSITORIES[1],
             marks=pytest.mark.xfail(raises=RuntimeError),
         ),
         # invalid root
@@ -120,7 +120,7 @@ SUBGROUP = f'{pytest.ID}.publish'
             pytest.DATE,
             pytest.META['1.0.0'],
             SUBGROUP,
-            False,
+            audmodel.config.REPOSITORIES[0],
             marks=pytest.mark.xfail(raises=FileNotFoundError)
         ),
         # invalid subgroup
@@ -133,13 +133,13 @@ SUBGROUP = f'{pytest.ID}.publish'
             pytest.DATE,
             pytest.META['1.0.0'],
             '_uid',
-            False,
+            audmodel.config.REPOSITORIES[0],
             marks=pytest.mark.xfail(raises=ValueError)
         ),
     )
 )
 def test_publish(root, name, subgroup, params, author, date, meta, version,
-                 private):
+                 repository):
 
     uid = audmodel.publish(
         root,
@@ -149,8 +149,8 @@ def test_publish(root, name, subgroup, params, author, date, meta, version,
         author=author,
         date=date,
         meta=meta,
+        repository=repository,
         subgroup=subgroup,
-        private=private,
     )
 
     assert audmodel.exists(uid)

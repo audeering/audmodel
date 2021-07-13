@@ -115,7 +115,7 @@ def name_from_url(url: str) -> str:  # pragma: no cover
 
 def private_from_url(url: str) -> bool:  # pragma: no cover
     repository = repository_from_url(url)
-    return repository == 'models-private-local'
+    return repository == config.LEGACY_REPOSITORY_PRIVATE
 
 
 def repository_from_url(url: str) -> str:  # pragma: no cover
@@ -571,8 +571,8 @@ def url(uid: str) -> str:  # pragma: no cover
     try:
         pattern = f'artifact?name={uid}'
         for repository in [
-                config.REPOSITORY_PUBLIC,
-                config.REPOSITORY_PRIVATE,
+                config.LEGACY_REPOSITORY_PUBLIC,
+                config.LEGACY_REPOSITORY_PRIVATE,
         ]:
             search_url = (
                 f'{defaults.ARTIFACTORY_HOST}/'
@@ -689,6 +689,6 @@ def _lookup_from_url(model_url: str) -> audfactory.Lookup:  # pragma: no cover
 
 def _repository(private: bool) -> str:  # pragma: no cover
     if private:
-        return config.REPOSITORY_PRIVATE
+        return config.LEGACY_REPOSITORY_PRIVATE
     else:
-        return config.REPOSITORY_PUBLIC
+        return config.LEGACY_REPOSITORY_PUBLIC

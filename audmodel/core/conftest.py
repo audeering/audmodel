@@ -1,5 +1,6 @@
 import pytest
 
+import audbackend
 import audmodel
 
 
@@ -14,10 +15,14 @@ def docstring_examples(doctest_namespace):  # pragma: no cover
     The ``conftest.py`` file has to be in the same folder
     as the code file where the docstring is defined.
     """
-    audmodel.config.BACKEND_HOST = (
-        'artifactory',
+    repository = audbackend.Repository(
+        'models-local',
         'https://artifactory.audeering.com/artifactory',
+        'artifactory',
     )
+    audmodel.config.REPOSITORIES = [
+        repository,
+    ]
     doctest_namespace['audmodel'] = audmodel
     subgroup = 'audmodel.docstring'
     for version, meta in pytest.META.items():
@@ -36,8 +41,8 @@ def docstring_examples(doctest_namespace):  # pragma: no cover
                 author=pytest.AUTHOR,
                 date=pytest.DATE,
                 meta=meta,
+                repository=repository,
                 subgroup=subgroup,
-                private=False,
             )
     yield
-    audmodel.config.BACKEND_HOST = pytest.BACKEND_HOST
+    audmodel.config.REPOSITORIES = pytest.REPOSITORIES

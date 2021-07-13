@@ -3,8 +3,8 @@ import pytest
 import audmodel
 
 
-audmodel.config.BACKEND_HOST = pytest.BACKEND_HOST
 audmodel.config.CACHE_ROOT = pytest.CACHE_ROOT
+audmodel.config.REPOSITORIES = pytest.REPOSITORIES
 
 SUBGROUP = f'{pytest.ID}.versions'
 
@@ -28,6 +28,7 @@ def test_versions():
             pytest.NAME,
             pytest.PARAMS,
             version,
+            repository=pytest.REPOSITORIES[0],
             subgroup=SUBGROUP,
         )
         assert audmodel.latest_version(sid) == version

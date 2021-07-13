@@ -8,8 +8,8 @@ import audeer
 import audmodel
 
 
-audmodel.config.BACKEND_HOST = pytest.BACKEND_HOST
 audmodel.config.CACHE_ROOT = pytest.CACHE_ROOT
+audmodel.config.REPOSITORIES = pytest.REPOSITORIES
 
 MODEL_FILES = {
     '1.0.0': ['test', 'sub/test'],
@@ -49,6 +49,7 @@ def fixture_publish_model():
             author=pytest.AUTHOR,
             date=pytest.DATE,
             meta=pytest.META[version],
+            repository=pytest.REPOSITORIES[0],
             subgroup=SUBGROUP,
         )
 

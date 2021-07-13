@@ -5,6 +5,7 @@ import typing
 
 import oyaml as yaml
 
+import audbackend
 import audeer
 
 from audmodel.core.backend import (
@@ -97,7 +98,7 @@ def default_cache_root() -> str:
         path to model cache
 
     """
-    return os.environ.get('CACHE_ROOT') or config.CACHE_ROOT
+    return os.environ.get('AUDMODEL_CACHE_ROOT') or config.CACHE_ROOT
 
 
 def exists(
@@ -254,8 +255,8 @@ def legacy_uid(
     """
     group_id = f'com.audeering.models.{name}' if subgroup is None \
         else f'com.audeering.models.{subgroup}.{name}'
-    repository = config.REPOSITORY_PRIVATE if private \
-        else config.REPOSITORY_PUBLIC
+    repository = config.LEGACY_REPOSITORY_PRIVATE if private \
+        else config.LEGACY_REPOSITORY_PUBLIC
     unique_string = (
         str(params)
         + group_id
@@ -413,8 +414,8 @@ def publish(
         author: str = None,
         date: datetime.date = None,
         meta: typing.Dict[str, typing.Any] = None,
+        repository: audbackend.Repository = config.REPOSITORIES[0],
         subgroup: str = None,
-        private: bool = False,
 ) -> str:
     r"""Zip model and publish as a new artifact.
 
@@ -453,6 +454,7 @@ def publish(
         author: author name(s), defaults to user name
         date: date, defaults to current timestamp
         meta: dictionary with meta information
+        repository: repository where the model will be published
         subgroup: extend group ID to
             ``com.audeering.models.<subgroup>``.
             You can increase the depth
@@ -461,7 +463,6 @@ def publish(
             ``subgroup=foo.bar``
             will result in
             ``com.audeering.models.foo.bar``
-        private: repository is private
 
     Returns:
         unique model ID
@@ -497,7 +498,7 @@ def publish(
             "exists already."
         )
 
-    backend = get_backend(private)
+    backend = get_backend(repository)
     header = utils.create_header(
         uid,
         author=author,
