@@ -13,6 +13,7 @@ from audmodel.core.api import (
     publish,
     subgroup,
     uid,
+    update_meta,
     url,
     version,
     versions,

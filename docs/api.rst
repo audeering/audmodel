@@ -79,6 +79,11 @@ uid
 
 .. autofunction:: uid
 
+update_meta
+-----------
+
+.. autofunction:: update_meta
+
 url
 ---
 

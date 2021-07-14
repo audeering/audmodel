@@ -35,7 +35,7 @@ def author(
     Args:
         uid: unique model ID
         cache_root: cache folder where models and headers are stored.
-            If not set :meth:`aumodel.default_cache_root` is used
+            If not set :meth:`audmodel.default_cache_root` is used
 
     Returns:
         model author
@@ -62,7 +62,7 @@ def date(
     Args:
         uid: unique model ID
         cache_root: cache folder where models and headers are stored.
-            If not set :meth:`aumodel.default_cache_root` is used
+            If not set :meth:`audmodel.default_cache_root` is used
 
     Returns:
         model publication date
@@ -141,7 +141,7 @@ def header(
     Args:
         uid: unique model ID
         cache_root: cache folder where models and headers are stored.
-            If not set :meth:`aumodel.default_cache_root` is used
+            If not set :meth:`audmodel.default_cache_root` is used
 
     Raises:
         ConnectionError: if Artifactory is not available
@@ -290,7 +290,7 @@ def load(
     Args:
         uid: unique model ID
         cache_root: cache folder where models and headers are stored.
-            If not set :meth:`aumodel.default_cache_root` is used
+            If not set :meth:`audmodel.default_cache_root` is used
         verbose: show debug messages
 
     Returns:
@@ -321,7 +321,7 @@ def meta(
     Args:
         uid: unique model ID
         cache_root: cache folder where models and headers are stored.
-            If not set :meth:`aumodel.default_cache_root` is used
+            If not set :meth:`audmodel.default_cache_root` is used
 
     Returns:
         dictionary with meta fields
@@ -361,7 +361,7 @@ def name(
     Args:
         uid: unique model ID
         cache_root: cache folder where models and headers are stored.
-            If not set :meth:`aumodel.default_cache_root` is used
+            If not set :meth:`audmodel.default_cache_root` is used
 
     Returns:
         model name
@@ -388,7 +388,7 @@ def parameters(
     Args:
         uid: unique model ID
         cache_root: cache folder where models and headers are stored.
-            If not set :meth:`aumodel.default_cache_root` is used
+            If not set :meth:`audmodel.default_cache_root` is used
 
     Returns:
         model parameters
@@ -525,7 +525,7 @@ def subgroup(
     Args:
         uid: unique model ID
         cache_root: cache folder where models and headers are stored.
-            If not set :meth:`aumodel.default_cache_root` is used
+            If not set :meth:`audmodel.default_cache_root` is used
 
     Returns:
         model subgroup
@@ -598,6 +598,111 @@ def uid(
         return f'{sid}-{version}'
 
 
+def update_meta(
+        uid: str,
+        meta: typing.Dict[str, typing.Any],
+        *,
+        replace: bool = False,
+        cache_root: str = None,
+) -> typing.Dict[str, typing.Any]:
+    r"""Update metadata of model on backend and in cache.
+
+    Unless ``replace`` is set to ``True``
+    iterates through current meta dictionary and
+    updates fields where they match or
+    adds missing fields,
+    but keeps all existing fields.
+
+    For instance, updating:
+
+    .. code-block::
+
+        {
+            'data': {
+                'emodb': {
+                    'version': '1.0.0',
+                    'format': 'wav',
+                },
+            },
+        }
+
+    with:
+
+    .. code-block::
+
+        {
+            'data': {
+                'emodb': {
+                    'version': '2.0.0',
+                },
+                'myai': {
+                    'version': '1.0.0',
+                    'format': 'wav',
+                }
+            },
+            'loss': 'ccc',
+        }
+
+    results in:
+
+    .. code-block::
+
+        {
+            'data': {
+                'emodb': {
+                    'version': '2.0.0',
+                    'format': 'wav',
+                },
+                'myai': {
+                    'version': '1.0.0',
+                    'format': 'wav',
+                }
+            },
+            'loss': 'ccc',
+        }
+
+    Args:
+        uid: unique model ID
+        meta: dictionary with meta information
+        replace: replace existing dictionary
+        cache_root: cache folder where models and headers are stored.
+            If not set :meth:`audmodel.default_cache_root` is used
+
+    Returns:
+        new meta dictionary
+
+    Raises:
+        ConnectionError: if Artifactory is not available
+        RuntimeError: if model does not exist
+
+    """
+    cache_root = audeer.safe_path(cache_root or default_cache_root())
+    short_id, version = split_uid(uid)
+
+    # update header
+    backend, header = get_header(short_id, version, cache_root)
+    if replace:
+        header['meta'] = meta
+    else:
+        utils.update_dict(header['meta'], meta)
+    meta = header['meta']
+    header = {uid: header}
+
+    # upload header
+    put_header(short_id, version, header, backend)
+
+    # update cache
+    local_path = os.path.join(
+        cache_root,
+        short_id,
+        f'{version}.yaml',
+    )
+    with open(local_path, 'w') as fp:
+        yaml.dump(header, fp)
+
+    return meta
+
+
 def url(
         uid: str,
         *,
@@ -610,7 +715,7 @@ def url(
         uid: unique model ID
         header: return URL to header instead of archive
         cache_root: cache folder where models and headers are stored.
-            If not set :meth:`aumodel.default_cache_root` is used
+            If not set :meth:`audmodel.default_cache_root` is used
 
     Returns:
         URL

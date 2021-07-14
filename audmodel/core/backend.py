@@ -105,8 +105,7 @@ def get_header(
     if os.path.exists(local_path):
         local_checksum = audbackend.md5(local_path)
         remote_checksum = backend.checksum(remote_path, version)
-        # TODO: remove pragma once we have a function to update the header
-        if local_checksum != remote_checksum:  # pragma: no cover
+        if local_checksum != remote_checksum:
             os.remove(local_path)
 
     # download header if it is not in cache yet

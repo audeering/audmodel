@@ -12,7 +12,6 @@ Usage
     import os
     import glob
 
-
     def create_model(name, files):
         root = os.path.join(ROOT, 'models', name)
         audeer.mkdir(root)
@@ -246,7 +245,7 @@ in the meta dictionary:
 
     meta_v2 = meta_v1.copy()
     meta_v2['data']['msppodcast'] = {
-        'version': '2.3.1',
+        'version': '2.3.0',
         'format': 'wav',
         'mixdown': True,
     }
@@ -277,6 +276,46 @@ To find the latest version we can do:
 .. jupyter-execute::
 
     audmodel.latest_version(uid)
+
+
+Update metadata
+---------------
+
+While the parameters of a model cannot be changed,
+it is possible to update its metadata.
+
+For instance,
+we can update or add fields
+by passing a dictionary
+that holds new / altered information.
+As the following example shows
+this even works with nested fields.
+
+.. jupyter-execute::
+
+    meta = {
+        'data': {
+            'msppodcast': {
+                'version': '2.3.1',  # fix version
+            },
+            'myai': {                # include another database
+                'version': '1.0.0',
+                'format': 'wav',
+                'mixdown': True,
+            },
+        },
+    }
+    audmodel.update_meta(uid, meta)
+    audmodel.meta(uid)
+
+Alternatively,
+we can replace the metadata.
+
+.. jupyter-execute::
+
+    meta = {'new': 'meta'}
+    audmodel.update_meta(uid, meta, replace=True)
+    audmodel.meta(uid)
 
 
 Cache folder

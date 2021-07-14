@@ -1,3 +1,4 @@
+import collections
 import datetime
 import getpass
 import os
@@ -60,3 +61,22 @@ def short_id(
     params = {key: params[key] for key in sorted(params)}
     unique_string = group_id + str(params)
     return audeer.uid(from_string=unique_string)[-8:]
+
+
+def update_dict(
+        d_dst: dict,
+        d_src: dict,
+):
+    """Recursive dictionary update.
+
+    Like standard dict.update(),
+    but also updates nested keys.
+
+    """
+    for k, v in d_src.items():
+        if (k in d_dst)\
+                and (isinstance(d_dst[k], dict)) \
+                and (isinstance(d_src[k], collections.Mapping)):
+            update_dict(d_dst[k], d_src[k])
+        else:
+            d_dst[k] = d_src[k]
