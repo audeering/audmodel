@@ -188,7 +188,7 @@ Now we can publish the model with
 The publishing process returns a unique model ID,
 that can be used to access the model.
 The model ID is derived from
-``name``, ``params``, ``subgroup``
+``name``, ``params``, ``subgroup``, ``version``
 and can always be used to safely identify a model.
 
 
