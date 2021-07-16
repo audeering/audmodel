@@ -38,15 +38,21 @@ def test_legacy():
         subgroup=SUBGROUP,
     )
 
+    # read from backend
+    assert audmodel.version(uid) == VERSION
+    assert audmodel.versions(uid) == [VERSION]
+    assert audmodel.latest_version(uid) == VERSION
+
+    # download to cache and read from there
     assert isinstance(audmodel.author(uid), str)
     assert isinstance(audmodel.date(uid), str)
     assert audmodel.exists(uid)
     assert audmodel.latest_version(uid) == VERSION
     assert audmodel.meta(uid) == {}
     assert audmodel.parameters(uid) == PARAMS
+    assert audmodel.url(uid, header=True)
     assert audmodel.version(uid) == VERSION
     assert audmodel.versions(uid) == [VERSION]
-    assert audmodel.url(uid, header=True)
 
     root = audmodel.load(uid)
     assert os.path.exists(root)

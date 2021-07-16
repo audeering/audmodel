@@ -309,7 +309,10 @@ def put_meta(
         )
 
 
-def split_uid(uid: str) -> (str, str):
+def split_uid(
+        uid: str,
+        cache_root: str,
+) -> (str, str):
     r"""Split uid into short id and version."""
 
     if utils.is_legacy_uid(uid):
@@ -317,21 +320,37 @@ def split_uid(uid: str) -> (str, str):
         short_id = uid
         version = None
 
-        # if a header was created for the model already,
-        # we can derive the version from it (fast!)
+        # if header is in cache, derive the version from there (very fast)
 
-        for repository in config.REPOSITORIES:
-            backend = get_backend(repository)
-            remote_path = backend.join(
-                define.UID_FOLDER,
-                uid + '.yaml',
+        root = os.path.join(
+            cache_root,
+            uid,
+        )
+        if os.path.exists(root):
+            files = audeer.list_file_names(
+                root,
+                basenames=True,
+                filetype=define.HEADER_EXT,
             )
-            versions = backend.versions(remote_path)
-            if versions:
-                # uid of legacy models encode version
-                # i.e. we cannot have more than one version
-                version = versions[0]
-                break
+            if files:
+                version = files[0].replace(f'.{define.HEADER_EXT}', '')
+
+        if version is None:
+
+            # otherwise try to derive from header on backend (still faster)
+
+            for repository in config.REPOSITORIES:
+                backend = get_backend(repository)
+                remote_path = backend.join(
+                    define.UID_FOLDER,
+                    uid + '.yaml',
+                )
+                versions = backend.versions(remote_path)
+                if versions:
+                    # uid of legacy models encode version
+                    # i.e. we cannot have more than one version
+                    version = versions[0]
+                    break
 
         if version is None:
 

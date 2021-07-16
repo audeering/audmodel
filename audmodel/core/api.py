@@ -168,7 +168,7 @@ def header(
 
     """
     cache_root = audeer.safe_path(cache_root or default_cache_root())
-    short_id, version = split_uid(uid)
+    short_id, version = split_uid(uid, cache_root)
     return get_header(short_id, version, cache_root)[1]
 
 
@@ -296,7 +296,7 @@ def load(
 
     """
     cache_root = audeer.safe_path(cache_root or default_cache_root())
-    short_id, version = split_uid(uid)
+    short_id, version = split_uid(uid, cache_root)
     return get_archive(short_id, version, cache_root, verbose)
 
 
@@ -338,7 +338,7 @@ def meta(
 
     """
     cache_root = audeer.safe_path(cache_root or default_cache_root())
-    short_id, version = split_uid(uid)
+    short_id, version = split_uid(uid, cache_root)
     return get_meta(short_id, version, cache_root)[1]
 
 
@@ -668,7 +668,7 @@ def update_meta(
 
     """
     cache_root = audeer.safe_path(cache_root or default_cache_root())
-    short_id, version = split_uid(uid)
+    short_id, version = split_uid(uid, cache_root)
 
     # update metadata
     backend, meta_backend = get_meta(short_id, version, cache_root)
@@ -723,7 +723,7 @@ def url(
 
     """
     cache_root = audeer.safe_path(cache_root or default_cache_root())
-    short_id, version = split_uid(uid)
+    short_id, version = split_uid(uid, cache_root)
 
     if header:
         backend, path = header_path(short_id, version)
@@ -734,12 +734,16 @@ def url(
 
 
 def version(
-        uid: str
+        uid: str,
+        *,
+        cache_root: str = None,
 ) -> str:
     r"""Version of model.
 
     Args:
         uid: unique model ID
+        cache_root: cache folder where models and headers are stored.
+            If not set :meth:`audmodel.default_cache_root` is used
 
     Returns:
         model version
@@ -749,16 +753,21 @@ def version(
         '3.0.0'
 
     """
-    return split_uid(uid)[1]
+    cache_root = audeer.safe_path(cache_root or default_cache_root())
+    return split_uid(uid, cache_root)[1]
 
 
 def versions(
         uid: str,
+        *,
+        cache_root: str = None,
 ) -> typing.List[str]:
     r"""Available model versions.
 
     Args:
         uid: unique or short model ID
+        cache_root: cache folder where models and headers are stored.
+            If not set :meth:`audmodel.default_cache_root` is used
 
     Returns:
         list with versions
@@ -774,15 +783,12 @@ def versions(
         ['1.0.0', '2.0.0', '3.0.0']
 
     """
+    cache_root = audeer.safe_path(cache_root or default_cache_root())
     if utils.is_legacy_uid(uid):
-        url = legacy.url(uid)
-        return legacy.versions(
-            legacy.name_from_url(url),
-            legacy.parameters(uid),
-            subgroup=legacy.subgroup_from_url(url),
-            private=legacy.private_from_url(url),
-        )
+        # legacy IDs can only have one version
+        _, version = split_uid(uid, cache_root)
+        return [version]
     else:
-        short_id, _ = split_uid(uid)
+        short_id, _ = split_uid(uid, cache_root)
         matches = header_versions(short_id)
         return [match[2] for match in matches]
