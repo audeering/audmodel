@@ -7,11 +7,6 @@ class config:
     CACHE_ROOT = '~/audmodel'
     r"""Default cache folder for storing models."""
 
-    LEGACY_REPOSITORY_PRIVATE = 'models-private-local'
-    r"""Default private repository for legacy models."""
-    LEGACY_REPOSITORY_PUBLIC = 'models-public-local'
-    r"""Default public repository for legacy models."""
-
     REPOSITORIES = [
         audbackend.Repository(
             'models-local',

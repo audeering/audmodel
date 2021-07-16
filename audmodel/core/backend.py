@@ -1,4 +1,3 @@
-import datetime
 import os
 import shutil
 import tempfile
@@ -10,7 +9,6 @@ import audeer
 
 from audmodel.core.config import config
 import audmodel.core.define as define
-import audmodel.core.legacy as legacy
 import audmodel.core.utils as utils
 
 
@@ -312,7 +310,7 @@ def put_meta(
 def split_uid(
         uid: str,
         cache_root: str,
-) -> (str, str):
+) -> typing.Tuple[str, str]:
     r"""Split uid into short id and version."""
 
     if utils.is_legacy_uid(uid):
@@ -343,7 +341,8 @@ def split_uid(
                 backend = get_backend(repository)
                 remote_path = backend.join(
                     define.UID_FOLDER,
-                    uid + '.yaml',
+                    uid,
+                    # f'{uid}.{define.HEADER_EXT}',
                 )
                 versions = backend.versions(remote_path)
                 if versions:
@@ -353,24 +352,9 @@ def split_uid(
                     break
 
         if version is None:
-
-            # otherwise use old api to get the version (slow!)
-            # and publish header and metadata to speed up in future
-
-            backend = get_backend(config.REPOSITORIES[0])
-            version = legacy.version(uid)
-
-            header = utils.create_header(
-                uid,
-                author=legacy.author(uid),
-                date=datetime.datetime.strptime(legacy.date(uid), '%Y/%m/%d'),
-                name=legacy.name(uid),
-                parameters=legacy.parameters(uid),
-                subgroup=f'com.audeering.models.{legacy.subgroup(uid)}',
-                version=version,
+            raise FileNotFoundError(
+                f"A model with version '{uid}' does not exists."
             )
-            put_header(uid, version, header, backend)
-            put_meta(uid, version, {}, backend)
 
     else:
 

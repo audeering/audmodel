@@ -23,7 +23,6 @@ from audmodel.core.backend import (
 )
 from audmodel.core.config import config
 import audmodel.core.define as define
-import audmodel.core.legacy as legacy
 import audmodel.core.utils as utils
 
 
@@ -194,24 +193,14 @@ def latest_version(
         '3.0.0'
 
     """
-    if utils.is_legacy_uid(uid):
-        url = legacy.url(uid)
-        return legacy.latest_version(
-            legacy.name_from_url(url),
-            legacy.parameters(uid),
-            subgroup=legacy.subgroup_from_url(url),
-            private=legacy.private_from_url(url),
+    vs = versions(uid)
+    if not vs:
+        raise RuntimeError(
+            f"A model with ID "
+            f"'{uid}' "
+            f"does not exist."
         )
-    else:
-        short_id = uid.split('-')[0]
-        vs = versions(short_id)
-        if not vs:
-            raise RuntimeError(
-                f"A model with short ID "
-                f"'{short_id}' "
-                f"does not exist."
-            )
-        return vs[-1]
+    return vs[-1]
 
 
 def legacy_uid(
@@ -241,11 +230,25 @@ def legacy_uid(
     Returns:
         unique model ID
 
+    Example:
+
+        >>> legacy_uid(
+        ...     'test',
+        ...     {
+        ...         'sampling_rate': 16000,
+        ...         'feature': 'melspec64',
+        ...         'model': 'cnn10',
+        ...     },
+        ...     subgroup='audmodel.docstring',
+        ...     version='1.0.0',
+        ... )
+        '3a117099-8039-ab5e-b834-ae16dafdaf42'
+
     """
     group_id = f'com.audeering.models.{name}' if subgroup is None \
         else f'com.audeering.models.{subgroup}.{name}'
-    repository = config.LEGACY_REPOSITORY_PRIVATE if private \
-        else config.LEGACY_REPOSITORY_PUBLIC
+    repository = define.LEGACY_REPOSITORY_PRIVATE if private \
+        else define.LEGACY_REPOSITORY_PUBLIC
     unique_string = (
         str(params)
         + group_id
