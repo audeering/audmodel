@@ -13,7 +13,7 @@ audmodel.config.REPOSITORIES = pytest.REPOSITORIES
 
 MODEL_FILES = ['test', 'sub/test']
 VERSION = '1.0.0'
-SUBGROUP = f'{pytest.ID}.load'
+SUBGROUP = f'{pytest.ID}.legacy'
 
 
 def clear_root(root: str):

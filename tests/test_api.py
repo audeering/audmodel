@@ -106,3 +106,14 @@ def test_load(name, params, subgroup, version):
     audmodel.load(uid)
     for path, mtime in mtimes.items():
         assert os.path.getmtime(path) != mtime
+
+
+def test_url():
+    with pytest.raises(ValueError):
+        uid = audmodel.uid(
+            pytest.NAME,
+            pytest.PARAMS,
+            '1.0.0',
+            subgroup=SUBGROUP,
+        )
+        audmodel.url(uid, type='something')

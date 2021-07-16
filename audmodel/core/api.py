@@ -16,6 +16,7 @@ from audmodel.core.backend import (
     get_meta,
     header_path,
     header_versions,
+    meta_path,
     put_archive,
     put_header,
     put_meta,
@@ -698,7 +699,7 @@ def update_meta(
 def url(
         uid: str,
         *,
-        header: bool = False,
+        type: str = 'model',
         cache_root: str = None,
 ) -> str:
     r"""URL to model archive or header.
@@ -706,6 +707,11 @@ def url(
     Args:
         uid: unique model ID
         header: return URL to header instead of archive
+        type: return URL to specified type.
+            ``'model'`` corresponds to the archive file
+            storing the model,
+            ``'header'`` to the model header,
+            and ``'meta'`` to the model metadata
         cache_root: cache folder where models and headers are stored.
             If not set :meth:`audmodel.default_cache_root` is used
 
@@ -714,26 +720,41 @@ def url(
 
     Raises:
         ConnectionError: if Artifactory is not available
-        RuntimeError: if model does not exist
+        RuntimeError: if URL does not exist
+        ValueError: if wrong ``type`` is given
 
     Example:
         >>> path = url('5fbbaf38-3.0.0')
         >>> os.path.basename(path)
         '5fbbaf38-3.0.0.zip'
-        >>> path = url('5fbbaf38-3.0.0', header=True)
+        >>> path = url('5fbbaf38-3.0.0', type='header')
         >>> os.path.basename(path)
         '5fbbaf38-3.0.0.header.yaml'
+        >>> path = url('5fbbaf38-3.0.0', type='meta')
+        >>> os.path.basename(path)
+        '5fbbaf38-3.0.0.meta.yaml'
 
     """
     cache_root = audeer.safe_path(cache_root or default_cache_root())
     short_id, version = split_uid(uid, cache_root)
 
-    if header:
-        backend, path = header_path(short_id, version)
-        return backend.path(path, version, ext=define.HEADER_EXT)
-    else:
+    if type == 'model':
         backend, path = archive_path(short_id, version, cache_root=cache_root)
         return backend.path(path, version)
+    elif type == 'header':
+        backend, path = header_path(short_id, version)
+        return backend.path(path, version, ext=define.HEADER_EXT)
+    elif type == 'meta':
+        backend, path = meta_path(short_id, version, cache_root=cache_root)
+        return backend.path(path, version, ext=define.META_EXT)
+    else:
+        raise ValueError(
+            "'type' has to be one of "
+            "'model', "
+            "'header', "
+            "'meta', "
+            f"not '{type}'"
+        )
 
 
 def version(

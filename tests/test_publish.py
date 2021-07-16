@@ -183,4 +183,5 @@ def test_publish(root, name, subgroup, params, author, date, meta, version,
     assert audmodel.meta(uid) == meta
 
     assert os.path.exists(audmodel.url(uid))
-    assert os.path.exists(audmodel.url(uid, header=True))
+    assert os.path.exists(audmodel.url(uid, type='header'))
+    assert os.path.exists(audmodel.url(uid, type='meta'))
