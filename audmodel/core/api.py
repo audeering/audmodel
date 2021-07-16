@@ -116,7 +116,6 @@ def exists(
 
     Raises:
         ConnectionError: if Artifactory is not available
-        RuntimeError: if Artifactory REST API query fails
 
     Example:
         >>> exists('5fbbaf38-3.0.0')
