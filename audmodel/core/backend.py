@@ -113,11 +113,7 @@ def get_header(
 
     # read header from local file
     with open(local_path, 'r') as fp:
-        if utils.is_legacy_uid(short_id):
-            uid = short_id
-        else:
-            uid = f'{short_id}-{version}'
-        header = yaml.load(fp, Loader=yaml.Loader)[uid]
+        header = yaml.load(fp, Loader=yaml.Loader)
 
     return backend, header
 

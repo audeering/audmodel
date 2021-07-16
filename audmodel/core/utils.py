@@ -19,14 +19,12 @@ def create_header(
 ) -> typing.Dict[str, typing.Dict[str, typing.Any]]:
     r"""Create header dictionary."""
     return {
-        uid: {
-            'author': author or getpass.getuser(),
-            'date': date or datetime.date.today(),
-            'name': name,
-            'parameters': parameters,
-            'subgroup': subgroup,
-            'version': version,
-        }
+        'author': author or getpass.getuser(),
+        'date': date or datetime.date.today(),
+        'name': name,
+        'parameters': parameters,
+        'subgroup': subgroup,
+        'version': version,
     }
 
 
