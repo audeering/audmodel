@@ -92,23 +92,13 @@ def get_header(
     r"""Return backend and header content."""
 
     backend, remote_path = header_path(short_id, version)
-
     local_path = os.path.join(
         cache_root,
         short_id,
-        f'{version}.yaml',
+        f'{version}.{define.HEADER_EXT}',
     )
 
-    # if header in cache,
-    # figure out if it matches remote version
-    # and delete it if this is not the case
-    if os.path.exists(local_path):
-        local_checksum = audbackend.md5(local_path)
-        remote_checksum = backend.checksum(remote_path, version)
-        if local_checksum != remote_checksum:
-            os.remove(local_path)
-
-    # download header if it is not in cache yet
+    # header is not in cache download it
     if not os.path.exists(local_path):
         audeer.mkdir(os.path.dirname(local_path))
         with tempfile.TemporaryDirectory() as root:
@@ -117,6 +107,7 @@ def get_header(
                 remote_path,
                 tmp_path,
                 version,
+                ext=define.HEADER_EXT,
             )
             shutil.move(tmp_path, local_path)
 
@@ -131,24 +122,80 @@ def get_header(
     return backend, header
 
 
+def get_meta(
+        short_id: str,
+        version: str,
+        cache_root: str,
+) -> (audbackend.Backend, typing.Dict[str, typing.Any]):
+    r"""Return backend and metadata."""
+
+    backend, remote_path = meta_path(short_id, version, cache_root)
+
+    local_path = os.path.join(
+        cache_root,
+        short_id,
+        f'{version}.{define.META_EXT}',
+    )
+
+    # if metadata in cache,
+    # figure out if it matches remote version
+    # and delete it if this is not the case
+    if os.path.exists(local_path):
+        local_checksum = audbackend.md5(local_path)
+        remote_checksum = backend.checksum(
+            remote_path,
+            version,
+            ext=define.META_EXT,
+        )
+        if local_checksum != remote_checksum:
+            os.remove(local_path)
+
+    # download metadata if it is not in cache yet
+    if not os.path.exists(local_path):
+        audeer.mkdir(os.path.dirname(local_path))
+        with tempfile.TemporaryDirectory() as root:
+            tmp_path = os.path.join(root, 'meta.yaml')
+            backend.get_file(
+                remote_path,
+                tmp_path,
+                version,
+                ext=define.META_EXT,
+            )
+            shutil.move(tmp_path, local_path)
+
+    # read metadata from local file
+    with open(local_path, 'r') as fp:
+        meta = yaml.load(fp, Loader=yaml.Loader)
+        if meta is None:
+            meta = {}
+
+    return backend, meta
+
+
 def header_path(
         short_id: str,
         version: str,
 ) -> typing.Union[
     typing.Tuple[audbackend.Backend, str],
 ]:
-    r"""Return backend, header path and version."""
+    r"""Return backend and header path."""
 
+    # if we have only one repository
+    # we assume the header exists there
+    # and return without checking if file exists
     for repository in config.REPOSITORIES:
         backend = get_backend(repository)
         path = backend.join(
-            define.HEADER_FOLDER,
-            short_id + '.yaml',
+            define.UID_FOLDER,
+            f'{short_id}.{define.HEADER_EXT}',
         )
-        if backend.exists(path, version=version):
+        if (
+                len(config.REPOSITORIES) == 1
+                or backend.exists(path, version=version, ext=define.HEADER_EXT)
+        ):
             return backend, path
 
-    raise RuntimeError(
+    raise FileNotFoundError(
         f"A header with ID "
         f"'{short_id}' "
         f"and version "
@@ -167,14 +214,30 @@ def header_versions(
     for repository in config.REPOSITORIES:
         backend = get_backend(repository)
         path = backend.join(
-            define.HEADER_FOLDER,
-            short_id + '.yaml',
+            define.UID_FOLDER,
+            f'{short_id}.{define.HEADER_EXT}',
         )
-        versions = backend.versions(path)
+        versions = backend.versions(path, ext=define.HEADER_EXT)
         for version in versions:
             matches.append((backend, path, version))
 
     return matches
+
+
+def meta_path(
+        short_id: str,
+        version: str,
+        cache_root: str,
+) -> typing.Tuple[audbackend.Backend, str]:
+    r"""Return backend, metadata path and version."""
+
+    backend, header = get_header(short_id, version, cache_root)
+    path = backend.join(
+        define.UID_FOLDER,
+        f'{short_id}.{define.META_EXT}',
+    )
+
+    return backend, path
 
 
 def put_archive(
@@ -209,15 +272,45 @@ def put_header(
     r"""Put header to backend."""
 
     dst_path = backend.join(
-        define.HEADER_FOLDER,
-        short_id + '.yaml',
+        define.UID_FOLDER,
+        f'{short_id}.{define.HEADER_EXT}',
     )
 
     with tempfile.TemporaryDirectory() as tmp_root:
         src_path = os.path.join(tmp_root, 'model.yaml')
         with open(src_path, 'w') as fp:
             yaml.dump(header, fp)
-        backend.put_file(src_path, dst_path, version)
+        backend.put_file(
+            src_path,
+            dst_path,
+            version,
+            ext=define.HEADER_EXT,
+        )
+
+
+def put_meta(
+        short_id: str,
+        version: str,
+        meta: typing.Dict[str, typing.Any],
+        backend: audbackend.Backend,
+):
+    r"""Put meta to backend."""
+
+    dst_path = backend.join(
+        define.UID_FOLDER,
+        f'{short_id}.{define.META_EXT}',
+    )
+
+    with tempfile.TemporaryDirectory() as tmp_root:
+        src_path = os.path.join(tmp_root, 'meta.yaml')
+        with open(src_path, 'w') as fp:
+            yaml.dump(meta, fp)
+        backend.put_file(
+            src_path,
+            dst_path,
+            version,
+            ext=define.META_EXT,
+        )
 
 
 def split_uid(uid: str) -> (str, str):
@@ -234,7 +327,7 @@ def split_uid(uid: str) -> (str, str):
         for repository in config.REPOSITORIES:
             backend = get_backend(repository)
             remote_path = backend.join(
-                define.HEADER_FOLDER,
+                define.UID_FOLDER,
                 uid + '.yaml',
             )
             versions = backend.versions(remote_path)
@@ -247,7 +340,7 @@ def split_uid(uid: str) -> (str, str):
         if version is None:
 
             # otherwise use old api to get the version (slow!)
-            # and publish a header to speed up in future
+            # and publish header and metadata to speed up in future
 
             backend = get_backend(config.REPOSITORIES[0])
             version = legacy.version(uid)
@@ -257,12 +350,12 @@ def split_uid(uid: str) -> (str, str):
                 author=legacy.author(uid),
                 date=datetime.datetime.strptime(legacy.date(uid), '%Y/%m/%d'),
                 name=legacy.name(uid),
-                meta={},
                 parameters=legacy.parameters(uid),
                 subgroup=f'com.audeering.models.{legacy.subgroup(uid)}',
                 version=version,
             )
             put_header(uid, version, header, backend)
+            put_meta(uid, version, {}, backend)
 
     else:
 

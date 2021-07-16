@@ -12,7 +12,6 @@ def create_header(
         *,
         author: typing.Optional[str],
         date: typing.Optional[datetime.date],
-        meta: typing.Optional[typing.Dict[str, typing.Any]],
         name: str,
         parameters: typing.Dict[str, typing.Any],
         subgroup: str,
@@ -23,7 +22,6 @@ def create_header(
         uid: {
             'author': author or getpass.getuser(),
             'date': date or datetime.date.today(),
-            'meta': meta or {},
             'name': name,
             'parameters': parameters,
             'subgroup': subgroup,

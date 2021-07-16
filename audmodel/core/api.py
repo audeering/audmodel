@@ -13,10 +13,12 @@ from audmodel.core.backend import (
     get_archive,
     get_backend,
     get_header,
+    get_meta,
     header_path,
     header_versions,
     put_archive,
     put_header,
+    put_meta,
     split_uid,
 )
 from audmodel.core.config import config
@@ -125,7 +127,7 @@ def exists(
     """
     try:
         url(uid)
-    except RuntimeError:
+    except FileNotFoundError:
         return False
 
     return True
@@ -145,7 +147,7 @@ def header(
 
     Raises:
         ConnectionError: if Artifactory is not available
-        RuntimeError: if header does not exist
+        FileNotFoundError: if model does not exist on backend
 
     Returns:
         dictionary with header fields
@@ -155,19 +157,6 @@ def header(
         >>> print(yaml.dump(d))
         author: Calvin and Hobbes
         date: 1985-11-18
-        meta:
-          data:
-            emodb:
-              version: 1.1.1
-              format: wav
-              mixdown: true
-          melspec64:
-            win_dur: 32ms
-            hop_dur: 10ms
-            num_fft: 512
-          cnn10:
-            learning-rate: 0.01
-            optimizer: adam
         name: test
         parameters:
           feature: melspec64
@@ -348,7 +337,9 @@ def meta(
         <BLANKLINE>
 
     """
-    return header(uid, cache_root=cache_root)['meta']
+    cache_root = audeer.safe_path(cache_root or default_cache_root())
+    short_id, version = split_uid(uid)
+    return get_meta(short_id, version, cache_root)[1]
 
 
 def name(
@@ -475,10 +466,10 @@ def publish(
     root = audeer.safe_path(root)
     subgroup = subgroup or ''
 
-    if subgroup == define.HEADER_FOLDER:
+    if subgroup == define.UID_FOLDER:
         raise ValueError(
             f"It is not allowed to set subgroup to "
-            f"'{define.HEADER_FOLDER}'."
+            f"'{define.UID_FOLDER}'."
         )
 
     if not os.path.isdir(root):
@@ -503,13 +494,13 @@ def publish(
         uid,
         author=author,
         date=date,
-        meta=meta,
         name=name,
         parameters=params,
         subgroup=subgroup,
         version=version,
     )
     put_header(short_id, version, header, backend)
+    put_meta(short_id, version, meta, backend)
     put_archive(short_id, version, name, subgroup, root, backend)
 
     return uid
@@ -679,23 +670,21 @@ def update_meta(
     cache_root = audeer.safe_path(cache_root or default_cache_root())
     short_id, version = split_uid(uid)
 
-    # update header
-    backend, header = get_header(short_id, version, cache_root)
+    # update metadata
+    backend, meta_backend = get_meta(short_id, version, cache_root)
     if replace:
-        header['meta'] = meta
+        meta_backend = meta
     else:
-        utils.update_dict(header['meta'], meta)
-    meta = header['meta']
-    header = {uid: header}
+        utils.update_dict(meta_backend, meta)
 
-    # upload header
-    put_header(short_id, version, header, backend)
+    # upload metadata
+    put_meta(short_id, version, meta_backend, backend)
 
     # update cache
     local_path = os.path.join(
         cache_root,
         short_id,
-        f'{version}.yaml',
+        f'{version}.{define.META_EXT}',
     )
     with open(local_path, 'w') as fp:
         yaml.dump(header, fp)
@@ -730,7 +719,7 @@ def url(
         '5fbbaf38-3.0.0.zip'
         >>> path = url('5fbbaf38-3.0.0', header=True)
         >>> os.path.basename(path)
-        '5fbbaf38-3.0.0.yaml'
+        '5fbbaf38-3.0.0.header.yaml'
 
     """
     cache_root = audeer.safe_path(cache_root or default_cache_root())
@@ -738,10 +727,10 @@ def url(
 
     if header:
         backend, path = header_path(short_id, version)
+        return backend.path(path, version, ext=define.HEADER_EXT)
     else:
         backend, path = archive_path(short_id, version, cache_root=cache_root)
-
-    return backend.path(path, version)
+        return backend.path(path, version)
 
 
 def version(

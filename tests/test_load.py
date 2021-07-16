@@ -65,7 +65,7 @@ def fixture_publish_model():
         (pytest.NAME, pytest.PARAMS, SUBGROUP, '2.0.0'),
         pytest.param(
             pytest.NAME, pytest.PARAMS, SUBGROUP, '3.0.0',
-            marks=pytest.mark.xfail(raises=RuntimeError),
+            marks=pytest.mark.xfail(raises=FileNotFoundError),
         )
     ),
 )
@@ -76,7 +76,10 @@ def test_load(name, params, subgroup, version):
     # load from backend
 
     root = audmodel.load(uid)
-    header = root + '.yaml'
+    header = os.path.join(
+        os.path.dirname(root),
+        f'{version}.{audmodel.core.define.HEADER_EXT}'
+    )
     files = audmodel.core.utils.scan_files(root)
     paths = [os.path.join(root, file) for file in files]
 

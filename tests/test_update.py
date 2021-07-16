@@ -30,8 +30,8 @@ def test_update():
 
     # download header to alternate cache
 
-    header = audmodel.header(uid, cache_root=CACHE_ROOT_ALT)
-    assert header['meta'] == {}
+    meta_alt = audmodel.meta(uid, cache_root=CACHE_ROOT_ALT)
+    assert meta_alt == {}
 
     # insert new fields
 
@@ -73,5 +73,5 @@ def test_update():
 
     # verify header is updated in alternate cache
 
-    header = audmodel.header(uid, cache_root=CACHE_ROOT_ALT)
-    assert header['meta'] == meta
+    meta_alt = audmodel.meta(uid, cache_root=CACHE_ROOT_ALT)
+    assert meta_alt == meta
