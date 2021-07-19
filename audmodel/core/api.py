@@ -396,6 +396,10 @@ def parameters(
     return header(uid, cache_root=cache_root)['parameters']
 
 
+@audeer.deprecated_keyword_argument(
+    deprecated_argument='private',
+    removal_version='1.2.0',
+)
 def publish(
         root: str,
         name: str,
