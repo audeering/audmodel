@@ -97,17 +97,20 @@ def get_header(
     )
 
     # header is not in cache download it
-    if not os.path.exists(local_path):
-        audeer.mkdir(os.path.dirname(local_path))
-        with tempfile.TemporaryDirectory() as root:
-            tmp_path = os.path.join(root, 'model.yaml')
-            backend.get_file(
-                remote_path,
-                tmp_path,
-                version,
-                ext=define.HEADER_EXT,
-            )
-            shutil.move(tmp_path, local_path)
+    try:
+        if not os.path.exists(local_path):
+            audeer.mkdir(os.path.dirname(local_path))
+            with tempfile.TemporaryDirectory() as root:
+                tmp_path = os.path.join(root, 'model.yaml')
+                backend.get_file(
+                    remote_path,
+                    tmp_path,
+                    version,
+                    ext=define.HEADER_EXT,
+                )
+                shutil.move(tmp_path, local_path)
+    except FileNotFoundError:
+        raise_model_not_found_error(short_id, version)
 
     # read header from local file
     with open(local_path, 'r') as fp:
@@ -189,13 +192,9 @@ def header_path(
         ):
             return backend, path
 
-    raise FileNotFoundError(
-        f"A header with ID "
-        f"'{short_id}' "
-        f"and version "
-        f"'{version} "
-        f"does not exist."
-    )
+    # This error is only raised if we have several repos,
+    # so we need to tackle it in get_header() as well
+    raise_model_not_found_error(short_id, version)
 
 
 def header_versions(
@@ -313,6 +312,22 @@ def put_meta(
     return dst_path
 
 
+def raise_model_not_found_error(
+        short_id: str,
+        version: str,
+):
+    r"""Raise RuntimeError with custom error message."""
+    if version:
+        uid = f'{short_id}-{version}'
+    else:
+        uid = short_id
+    raise RuntimeError(
+        f"A model with ID "
+        f"'{uid}' "
+        f"does not exist."
+    )
+
+
 def split_uid(
         uid: str,
         cache_root: str,
@@ -348,7 +363,6 @@ def split_uid(
                 remote_path = backend.join(
                     define.UID_FOLDER,
                     uid,
-                    # f'{uid}.{define.HEADER_EXT}',
                 )
                 versions = backend.versions(remote_path)
                 if versions:
@@ -358,11 +372,7 @@ def split_uid(
                     break
 
         if version is None:
-            raise FileNotFoundError(
-                f"A model with legacy ID "
-                f"'{uid}' "
-                f"does not exist."
-            )
+            raise_model_not_found_error(short_id, version)
 
     elif utils.is_short_uid(uid):
 
@@ -370,11 +380,7 @@ def split_uid(
         versions = header_versions(short_id)
 
         if not versions:
-            raise FileNotFoundError(
-                f"A model with short ID "
-                f"'{short_id}' "
-                f"does not exist."
-            )
+            raise_model_not_found_error(short_id, None)
 
         version = versions[-1][2]
 

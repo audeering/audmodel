@@ -106,7 +106,7 @@ def fixture_publish_model():
         (pytest.NAME, pytest.PARAMS, SUBGROUP, '1.0.0'),
         pytest.param(
             pytest.NAME, pytest.PARAMS, SUBGROUP, '3.0.0',
-            marks=pytest.mark.xfail(raises=FileNotFoundError),
+            marks=pytest.mark.xfail(raises=RuntimeError),
         )
     ),
 )

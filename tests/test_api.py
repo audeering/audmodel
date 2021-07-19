@@ -59,41 +59,58 @@ def fixture_publish_model():
 
 
 @pytest.mark.parametrize(
-    'uid',
+    'uid,expected_error',
     [
-        'bad-id',
-        '00000000',
-        '00000000-0000-0000-0000-000000000000',
+        (
+            'bad-id',  # bad ID with version string
+            "A model with ID 'bad-id' does not exist.",
+        ),
+        (
+            '000',  # bad ID without version string
+            "A model with ID '000' does not exist.",
+        ),
+        (
+            '00000000',
+            "A model with ID '00000000' does not exist.",
+        ),
+        (
+            '00000000-0000-0000-0000-000000000000',
+            (
+                "A model with ID "
+                "'00000000-0000-0000-0000-000000000000' "
+                "does not exist."
+            ),
+        ),
     ]
 
 )
-def test_bad_uid(uid):
+def test_bad_uid(uid, expected_error):
 
-    with pytest.raises(FileNotFoundError):
+    with pytest.raises(RuntimeError, match=expected_error):
         audmodel.author(uid)
 
-    with pytest.raises(FileNotFoundError):
+    with pytest.raises(RuntimeError, match=expected_error):
         audmodel.date(uid)
 
-    with pytest.raises(FileNotFoundError):
+    with pytest.raises(RuntimeError, match=expected_error):
         audmodel.header(uid)
 
-    with pytest.raises(FileNotFoundError):
+    with pytest.raises(RuntimeError, match=expected_error):
         audmodel.latest_version(uid)
 
-    with pytest.raises(FileNotFoundError):
+    with pytest.raises(RuntimeError, match=expected_error):
         audmodel.meta(uid)
 
-    with pytest.raises(FileNotFoundError):
+    with pytest.raises(RuntimeError, match=expected_error):
         audmodel.name(uid)
 
-    with pytest.raises(FileNotFoundError):
+    with pytest.raises(RuntimeError, match=expected_error):
         audmodel.parameters(uid)
 
-    with pytest.raises(FileNotFoundError):
+    with pytest.raises(RuntimeError, match=expected_error):
         audmodel.subgroup(uid)
 
-    with pytest.raises(FileNotFoundError):
+    with pytest.raises(RuntimeError, match=expected_error):
         audmodel.update_meta(uid, {})
 
     assert not audmodel.versions(uid)
@@ -108,11 +125,11 @@ def test_bad_uid(uid):
         (pytest.NAME, pytest.PARAMS, SUBGROUP, None),
         pytest.param(  # version does not exist
             pytest.NAME, pytest.PARAMS, SUBGROUP, '3.0.0',
-            marks=pytest.mark.xfail(raises=FileNotFoundError),
+            marks=pytest.mark.xfail(raises=RuntimeError),
         ),
         pytest.param(  # short ID does not exist
             'does-not-exist', pytest.PARAMS, SUBGROUP, None,
-            marks=pytest.mark.xfail(raises=FileNotFoundError),
+            marks=pytest.mark.xfail(raises=RuntimeError),
         ),
     ),
 )

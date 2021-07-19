@@ -17,7 +17,7 @@ def test_versions():
         subgroup=SUBGROUP,
     )
 
-    with pytest.raises(FileNotFoundError):
+    with pytest.raises(RuntimeError):
         audmodel.latest_version(sid)
     assert not audmodel.versions(sid)
 

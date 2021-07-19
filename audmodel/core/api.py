@@ -20,6 +20,7 @@ from audmodel.core.backend import (
     put_archive,
     put_header,
     put_meta,
+    raise_model_not_found_error,
     split_uid,
 )
 from audmodel.core.config import config
@@ -44,7 +45,7 @@ def author(
 
     Raises:
         ConnectionError: if Artifactory is not available
-        FileNotFoundError: if model does not exist
+        RuntimeError: if model does not exist
 
     Example:
         >>> author('5fbbaf38-3.0.0')
@@ -71,7 +72,7 @@ def date(
 
     Raises:
         ConnectionError: if Artifactory is not available
-        FileNotFoundError: if model does not exist
+        RuntimeError: if model does not exist
 
     Example:
         >>> date('5fbbaf38-3.0.0')
@@ -126,7 +127,7 @@ def exists(
     """
     try:
         url(uid)
-    except FileNotFoundError:
+    except RuntimeError:
         return False
 
     return True
@@ -146,7 +147,7 @@ def header(
 
     Raises:
         ConnectionError: if Artifactory is not available
-        FileNotFoundError: if model does not exist on backend
+        RuntimeError: if model does not exist on backend
 
     Returns:
         dictionary with header fields
@@ -184,7 +185,7 @@ def latest_version(
 
     Raises:
         ConnectionError: if Artifactory is not available
-        FileNotFoundError: if model does not exist
+        RuntimeError: if model does not exist
 
     Example:
         >>> latest_version('5fbbaf38')
@@ -195,11 +196,7 @@ def latest_version(
     """
     vs = versions(uid)
     if not vs:
-        raise FileNotFoundError(
-            f"A model with ID "
-            f"'{uid}' "
-            f"does not exist."
-        )
+        raise_model_not_found_error(uid, None)
     return vs[-1]
 
 
@@ -290,7 +287,7 @@ def load(
 
     Raises:
         ConnectionError: if Artifactory is not available
-        FileNotFoundError: if model does not exist
+        RuntimeError: if model does not exist
 
     Example:
         >>> root = load('5fbbaf38-3.0.0')
@@ -320,7 +317,7 @@ def meta(
 
     Raises:
         ConnectionError: if Artifactory is not available
-        FileNotFoundError: if model does not exist
+        RuntimeError: if model does not exist
 
     Example:
         >>> d = meta('5fbbaf38-3.0.0')
@@ -362,7 +359,7 @@ def name(
 
     Raises:
         ConnectionError: if Artifactory is not available
-        FileNotFoundError: if model does not exist
+        RuntimeError: if model does not exist
 
     Example:
         >>> name('5fbbaf38-3.0.0')
@@ -389,7 +386,7 @@ def parameters(
 
     Raises:
         ConnectionError: if Artifactory is not available
-        FileNotFoundError: if model does not exist
+        RuntimeError: if model does not exist
 
     Example:
         >>> parameters('5fbbaf38-3.0.0')
@@ -464,6 +461,7 @@ def publish(
     Raises:
         RuntimeError: if a model with same UID exists already
         ValueError: if subgroup is set to ``'_uid'``
+        FileNotFoundError: if ``root`` folder cannot be found
 
     """
     root = audeer.safe_path(root)
@@ -544,7 +542,7 @@ def subgroup(
 
     Raises:
         ConnectionError: if Artifactory is not available
-        FileNotFoundError: if model does not exist
+        RuntimeError: if model does not exist
 
     Example:
         >>> subgroup('5fbbaf38-3.0.0')
@@ -685,7 +683,7 @@ def update_meta(
 
     Raises:
         ConnectionError: if Artifactory is not available
-        FileNotFoundError: if model does not exist
+        RuntimeError: if model does not exist
 
     """
     cache_root = audeer.safe_path(cache_root or default_cache_root())
@@ -791,7 +789,7 @@ def versions(
 
     Raises:
         ConnectionError: if Artifactory is not available
-        FileNotFoundError: if model does not exist
+        RuntimeError: if model does not exist
 
     Example:
         >>> versions('5fbbaf38')
@@ -806,7 +804,7 @@ def versions(
             # legacy IDs can only have one version
             _, version = split_uid(uid, cache_root)
             return [version]
-        except FileNotFoundError:
+        except RuntimeError:
             return []
     else:
         short_id = uid.split('-')[0]
