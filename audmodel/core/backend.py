@@ -353,8 +353,24 @@ def split_uid(
 
         if version is None:
             raise FileNotFoundError(
-                f"A model with version '{uid}' does not exists."
+                f"A model with legacy ID "
+                f"'{uid}' "
+                f"does not exist."
             )
+
+    elif utils.is_short_uid(uid):
+
+        short_id = uid
+        versions = header_versions(short_id)
+
+        if not versions:
+            raise FileNotFoundError(
+                f"A model with short ID "
+                f"'{short_id}' "
+                f"does not exist."
+            )
+
+        version = versions[-1][2]
 
     else:
 

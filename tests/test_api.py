@@ -59,14 +59,61 @@ def fixture_publish_model():
 
 
 @pytest.mark.parametrize(
+    'uid',
+    [
+        'bad-id',
+        '00000000',
+        '00000000-0000-0000-0000-000000000000',
+    ]
+
+)
+def test_bad_uid(uid):
+
+    with pytest.raises(FileNotFoundError):
+        audmodel.author(uid)
+
+    with pytest.raises(FileNotFoundError):
+        audmodel.date(uid)
+
+    with pytest.raises(FileNotFoundError):
+        audmodel.header(uid)
+
+    with pytest.raises(FileNotFoundError):
+        audmodel.latest_version(uid)
+
+    with pytest.raises(FileNotFoundError):
+        audmodel.meta(uid)
+
+    with pytest.raises(FileNotFoundError):
+        audmodel.name(uid)
+
+    with pytest.raises(FileNotFoundError):
+        audmodel.parameters(uid)
+
+    with pytest.raises(FileNotFoundError):
+        audmodel.subgroup(uid)
+
+    with pytest.raises(FileNotFoundError):
+        audmodel.update_meta(uid, {})
+
+    assert not audmodel.versions(uid)
+    assert not audmodel.exists(uid)
+
+
+@pytest.mark.parametrize(
     'name, params, subgroup, version',
     (
         (pytest.NAME, pytest.PARAMS, SUBGROUP, '1.0.0'),
         (pytest.NAME, pytest.PARAMS, SUBGROUP, '2.0.0'),
-        pytest.param(
+        (pytest.NAME, pytest.PARAMS, SUBGROUP, None),
+        pytest.param(  # version does not exist
             pytest.NAME, pytest.PARAMS, SUBGROUP, '3.0.0',
             marks=pytest.mark.xfail(raises=FileNotFoundError),
-        )
+        ),
+        pytest.param(  # short ID does not exist
+            'does-not-exist', pytest.PARAMS, SUBGROUP, None,
+            marks=pytest.mark.xfail(raises=FileNotFoundError),
+        ),
     ),
 )
 def test_load(name, params, subgroup, version):
@@ -76,6 +123,8 @@ def test_load(name, params, subgroup, version):
     # load from backend
 
     root = audmodel.load(uid)
+    if version is None:
+        version = audmodel.latest_version(uid)
     header = os.path.join(
         os.path.dirname(root),
         f'{version}.{audmodel.core.define.HEADER_EXT}'

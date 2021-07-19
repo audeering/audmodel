@@ -35,7 +35,7 @@ def author(
     r"""Author of model.
 
     Args:
-        uid: unique model ID
+        uid: unique model ID or short ID for latest version
         cache_root: cache folder where models and headers are stored.
             If not set :meth:`audmodel.default_cache_root` is used
 
@@ -44,7 +44,7 @@ def author(
 
     Raises:
         ConnectionError: if Artifactory is not available
-        RuntimeError: if model does not exist
+        FileNotFoundError: if model does not exist
 
     Example:
         >>> author('5fbbaf38-3.0.0')
@@ -62,7 +62,7 @@ def date(
     r"""Publication date of model.
 
     Args:
-        uid: unique model ID
+        uid: unique model ID or short ID for latest version
         cache_root: cache folder where models and headers are stored.
             If not set :meth:`audmodel.default_cache_root` is used
 
@@ -71,7 +71,7 @@ def date(
 
     Raises:
         ConnectionError: if Artifactory is not available
-        RuntimeError: if model does not exist
+        FileNotFoundError: if model does not exist
 
     Example:
         >>> date('5fbbaf38-3.0.0')
@@ -109,7 +109,7 @@ def exists(
     r"""Check if a model with this ID exists.
 
     Args:
-        uid: unique model ID
+        uid: unique model ID or short ID for latest version
 
     Returns:
         ``True`` if a model with this ID is found
@@ -140,7 +140,7 @@ def header(
     r"""Load model header.
 
     Args:
-        uid: unique model ID
+        uid: unique model ID or short ID for latest version
         cache_root: cache folder where models and headers are stored.
             If not set :meth:`audmodel.default_cache_root` is used
 
@@ -177,14 +177,14 @@ def latest_version(
     r"""Latest available version of model.
 
     Args:
-        uid: unique or short model ID
+        uid: unique model ID or short ID
 
     Returns:
         latest version of model
 
     Raises:
         ConnectionError: if Artifactory is not available
-        RuntimeError: if model does not exist
+        FileNotFoundError: if model does not exist
 
     Example:
         >>> latest_version('5fbbaf38')
@@ -195,7 +195,7 @@ def latest_version(
     """
     vs = versions(uid)
     if not vs:
-        raise RuntimeError(
+        raise FileNotFoundError(
             f"A model with ID "
             f"'{uid}' "
             f"does not exist."
@@ -280,7 +280,7 @@ def load(
     the download is skipped.
 
     Args:
-        uid: unique model ID
+        uid: unique model ID or short ID for latest version
         cache_root: cache folder where models and headers are stored.
             If not set :meth:`audmodel.default_cache_root` is used
         verbose: show debug messages
@@ -290,7 +290,7 @@ def load(
 
     Raises:
         ConnectionError: if Artifactory is not available
-        RuntimeError: if model does not exist
+        FileNotFoundError: if model does not exist
 
     Example:
         >>> root = load('5fbbaf38-3.0.0')
@@ -311,7 +311,7 @@ def meta(
     r"""Meta information of model.
 
     Args:
-        uid: unique model ID
+        uid: unique model ID or short ID for latest version
         cache_root: cache folder where models and headers are stored.
             If not set :meth:`audmodel.default_cache_root` is used
 
@@ -320,7 +320,7 @@ def meta(
 
     Raises:
         ConnectionError: if Artifactory is not available
-        RuntimeError: if model does not exist
+        FileNotFoundError: if model does not exist
 
     Example:
         >>> d = meta('5fbbaf38-3.0.0')
@@ -353,7 +353,7 @@ def name(
     r"""Name of model.
 
     Args:
-        uid: unique model ID
+        uid: unique model ID or short ID for latest version
         cache_root: cache folder where models and headers are stored.
             If not set :meth:`audmodel.default_cache_root` is used
 
@@ -362,7 +362,7 @@ def name(
 
     Raises:
         ConnectionError: if Artifactory is not available
-        RuntimeError: if model does not exist
+        FileNotFoundError: if model does not exist
 
     Example:
         >>> name('5fbbaf38-3.0.0')
@@ -380,7 +380,7 @@ def parameters(
     r"""Parameters of model.
 
     Args:
-        uid: unique model ID
+        uid: unique model ID or short ID for latest version
         cache_root: cache folder where models and headers are stored.
             If not set :meth:`audmodel.default_cache_root` is used
 
@@ -389,7 +389,7 @@ def parameters(
 
     Raises:
         ConnectionError: if Artifactory is not available
-        RuntimeError: if model does not exist
+        FileNotFoundError: if model does not exist
 
     Example:
         >>> parameters('5fbbaf38-3.0.0')
@@ -462,7 +462,7 @@ def publish(
         unique model ID
 
     Raises:
-        RuntimeError: if an artifact exists already
+        RuntimeError: if a model with same UID exists already
         ValueError: if subgroup is set to ``'_uid'``
 
     """
@@ -517,7 +517,7 @@ def subgroup(
     r"""Subgroup of model.
 
     Args:
-        uid: unique model ID
+        uid: unique model ID or short ID for latest version
         cache_root: cache folder where models and headers are stored.
             If not set :meth:`audmodel.default_cache_root` is used
 
@@ -526,7 +526,7 @@ def subgroup(
 
     Raises:
         ConnectionError: if Artifactory is not available
-        RuntimeError: if model does not exist
+        FileNotFoundError: if model does not exist
 
     Example:
         >>> subgroup('5fbbaf38-3.0.0')
@@ -656,7 +656,7 @@ def update_meta(
         }
 
     Args:
-        uid: unique model ID
+        uid: unique model ID or short ID for latest version
         meta: dictionary with meta information
         replace: replace existing dictionary
         cache_root: cache folder where models and headers are stored.
@@ -667,7 +667,7 @@ def update_meta(
 
     Raises:
         ConnectionError: if Artifactory is not available
-        RuntimeError: if model does not exist
+        FileNotFoundError: if model does not exist
 
     """
     cache_root = audeer.safe_path(cache_root or default_cache_root())
@@ -704,7 +704,7 @@ def url(
     r"""URL to model archive or header.
 
     Args:
-        uid: unique model ID
+        uid: unique model ID or short ID for latest version
         header: return URL to header instead of archive
         type: return URL to specified type.
             ``'model'`` corresponds to the archive file
@@ -756,30 +756,6 @@ def url(
         )
 
 
-def version(
-        uid: str,
-        *,
-        cache_root: str = None,
-) -> str:
-    r"""Version of model.
-
-    Args:
-        uid: unique model ID
-        cache_root: cache folder where models and headers are stored.
-            If not set :meth:`audmodel.default_cache_root` is used
-
-    Returns:
-        model version
-
-    Example:
-        >>> version('5fbbaf38-3.0.0')
-        '3.0.0'
-
-    """
-    cache_root = audeer.safe_path(cache_root or default_cache_root())
-    return split_uid(uid, cache_root)[1]
-
-
 def versions(
         uid: str,
         *,
@@ -788,7 +764,7 @@ def versions(
     r"""Available model versions.
 
     Args:
-        uid: unique or short model ID
+        uid: unique model ID or short ID
         cache_root: cache folder where models and headers are stored.
             If not set :meth:`audmodel.default_cache_root` is used
 
@@ -797,7 +773,7 @@ def versions(
 
     Raises:
         ConnectionError: if Artifactory is not available
-        RuntimeError: if model does not exist
+        FileNotFoundError: if model does not exist
 
     Example:
         >>> versions('5fbbaf38')
@@ -808,10 +784,13 @@ def versions(
     """
     cache_root = audeer.safe_path(cache_root or default_cache_root())
     if utils.is_legacy_uid(uid):
-        # legacy IDs can only have one version
-        _, version = split_uid(uid, cache_root)
-        return [version]
+        try:
+            # legacy IDs can only have one version
+            _, version = split_uid(uid, cache_root)
+            return [version]
+        except FileNotFoundError:
+            return []
     else:
-        short_id, _ = split_uid(uid, cache_root)
+        short_id = uid.split('-')[0]
         matches = header_versions(short_id)
         return [match[2] for match in matches]

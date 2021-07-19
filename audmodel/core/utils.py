@@ -33,6 +33,11 @@ def is_legacy_uid(uid: str) -> bool:
     return len(uid) == 36
 
 
+def is_short_uid(uid: str) -> bool:
+    r"""Check if uid is short ID."""
+    return len(uid) == 8
+
+
 def scan_files(root: str) -> typing.Sequence[str]:
     r"""Helper function to find all files in directory."""
 

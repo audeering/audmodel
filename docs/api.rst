@@ -89,11 +89,6 @@ url
 
 .. autofunction:: url
 
-version
--------
-
-.. autofunction:: version
-
 versions
 --------
 
