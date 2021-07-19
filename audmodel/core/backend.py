@@ -241,7 +241,7 @@ def put_archive(
         subgroup: str,
         root: str,
         backend: audbackend.Backend,
-):
+) -> str:
     r"""Put archive to backend."""
 
     dst_path = backend.join(
@@ -256,13 +256,15 @@ def put_archive(
         audeer.create_archive(root, files, src_path)
         backend.put_file(src_path, dst_path, version)
 
+    return dst_path
+
 
 def put_header(
         short_id: str,
         version: str,
         header: typing.Dict[str, typing.Any],
         backend: audbackend.Backend,
-):
+) -> str:
     r"""Put header to backend."""
 
     dst_path = backend.join(
@@ -281,13 +283,15 @@ def put_header(
             ext=define.HEADER_EXT,
         )
 
+    return dst_path
+
 
 def put_meta(
         short_id: str,
         version: str,
         meta: typing.Dict[str, typing.Any],
         backend: audbackend.Backend,
-):
+) -> str:
     r"""Put meta to backend."""
 
     dst_path = backend.join(
@@ -305,6 +309,8 @@ def put_meta(
             version,
             ext=define.META_EXT,
         )
+
+    return dst_path
 
 
 def split_uid(

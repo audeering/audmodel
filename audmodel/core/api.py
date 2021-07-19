@@ -502,9 +502,27 @@ def publish(
         subgroup=subgroup,
         version=version,
     )
-    put_header(short_id, version, header, backend)
-    put_meta(short_id, version, meta, backend)
-    put_archive(short_id, version, name, subgroup, root, backend)
+
+    paths = []
+    try:
+        path = put_header(short_id, version, header, backend)
+        paths.append(path)
+        path = put_meta(short_id, version, meta, backend)
+        paths.append(path)
+        path = put_archive(
+            short_id,
+            version,
+            name,
+            subgroup,
+            root,
+            backend,
+        )
+        paths.append(path)
+    except Exception:  # pragma: no cover
+        # if something goes wrong, clean up
+        for path in paths:
+            if backend.exists(path, version):
+                backend.remove_file(path, version)
 
     return uid
 
