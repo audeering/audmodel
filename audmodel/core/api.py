@@ -259,12 +259,6 @@ def legacy_uid(
     return audeer.uid(from_string=unique_string)
 
 
-@audeer.deprecated_keyword_argument(
-    deprecated_argument='root',
-    new_argument='cache_root',
-    mapping=lambda value: value,
-    removal_version='1.0.0',
-)
 def load(
         uid: str,
         *,
