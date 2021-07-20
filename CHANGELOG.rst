@@ -7,6 +7,24 @@ The format is based on `Keep a Changelog`_,
 and this project adheres to `Semantic Versioning`_.
 
 
+Version 1.0.0 (2021-07-20)
+--------------------------
+
+* Added: :func:`audmodel.header`
+* Added: :func:`audmodel.meta`
+* Added: :func:`audmodel.legacy_uid`
+* Added: :func:`audmodel.update_meta`
+* Added: argument ``cache_root`` to several functions
+* Added: argument ``type`` to :func:`audmodel.url`
+* Changed: make ``'models-local'`` default repository
+* Changed: shorter model ID format, e.g. ``'5fbbaf38-3.0.0'``
+* Changed: support for different backends
+* Deprecated: ``private`` in :func:`audmodel.publish`
+* Deprecated: ``root`` in :func:`audmodel.load`
+* Removed: ``audmodel.lookup_table()``
+* Removed: ``audmodel.remove()``
+
+
 Version 0.10.0 (2021-04-06)
 ---------------------------
 
