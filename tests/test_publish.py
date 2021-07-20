@@ -179,6 +179,7 @@ def test_publish(root, name, subgroup, params, author, date, meta, version,
     assert audmodel.subgroup(uid) == subgroup
 
     assert header['version'] == version
+    assert audmodel.version(uid) == version
 
     assert audmodel.meta(uid) == meta
 

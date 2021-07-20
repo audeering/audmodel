@@ -15,6 +15,7 @@ from audmodel.core.api import (
     uid,
     update_meta,
     url,
+    version,
     versions,
 )
 from audmodel.core.config import config

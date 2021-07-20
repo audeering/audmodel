@@ -776,6 +776,33 @@ def url(
         )
 
 
+def version(
+        uid: str,
+        *,
+        cache_root: str = None,
+) -> str:
+    r"""Version of model.
+
+    Args:
+        uid: unique model ID or short ID for latest version
+        cache_root: cache folder where models and headers are stored.
+            If not set :meth:`audmodel.default_cache_root` is used
+
+    Returns:
+        model version
+
+    Raises:
+        ConnectionError: if Artifactory is not available
+        RuntimeError: if model does not exist
+
+    Example:
+        >>> version('5fbbaf38-3.0.0')
+        '3.0.0'
+
+    """
+    return header(uid, cache_root=cache_root)['version']
+
+
 def versions(
         uid: str,
         *,

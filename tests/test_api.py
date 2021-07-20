@@ -113,6 +113,9 @@ def test_bad_uid(uid, expected_error):
     with pytest.raises(RuntimeError, match=expected_error):
         audmodel.update_meta(uid, {})
 
+    with pytest.raises(RuntimeError, match=expected_error):
+        audmodel.version(uid)
+
     assert not audmodel.versions(uid)
     assert not audmodel.exists(uid)
 
