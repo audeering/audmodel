@@ -464,6 +464,7 @@ def publish(
 
     Raises:
         RuntimeError: if a model with same UID exists already
+        RuntimeError: if an unexpected error occurs during publishing
         ValueError: if subgroup is set to ``'_uid'``
         FileNotFoundError: if ``root`` folder cannot be found
 
@@ -505,13 +506,10 @@ def publish(
         version=version,
     )
 
-    paths = []
     try:
-        path = put_header(short_id, version, header, backend)
-        paths.append(path)
-        path = put_meta(short_id, version, meta, backend)
-        paths.append(path)
-        path = put_archive(
+        put_header(short_id, version, header, backend)
+        put_meta(short_id, version, meta, backend)
+        put_archive(
             short_id,
             version,
             name,
@@ -519,12 +517,32 @@ def publish(
             root,
             backend,
         )
-        paths.append(path)
-    except Exception:  # pragma: no cover
-        # if something goes wrong, clean up
-        for path in paths:
-            if backend.exists(path, version):
-                backend.remove_file(path, version)
+    except Exception:
+        # if something goes wrong
+        # remove files that were already published
+        for ext in [define.HEADER_EXT, define.META_EXT]:
+            path = backend.join(
+                define.UID_FOLDER,
+                f'{short_id}.{ext}',
+            )
+            if backend.exists(path, version, ext=ext):
+                backend.remove_file(path, version, ext=ext)
+
+        path = backend.join(
+            *subgroup.split('.'),
+            name,
+            short_id + '.zip',
+        )
+        if backend.exists(path, version):  # pragma: no cover
+            # we can probably assume that the archive
+            # does not exist on the backend
+            # if something goes wrong during 'put_archive()'
+            # so it's not likely we'll ever end up in this case
+            backend.remove_file(path, version)
+
+        raise RuntimeError(
+            f'Could not publish model due to an unexpected error.'
+        )
 
     return uid
 
