@@ -21,6 +21,7 @@ from audmodel.core.backend import (
     put_header,
     put_meta,
     raise_model_not_found_error,
+    SERIALIZE_ERROR_MESSAGE,
     split_uid,
 )
 from audmodel.core.config import config
@@ -465,6 +466,8 @@ def publish(
     Raises:
         RuntimeError: if a model with same UID exists already
         RuntimeError: if an unexpected error occurs during publishing
+        RuntimeError: if ``meta`` or ``params``
+            cannot be serialized to a YAML file
         ValueError: if subgroup is set to ``'_uid'``
         FileNotFoundError: if ``root`` folder cannot be found
 
@@ -517,7 +520,7 @@ def publish(
             root,
             backend,
         )
-    except Exception:
+    except Exception as ex:
         # if something goes wrong
         # remove files that were already published
         for ext in [define.HEADER_EXT, define.META_EXT]:
@@ -540,9 +543,16 @@ def publish(
             # so it's not likely we'll ever end up in this case
             backend.remove_file(path, version)
 
-        raise RuntimeError(
-            f'Could not publish model due to an unexpected error.'
-        )
+        # Reraise our custom error if params or meta cannot be serialized
+        if (
+                type(ex) == RuntimeError
+                and ex.args[0].startswith(SERIALIZE_ERROR_MESSAGE)
+        ):
+            raise ex
+        else:  # pragma: no cover
+            raise RuntimeError(
+                f'Could not publish model due to an unexpected error.'
+            )
 
     return uid
 
@@ -706,6 +716,7 @@ def update_meta(
     Raises:
         ConnectionError: if Artifactory is not available
         RuntimeError: if model does not exist
+        RuntimeError: if ``meta`` cannot be serialized to a YAML file
 
     """
     cache_root = audeer.safe_path(cache_root or default_cache_root())

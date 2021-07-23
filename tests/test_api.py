@@ -177,6 +177,18 @@ def test_load(name, params, subgroup, version):
         assert os.path.getmtime(path) != mtime
 
 
+def test_update_meta():
+    uid = audmodel.uid(
+        pytest.NAME,
+        pytest.PARAMS,
+        '1.0.0',
+        subgroup=SUBGROUP,
+    )
+    meta = {'model': pytest.CANNOT_PICKLE}
+    with pytest.raises(RuntimeError, match=r'Cannot serialize'):
+        audmodel.update_meta(uid, meta)
+
+
 def test_url():
     with pytest.raises(ValueError):
         uid = audmodel.uid(

@@ -2,6 +2,7 @@ import os
 
 import pytest
 
+import audbackend
 import audmodel
 
 
@@ -190,21 +191,15 @@ def test_publish(root, name, subgroup, params, author, date, meta, version,
 
 def test_publish_interrupt():
 
-    # create object that cannot be pickled
-    # so it will raise an error when converted to yaml
-    class CannotPickle:
-        def __getstate__(self):
-            raise Exception('cannot pickle object')
-
-    meta = {
-        'object': CannotPickle()
-    }
-
     name = pytest.NAME
-    params = {}
     version = '1.0.0'
 
-    err_msg = 'Could not publish model due to an unexpected error.'
+    # Fail if meta cannot be serialized
+    params = {}
+    meta = {
+        'object': pytest.CANNOT_PICKLE
+    }
+    err_msg = r'Cannot serialize'
     with pytest.raises(RuntimeError, match=err_msg):
         audmodel.publish(
             pytest.MODEL_ROOT,
@@ -214,6 +209,47 @@ def test_publish_interrupt():
             meta=meta,
             repository=audmodel.config.REPOSITORIES[0],
         )
+
+    # Fail if params cannot be serialized
+    params = {
+        'object': pytest.CANNOT_PICKLE
+    }
+    meta = {}
+    err_msg = r'Cannot serialize'
+    with pytest.raises(RuntimeError, match=err_msg):
+        audmodel.publish(
+            pytest.MODEL_ROOT,
+            name,
+            params,
+            version,
+            meta=meta,
+            repository=audmodel.config.REPOSITORIES[0],
+        )
+
+    # Enable this test
+    # as soon as https://github.com/audeering/audbackend/issues/24
+    # is fixed
+    #
+    # Fail if repo does not exist
+    # params = {}
+    # meta = {}
+    # repository = audmodel.config.REPOSITORIES[0]
+    # repository.name = 'non-existent'
+    # repository = audbackend.Repository(
+    #     'repo',
+    #     'https://non-existing.audeering.com/artifactory',
+    #     'artifactory',
+    # )
+    # err_msg = 'Could not publish model due to an unexpected error.'
+    # with pytest.raises(RuntimeError, match=err_msg):
+    #     audmodel.publish(
+    #         pytest.MODEL_ROOT,
+    #         name,
+    #         params,
+    #         version,
+    #         meta=meta,
+    #         repository=repository,
+    #     )
 
     uid = audmodel.uid(
         name,

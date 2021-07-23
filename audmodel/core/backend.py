@@ -12,6 +12,11 @@ import audmodel.core.define as define
 import audmodel.core.utils as utils
 
 
+SERIALIZE_ERROR_MESSAGE = (
+    'Cannot serialize the following object to a YAML file:\n'
+)
+
+
 def archive_path(
         short_id: str,
         version: str,
@@ -273,8 +278,7 @@ def put_header(
 
     with tempfile.TemporaryDirectory() as tmp_root:
         src_path = os.path.join(tmp_root, 'model.yaml')
-        with open(src_path, 'w') as fp:
-            yaml.dump(header, fp)
+        write_yaml(src_path, header)
         backend.put_file(
             src_path,
             dst_path,
@@ -300,8 +304,7 @@ def put_meta(
 
     with tempfile.TemporaryDirectory() as tmp_root:
         src_path = os.path.join(tmp_root, 'meta.yaml')
-        with open(src_path, 'w') as fp:
-            yaml.dump(meta, fp)
+        write_yaml(src_path, meta)
         backend.put_file(
             src_path,
             dst_path,
@@ -391,3 +394,18 @@ def split_uid(
         version = '-'.join(tokens[1:])
 
     return short_id, version
+
+
+def write_yaml(
+    src_path: str,
+    obj: typing.Dict,
+):
+    r"""Write dictionary to YAML file."""
+    with open(src_path, 'w') as fp:
+        try:
+            yaml.dump(obj, fp)
+        except Exception:
+            raise RuntimeError(
+                f"{SERIALIZE_ERROR_MESSAGE}"
+                f"'{obj}'"
+            )

@@ -98,6 +98,16 @@ pytest.REPOSITORIES = [
 ]
 
 
+# create object that cannot be pickled
+# so it will raise an error when converted to yaml
+class CannotPickle:
+    def __getstate__(self):
+        raise Exception('cannot pickle object')
+
+
+pytest.CANNOT_PICKLE = CannotPickle()
+
+
 @pytest.fixture(scope='session', autouse=True)
 def cleanup_session():
     path = os.path.join(
