@@ -7,6 +7,13 @@ The format is based on `Keep a Changelog`_,
 and this project adheres to `Semantic Versioning`_.
 
 
+Version 1.0.1 (2021-07-23)
+--------------------------
+
+* Changed: raise error if meta or parameters cannot be serialized
+* Fixed: clean up files when :func:`audmodel.publish` is interrupted
+
+
 Version 1.0.0 (2021-07-20)
 --------------------------
 
