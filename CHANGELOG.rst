@@ -7,6 +7,14 @@ The format is based on `Keep a Changelog`_,
 and this project adheres to `Semantic Versioning`_.
 
 
+Version 1.0.2 (2021-09-14)
+--------------------------
+
+* Added: tests for Windows
+* Added: tests for macOS
+* Fixed: folder creation bug under Windows when loading a model
+
+
 Version 1.0.1 (2021-07-23)
 --------------------------
 
