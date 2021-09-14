@@ -17,6 +17,7 @@ cache:
   paths:
     - linux/
     - macos/
+    - windows/
 
 .pytest:
   script:
@@ -46,6 +47,17 @@ macos:
     - virtualenv macos/venv -p python3
     - source macos/venv/bin/activate
     - pip install --upgrade pip
+
+windows:
+  extends: .pytest
+  stage: test
+  tags:
+    - windows
+  before_script:
+    - python -V
+    - pip install virtualenv
+    - virtualenv windows\venv -p C:\Python36\python.exe
+    - .\windows\venv\Scripts\activate
 
 docs:
   extends: .pytest

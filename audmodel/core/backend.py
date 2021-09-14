@@ -69,7 +69,6 @@ def get_archive(
         )
 
         # move folder
-        audeer.mkdir(root)
         os.rename(tmp_root, root)
 
     return root

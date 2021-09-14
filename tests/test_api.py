@@ -12,8 +12,8 @@ audmodel.config.CACHE_ROOT = pytest.CACHE_ROOT
 audmodel.config.REPOSITORIES = pytest.REPOSITORIES
 
 MODEL_FILES = {
-    '1.0.0': ['test', 'sub/test'],
-    '2.0.0': ['other', 'sub/test'],
+    '1.0.0': ['test', os.path.join('sub', 'test')],
+    '2.0.0': ['other', os.path.join('sub', 'test')],
 }
 SUBGROUP = f'{pytest.ID}.load'
 

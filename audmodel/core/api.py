@@ -292,7 +292,7 @@ def load(
 
     Example:
         >>> root = load('5fbbaf38-3.0.0')
-        >>> '/'.join(root.split('/')[-2:])
+        >>> '/'.join(root.split(os.path.sep)[-2:])
         '5fbbaf38/3.0.0'
 
     """
