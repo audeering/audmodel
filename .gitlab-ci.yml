@@ -15,15 +15,10 @@ include:
 
 cache:
   paths:
-    - venv/
+    - linux/
+    - macos/
 
 .pytest:
-  before_script:
-    - python3 -V
-    - pip3 install virtualenv
-    - virtualenv venv -p python3
-    - source venv/bin/activate
-    - pip install --upgrade pip
   script:
     - pip install -r requirements.txt
     - pip install -r tests/requirements.txt
@@ -33,12 +28,24 @@ python-3.6:
   extends: .pytest
   stage: test
   image: docker.audeering.com/audeering/python-3.6:latest
+  before_script:
+    - python -V
+    - mkdir -p linux
+    - pip install virtualenv
+    - virtualenv linux/venv
+    - source linux/venv/bin/activate
 
 macos:
   extends: .pytest
   stage: test
   tags:
     - osx
+  before_script:
+    - python3 -V
+    - pip3 install virtualenv
+    - virtualenv macos/venv -p python3
+    - source macos/venv/bin/activate
+    - pip install --upgrade pip
 
 docs:
   extends: .pytest
