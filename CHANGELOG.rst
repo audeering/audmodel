@@ -7,6 +7,13 @@ The format is based on `Keep a Changelog`_,
 and this project adheres to `Semantic Versioning`_.
 
 
+Version 1.0.3 (2021-09-29)
+--------------------------
+
+* Fixed: ``audmodel.load()`` could fail when broken folders
+  loaded by older versions of ``audmodel`` were present in the cache
+
+
 Version 1.0.2 (2021-09-14)
 --------------------------
 
