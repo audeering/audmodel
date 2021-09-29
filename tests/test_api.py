@@ -140,6 +140,13 @@ def test_load(name, params, subgroup, version):
 
     uid = audmodel.uid(name, params, version, subgroup=subgroup)
 
+    # ensure it also works if we have already an existing EMPTY model folder
+
+    if version == '1.0.0':
+        root = audeer.mkdir(
+            os.path.join(audmodel.config.CACHE_ROOT, *uid.split('-'))
+        )
+
     # load from backend
 
     root = audmodel.load(uid)

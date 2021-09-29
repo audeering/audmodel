@@ -46,7 +46,7 @@ def get_archive(
         version,
     )
 
-    if not os.path.exists(root):
+    if not os.path.exists(root) or len(os.listdir(root)) == 0:
 
         tmp_root = audeer.mkdir(root + '~')
         backend, path = archive_path(short_id, version, cache_root)
@@ -68,7 +68,9 @@ def get_archive(
             verbose=verbose,
         )
 
-        # move folder
+        # move tmp folder to final destination
+        if os.path.exists(root):
+            os.rmdir(root)
         os.rename(tmp_root, root)
 
     return root
