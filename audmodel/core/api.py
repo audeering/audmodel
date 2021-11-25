@@ -138,6 +138,7 @@ def header(
         uid: str,
         *,
         cache_root: str = None,
+        verbose: bool = False,
 ) -> typing.Dict[str, typing.Any]:
     r"""Load model header.
 
@@ -145,6 +146,7 @@ def header(
         uid: unique model ID or short ID for latest version
         cache_root: cache folder where models and headers are stored.
             If not set :meth:`audmodel.default_cache_root` is used
+        verbose: show debug messages
 
     Raises:
         ConnectionError: if Artifactory is not available
@@ -170,7 +172,7 @@ def header(
     """
     cache_root = audeer.safe_path(cache_root or default_cache_root())
     short_id, version = split_uid(uid, cache_root)
-    return get_header(short_id, version, cache_root)[1]
+    return get_header(short_id, version, cache_root, verbose)[1]
 
 
 def latest_version(
@@ -305,6 +307,7 @@ def meta(
         uid: str,
         *,
         cache_root: str = None,
+        verbose: bool = False,
 ) -> typing.Dict[str, typing.Any]:
     r"""Meta information of model.
 
@@ -312,6 +315,7 @@ def meta(
         uid: unique model ID or short ID for latest version
         cache_root: cache folder where models and headers are stored.
             If not set :meth:`audmodel.default_cache_root` is used
+        verbose: show debug messages
 
     Returns:
         dictionary with meta fields
@@ -340,13 +344,14 @@ def meta(
     """
     cache_root = audeer.safe_path(cache_root or default_cache_root())
     short_id, version = split_uid(uid, cache_root)
-    return get_meta(short_id, version, cache_root)[1]
+    return get_meta(short_id, version, cache_root, verbose)[1]
 
 
 def name(
         uid: str,
         *,
         cache_root: str = None,
+        verbose: bool = False,
 ) -> str:
     r"""Name of model.
 
@@ -354,6 +359,7 @@ def name(
         uid: unique model ID or short ID for latest version
         cache_root: cache folder where models and headers are stored.
             If not set :meth:`audmodel.default_cache_root` is used
+        verbose: show debug messages
 
     Returns:
         model name
@@ -367,13 +373,14 @@ def name(
         'test'
 
     """
-    return header(uid, cache_root=cache_root)['name']
+    return header(uid, cache_root=cache_root, verbose=verbose)['name']
 
 
 def parameters(
         uid: str,
         *,
         cache_root: str = None,
+        verbose: bool = False,
 ) -> typing.Dict:
     r"""Parameters of model.
 
@@ -381,6 +388,7 @@ def parameters(
         uid: unique model ID or short ID for latest version
         cache_root: cache folder where models and headers are stored.
             If not set :meth:`audmodel.default_cache_root` is used
+        verbose: show debug messages
 
     Returns:
         model parameters
@@ -394,7 +402,7 @@ def parameters(
         {'feature': 'melspec64', 'model': 'cnn10', 'sampling_rate': 16000}
 
     """
-    return header(uid, cache_root=cache_root)['parameters']
+    return header(uid, cache_root=cache_root, verbose=verbose)['parameters']
 
 
 @audeer.deprecated_keyword_argument(
@@ -412,6 +420,7 @@ def publish(
         meta: typing.Dict[str, typing.Any] = None,
         repository: audbackend.Repository = config.REPOSITORIES[0],
         subgroup: str = None,
+        verbose: bool = False,
 ) -> str:
     r"""Zip model and publish as a new artifact.
 
@@ -459,6 +468,7 @@ def publish(
             ``subgroup=foo.bar``
             will result in
             ``com.audeering.models.foo.bar``
+        verbose: show debug messages
 
     Returns:
         unique model ID
@@ -510,8 +520,20 @@ def publish(
     )
 
     try:
-        put_header(short_id, version, header, backend)
-        put_meta(short_id, version, meta, backend)
+        put_header(
+            short_id,
+            version,
+            header,
+            backend,
+            verbose,
+        )
+        put_meta(
+            short_id,
+            version,
+            meta,
+            backend,
+            verbose,
+        )
         put_archive(
             short_id,
             version,
@@ -519,6 +541,7 @@ def publish(
             subgroup,
             root,
             backend,
+            verbose,
         )
     except Exception as ex:
         # if something goes wrong
@@ -561,6 +584,7 @@ def subgroup(
         uid: str,
         *,
         cache_root: str = None,
+        verbose: bool = False,
 ) -> str:
     r"""Subgroup of model.
 
@@ -568,6 +592,7 @@ def subgroup(
         uid: unique model ID or short ID for latest version
         cache_root: cache folder where models and headers are stored.
             If not set :meth:`audmodel.default_cache_root` is used
+        verbose: show debug messages
 
     Returns:
         model subgroup
@@ -581,7 +606,7 @@ def subgroup(
         'audmodel.docstring'
 
     """
-    return header(uid, cache_root=cache_root)['subgroup']
+    return header(uid, cache_root=cache_root, verbose=verbose)['subgroup']
 
 
 def uid(
@@ -646,6 +671,7 @@ def update_meta(
         *,
         replace: bool = False,
         cache_root: str = None,
+        verbose: bool = False,
 ) -> typing.Dict[str, typing.Any]:
     r"""Update metadata of model on backend and in cache.
 
@@ -709,6 +735,7 @@ def update_meta(
         replace: replace existing dictionary
         cache_root: cache folder where models and headers are stored.
             If not set :meth:`audmodel.default_cache_root` is used
+        verbose: show debug messages
 
     Returns:
         new meta dictionary
@@ -723,14 +750,25 @@ def update_meta(
     short_id, version = split_uid(uid, cache_root)
 
     # update metadata
-    backend, meta_backend = get_meta(short_id, version, cache_root)
+    backend, meta_backend = get_meta(
+        short_id,
+        version,
+        cache_root,
+        verbose,
+    )
     if replace:
         meta_backend = meta
     else:
         utils.update_dict(meta_backend, meta)
 
     # upload metadata
-    put_meta(short_id, version, meta_backend, backend)
+    put_meta(
+        short_id,
+        version,
+        meta_backend,
+        backend,
+        verbose,
+    )
 
     # update cache
     local_path = os.path.join(
@@ -749,12 +787,12 @@ def url(
         *,
         type: str = 'model',
         cache_root: str = None,
+        verbose: bool = False,
 ) -> str:
     r"""URL to model archive or header.
 
     Args:
         uid: unique model ID or short ID for latest version
-        header: return URL to header instead of archive
         type: return URL to specified type.
             ``'model'`` corresponds to the archive file
             storing the model,
@@ -762,6 +800,7 @@ def url(
             and ``'meta'`` to the model metadata
         cache_root: cache folder where models and headers are stored.
             If not set :meth:`audmodel.default_cache_root` is used
+        verbose: show debug messages
 
     Returns:
         URL
@@ -787,13 +826,23 @@ def url(
     short_id, version = split_uid(uid, cache_root)
 
     if type == 'model':
-        backend, path = archive_path(short_id, version, cache_root=cache_root)
+        backend, path = archive_path(
+            short_id,
+            version,
+            cache_root,
+            verbose,
+        )
         return backend.path(path, version)
     elif type == 'header':
         backend, path = header_path(short_id, version)
         return backend.path(path, version, ext=define.HEADER_EXT)
     elif type == 'meta':
-        backend, path = meta_path(short_id, version, cache_root=cache_root)
+        backend, path = meta_path(
+            short_id,
+            version,
+            cache_root,
+            verbose,
+        )
         return backend.path(path, version, ext=define.META_EXT)
     else:
         raise ValueError(
@@ -809,6 +858,7 @@ def version(
         uid: str,
         *,
         cache_root: str = None,
+        verbose: bool = False,
 ) -> str:
     r"""Version of model.
 
@@ -816,6 +866,7 @@ def version(
         uid: unique model ID or short ID for latest version
         cache_root: cache folder where models and headers are stored.
             If not set :meth:`audmodel.default_cache_root` is used
+        verbose: show debug messages
 
     Returns:
         model version
@@ -829,7 +880,7 @@ def version(
         '3.0.0'
 
     """
-    return header(uid, cache_root=cache_root)['version']
+    return header(uid, cache_root=cache_root, verbose=verbose)['version']
 
 
 def versions(

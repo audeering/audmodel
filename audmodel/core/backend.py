@@ -21,10 +21,16 @@ def archive_path(
         short_id: str,
         version: str,
         cache_root: str,
+        verbose: bool,
 ) -> typing.Tuple[audbackend.Backend, str]:
     r"""Return backend, archive path and version."""
 
-    backend, header = get_header(short_id, version, cache_root)
+    backend, header = get_header(
+        short_id,
+        version,
+        cache_root,
+        verbose,
+    )
     name = header['name']
     subgroup = header['subgroup'].split('.')
     path = backend.join(*subgroup, name, short_id + '.zip')
@@ -49,7 +55,12 @@ def get_archive(
     if not os.path.exists(root) or len(os.listdir(root)) == 0:
 
         tmp_root = audeer.mkdir(root + '~')
-        backend, path = archive_path(short_id, version, cache_root)
+        backend, path = archive_path(
+            short_id,
+            version,
+            cache_root,
+            verbose,
+        )
 
         # get archive
         src_path = path
@@ -58,6 +69,7 @@ def get_archive(
             src_path,
             dst_path,
             version,
+            verbose=verbose,
         )
 
         # extract files
@@ -92,6 +104,7 @@ def get_header(
         short_id: str,
         version: str,
         cache_root: str,
+        verbose: bool,
 ) -> typing.Tuple[audbackend.Backend, typing.Dict[str, typing.Any]]:
     r"""Return backend and header content."""
 
@@ -113,6 +126,7 @@ def get_header(
                     tmp_path,
                     version,
                     ext=define.HEADER_EXT,
+                    verbose=verbose,
                 )
                 shutil.move(tmp_path, local_path)
     except FileNotFoundError:
@@ -129,10 +143,16 @@ def get_meta(
         short_id: str,
         version: str,
         cache_root: str,
+        verbose: bool,
 ) -> (audbackend.Backend, typing.Dict[str, typing.Any]):
     r"""Return backend and metadata."""
 
-    backend, remote_path = meta_path(short_id, version, cache_root)
+    backend, remote_path = meta_path(
+        short_id,
+        version,
+        cache_root,
+        verbose,
+    )
 
     local_path = os.path.join(
         cache_root,
@@ -163,6 +183,7 @@ def get_meta(
                 tmp_path,
                 version,
                 ext=define.META_EXT,
+                verbose=verbose,
             )
             shutil.move(tmp_path, local_path)
 
@@ -227,10 +248,16 @@ def meta_path(
         short_id: str,
         version: str,
         cache_root: str,
+        verbose: bool,
 ) -> typing.Tuple[audbackend.Backend, str]:
     r"""Return backend, metadata path and version."""
 
-    backend, header = get_header(short_id, version, cache_root)
+    backend, header = get_header(
+        short_id,
+        version,
+        cache_root,
+        verbose,
+    )
     path = backend.join(
         define.UID_FOLDER,
         f'{short_id}.{define.META_EXT}',
@@ -246,6 +273,7 @@ def put_archive(
         subgroup: str,
         root: str,
         backend: audbackend.Backend,
+        verbose: bool,
 ) -> str:
     r"""Put archive to backend."""
 
@@ -258,8 +286,18 @@ def put_archive(
     with tempfile.TemporaryDirectory() as tmp_root:
         src_path = os.path.join(tmp_root, 'model.zip')
         files = utils.scan_files(root)
-        audeer.create_archive(root, files, src_path)
-        backend.put_file(src_path, dst_path, version)
+        audeer.create_archive(
+            root,
+            files,
+            src_path,
+            verbose=verbose,
+        )
+        backend.put_file(
+            src_path,
+            dst_path,
+            version,
+            verbose=verbose,
+        )
 
     return dst_path
 
@@ -269,6 +307,7 @@ def put_header(
         version: str,
         header: typing.Dict[str, typing.Any],
         backend: audbackend.Backend,
+        verbose: bool,
 ) -> str:
     r"""Put header to backend."""
 
@@ -285,6 +324,7 @@ def put_header(
             dst_path,
             version,
             ext=define.HEADER_EXT,
+            verbose=verbose,
         )
 
     return dst_path
@@ -295,6 +335,7 @@ def put_meta(
         version: str,
         meta: typing.Dict[str, typing.Any],
         backend: audbackend.Backend,
+        verbose: bool,
 ) -> str:
     r"""Put meta to backend."""
 
@@ -311,6 +352,7 @@ def put_meta(
             dst_path,
             version,
             ext=define.META_EXT,
+            verbose=verbose,
         )
 
     return dst_path
