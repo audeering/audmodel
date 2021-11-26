@@ -7,6 +7,13 @@ The format is based on `Keep a Changelog`_,
 and this project adheres to `Semantic Versioning`_.
 
 
+Version 1.0.4 (2021-11-26)
+--------------------------
+
+* Added: ``verbose`` argument to functions that interact with the backend
+* Changed: use new sphinx-audeering-theme
+
+
 Version 1.0.3 (2021-09-29)
 --------------------------
 
