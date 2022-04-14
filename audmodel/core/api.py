@@ -425,31 +425,46 @@ def publish(
     r"""Zip model and publish as a new artifact.
 
     Before publishing a model,
-    pick meaningful model ``params``, ``name``, ``subgroup``
-    values.
+    pick meaningful values for
+    ``name``,
+    ``subgroup``,
+    ``params``.
+    The following table explains
+    what the arguments should encode
+    and shows examples.
 
-    For ``name``  we recommend to encode
-    the package that was used for training,
-    e.g. ``audpann``.
+    +--------------+---------------------+--------------------------------------+
+    |              | Encodes             | Examples                             |
+    +==============+=====================+=================================++===+
+    | ``name``     |  - package          | - onnx                               |
+    |              |    used to          | - sklearn                            |
+    |              |    train/create     | - torch                              |
+    |              |    the model        |                                      |
+    +--------------+---------------------+--------------------------------------+
+    | ``subgroup`` | - project           | - ser.dimensions.wav2vec2            |
+    |              | - task the model    | - projectsmile.sex.cnn10             |
+    |              |   was trained for   |                                      |
+    |              | - model architecture|                                      |
+    +--------------+---------------------+--------------------------------------+
+    | ``params``   | - data              | - {                                  |
+    |              | - feature set       |   'data': 'msppodcast-3.3.0',        |
+    |              | - used pre-trained  |   'model': 'facebook/wav2vec2-large',|
+    |              |   model             |   'sampling_rate': 16000             |
+    |              | - sampling rate     |   }                                  |
+    |              |                     | - {                                  |
+    |              |                     |   'data': 'agender-1.1.3',           |
+    |              |                     |   'feature': 'log-melspec-64',       |
+    |              |                     |   'sampling_rate': 8000              |
+    |              |                     |   }                                  |
+    +--------------+---------------------+--------------------------------------+
 
-    For model ``params`` we recommend to encode:
-
-    * feature set
-    * model type
-    * sampling rate
-
-    For ``subgroup`` we recommend to encode:
-
-    * task the model was trained for, e.g. ``gender``
-    * maybe also project, e.g. ``projectsmile.client-tone-4``
-
-    All other details that are relevant to the model
-    can be stored as ``meta`` information, e.g.
-
-    * class names
-    * data the model was trained on
-    * frame and hop size used for feature extraction
-    * model hyper parameters
+    The ``meta`` argument encodes additional information.
+    In contrast to ``name``, ``subgroup``, ``params`` it
+    can be changed later.
+    It should be used to store informtation
+    on model hyper parameters,
+    example output,
+    and benchmark results.
 
     Args:
         root: folder with model files
@@ -481,7 +496,7 @@ def publish(
         ValueError: if subgroup is set to ``'_uid'``
         FileNotFoundError: if ``root`` folder cannot be found
 
-    """
+    """  # noqa: E501
     root = audeer.safe_path(root)
     subgroup = subgroup or ''
 
