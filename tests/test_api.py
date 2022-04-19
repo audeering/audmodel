@@ -194,6 +194,14 @@ def test_update_meta():
     meta = {'model': pytest.CANNOT_PICKLE}
     with pytest.raises(RuntimeError, match=r'Cannot serialize'):
         audmodel.update_meta(uid, meta)
+    meta = {'cnn10': {'layers': 10}}
+    original_meta = audmodel.meta(uid)
+    expected_meta = audmodel.meta(uid)
+    audmodel.core.utils.update_dict(expected_meta, meta)
+    new_meta = audmodel.update_meta(uid, meta)
+    assert new_meta == expected_meta
+    new_meta = audmodel.update_meta(uid, original_meta, replace=True)
+    assert new_meta == original_meta
 
 
 def test_url():

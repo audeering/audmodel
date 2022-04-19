@@ -794,7 +794,7 @@ def update_meta(
     with open(local_path, 'w') as fp:
         yaml.dump(header, fp)
 
-    return meta
+    return meta_backend
 
 
 def url(
