@@ -46,13 +46,11 @@ macos:
 windows:
   extends: .pytest
   stage: test
+  image: docker.audeering.com/audeering/windows-python-3.8:latest
   tags:
-    - windows
+    - docker-windows
   before_script:
     - python -V
-    - pip install virtualenv
-    - virtualenv windows\venv -p C:\Python36\python.exe
-    - .\windows\venv\Scripts\activate
 
 docs:
   extends: .pytest
