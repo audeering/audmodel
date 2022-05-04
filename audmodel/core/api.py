@@ -49,7 +49,7 @@ def author(
         RuntimeError: if model does not exist
 
     Example:
-        >>> author('5fbbaf38-3.0.0')
+        >>> author('d4e9c65b-3.0.0')
         'Calvin and Hobbes'
 
     """
@@ -76,7 +76,7 @@ def date(
         RuntimeError: if model does not exist
 
     Example:
-        >>> date('5fbbaf38-3.0.0')
+        >>> date('d4e9c65b-3.0.0')
         '1985-11-18'
 
     """
@@ -120,9 +120,9 @@ def exists(
         ConnectionError: if Artifactory is not available
 
     Example:
-        >>> exists('5fbbaf38-3.0.0')
+        >>> exists('d4e9c65b-3.0.0')
         True
-        >>> exists('5fbbaf38-9.9.9')
+        >>> exists('d4e9c65b-9.9.9')
         False
 
     """
@@ -155,17 +155,18 @@ def header(
     Returns:
         dictionary with header fields
 
-    Examples:
-        >>> d = header('5fbbaf38-3.0.0')
+    Example:
+        >>> d = header('d4e9c65b-3.0.0')
         >>> print(yaml.dump(d))
         author: Calvin and Hobbes
         date: 1985-11-18
-        name: test
+        name: torch
         parameters:
-          feature: melspec64
           model: cnn10
+          data: emodb
+          feature: melspec
           sampling_rate: 16000
-        subgroup: audmodel.docstring
+        subgroup: audmodel.dummy.cnn
         version: 3.0.0
         <BLANKLINE>
 
@@ -191,9 +192,9 @@ def latest_version(
         RuntimeError: if model does not exist
 
     Example:
-        >>> latest_version('5fbbaf38')
+        >>> latest_version('d4e9c65b')
         '3.0.0'
-        >>> latest_version('5fbbaf38-1.0.0')
+        >>> latest_version('d4e9c65b-1.0.0')
         '3.0.0'
 
     """
@@ -231,18 +232,18 @@ def legacy_uid(
         unique model ID
 
     Example:
-
         >>> legacy_uid(
         ...     'test',
         ...     {
-        ...         'sampling_rate': 16000,
-        ...         'feature': 'melspec64',
         ...         'model': 'cnn10',
+        ...         'data': 'emodb',
+        ...         'feature': 'melspec',
+        ...         'sampling_rate': 16000,
         ...     },
-        ...     subgroup='audmodel.docstring',
+        ...     subgroup='audmodel.dummy.cnn',
         ...     version='1.0.0',
         ... )
-        '3a117099-8039-ab5e-b834-ae16dafdaf42'
+        '65206614-dbb7-d61a-b00c-153db7b525c0'
 
     """
     group_id = f'com.audeering.models.{name}' if subgroup is None \
@@ -293,9 +294,9 @@ def load(
         RuntimeError: if model does not exist
 
     Example:
-        >>> root = load('5fbbaf38-3.0.0')
+        >>> root = load('d4e9c65b-3.0.0')
         >>> '/'.join(root.split(os.path.sep)[-2:])
-        '5fbbaf38/3.0.0'
+        'd4e9c65b/3.0.0'
 
     """
     cache_root = audeer.safe_path(cache_root or default_cache_root())
@@ -325,20 +326,21 @@ def meta(
         RuntimeError: if model does not exist
 
     Example:
-        >>> d = meta('5fbbaf38-3.0.0')
+        >>> d = meta('d4e9c65b-3.0.0')
         >>> print(yaml.dump(d))
         data:
           emodb:
-            version: 1.1.1
-            format: wav
-            mixdown: true
-        melspec64:
-          win_dur: 32ms
-          hop_dur: 10ms
-          num_fft: 512
-        cnn10:
-          learning-rate: 0.01
-          optimizer: adam
+            version: 1.2.0
+        feature:
+          melspec:
+            win_dur: 32ms
+            hop_dur: 10ms
+            num_fft: 512
+            mel_bins: 64
+        model:
+          cnn10:
+            learning-rate: 0.01
+            optimizer: adam
         <BLANKLINE>
 
     """
@@ -369,8 +371,8 @@ def name(
         RuntimeError: if model does not exist
 
     Example:
-        >>> name('5fbbaf38-3.0.0')
-        'test'
+        >>> name('d4e9c65b-3.0.0')
+        'torch'
 
     """
     return header(uid, cache_root=cache_root, verbose=verbose)['name']
@@ -398,10 +400,10 @@ def parameters(
         RuntimeError: if model does not exist
 
     Example:
-        >>> parameters('5fbbaf38-3.0.0')
-        {'feature': 'melspec64', 'model': 'cnn10', 'sampling_rate': 16000}
+        >>> parameters('d4e9c65b-3.0.0')
+        {'model': 'cnn10', 'data': 'emodb', 'feature': 'melspec', 'sampling_rate': 16000}
 
-    """
+    """  # noqa: E501
     return header(uid, cache_root=cache_root, verbose=verbose)['parameters']
 
 
@@ -442,18 +444,19 @@ def publish(
     |              |    the model        |                                      |
     +--------------+---------------------+--------------------------------------+
     | ``subgroup`` | - project           | - ser.dimensions.wav2vec2            |
-    |              | - task the model    | - projectsmile.sex.cnn10             |
+    |              | - task the model    | - projectsmile.sex.cnn               |
     |              |   was trained for   |                                      |
     |              | - model architecture|                                      |
     +--------------+---------------------+--------------------------------------+
-    | ``params``   | - data              | - {                                  |
-    |              | - feature set       |   'data': 'msppodcast-3.3.0',        |
-    |              | - used pre-trained  |   'model': 'facebook/wav2vec2-large',|
-    |              |   model             |   'sampling_rate': 16000             |
-    |              | - sampling rate     |   }                                  |
+    | ``params``   | - model             | - {                                  |
+    |              | - data              |   'model': 'facebook/wav2vec2-large',|
+    |              | - feature set       |   'data': 'msppodcast',              |
+    |              | - sampling rate     |   'sampling_rate': 16000             |
+    |              |                     |   }                                  |
     |              |                     | - {                                  |
-    |              |                     |   'data': 'agender-1.1.3',           |
-    |              |                     |   'feature': 'log-melspec-64',       |
+    |              |                     |   'model': 'cnn10',                  |
+    |              |                     |   'data': ['agender', 'emodb'],      |
+    |              |                     |   'feature': 'log-melspec',          |
     |              |                     |   'sampling_rate': 8000              |
     |              |                     |   }                                  |
     +--------------+---------------------+--------------------------------------+
@@ -461,10 +464,24 @@ def publish(
     The ``meta`` argument encodes additional information.
     In contrast to ``name``, ``subgroup``, ``params`` it
     can be changed later.
-    It should be used to store informtation
-    on model hyper parameters,
+    It should be used to extend information
+    of the ``params`` entries
+    using the same keys.
+    In addition,
+    it can store
     example output,
     and benchmark results.
+    For example,
+    a ``meta`` entry
+    corresponding to the first ``params`` from the table
+    might contain:
+
+    .. code-block::
+
+        {
+            'model': {'facebook/wav2vec2-large': {'layers': 24}},
+            'data': {'msppodcast': {'version': '2.6.0'}},
+        }
 
     Args:
         root: folder with model files
@@ -495,6 +512,56 @@ def publish(
             cannot be serialized to a YAML file
         ValueError: if subgroup is set to ``'_uid'``
         FileNotFoundError: if ``root`` folder cannot be found
+
+    Example:
+        >>> # Assuming your model files are stored under `model_root`
+        >>> # and your repository is given by `repository`
+        >>> # (which you usually don't specify, but use its default value)
+        >>> import datetime
+        >>> name = 'torch'
+        >>> subgroup = 'audmodel.dummy.cnn'
+        >>> version = '4.0.0'
+        >>> author = 'Calvin and Hobbes'
+        >>> data = datetime.date(1985, 11, 18)
+        >>> params = {
+        ...     'model': 'cnn10',
+        ...     'data': 'emodb',
+        ...     'feature': 'melspec',
+        ...     'sampling_rate': 16000,
+        ... }
+        >>> meta = {
+        ...     'model': {
+        ...         'cnn10': {
+        ...             'learning-rate': 1e-4,
+        ...             'optimizer': 'sgd',
+        ...         },
+        ...     },
+        ...     'data': {
+        ...         'emodb': {
+        ...             'version': '1.2.0',
+        ...         },
+        ...     },
+        ...     'feature': {
+        ...         'melspec': {
+        ...             'win_dur': '32ms',
+        ...             'hop_dur': '10ms',
+        ...             'num_fft': 512,
+        ...             'mel_bins': 64,
+        ...         },
+        ...    },
+        ... }
+        >>> publish(
+        ...     model_root,
+        ...     name,
+        ...     params,
+        ...     version,
+        ...     author=author,
+        ...     date=date,
+        ...     meta=meta,
+        ...     subgroup=subgroup,
+        ...     repository=repository,
+        ... )
+        'd4e9c65b-4.0.0'
 
     """  # noqa: E501
     root = audeer.safe_path(root)
@@ -617,8 +684,8 @@ def subgroup(
         RuntimeError: if model does not exist
 
     Example:
-        >>> subgroup('5fbbaf38-3.0.0')
-        'audmodel.docstring'
+        >>> subgroup('d4e9c65b-3.0.0')
+        'audmodel.dummy.cnn'
 
     """
     return header(uid, cache_root=cache_root, verbose=verbose)['subgroup']
@@ -651,26 +718,28 @@ def uid(
 
     Example:
         >>> uid(
-        ...     'test',
+        ...     'torch',
         ...     {
-        ...         'sampling_rate': 16000,
-        ...         'feature': 'melspec64',
         ...         'model': 'cnn10',
+        ...         'data': 'emodb',
+        ...         'feature': 'melspec',
+        ...         'sampling_rate': 16000,
         ...     },
-        ...     subgroup='audmodel.docstring',
+        ...     subgroup='audmodel.dummy.cnn',
         ... )
-        '5fbbaf38'
+        'd4e9c65b'
         >>> uid(
-        ...     'test',
+        ...     'torch',
         ...     {
-        ...         'sampling_rate': 16000,
-        ...         'feature': 'melspec64',
         ...         'model': 'cnn10',
+        ...         'data': 'emodb',
+        ...         'feature': 'melspec',
+        ...         'sampling_rate': 16000,
         ...     },
         ...     version='3.0.0',
-        ...     subgroup='audmodel.docstring',
+        ...     subgroup='audmodel.dummy.cnn',
         ... )
-        '5fbbaf38-3.0.0'
+        'd4e9c65b-3.0.0'
 
     """
     sid = utils.short_id(name, params, subgroup)
@@ -696,54 +765,6 @@ def update_meta(
     adds missing fields,
     but keeps all existing fields.
 
-    For instance, updating:
-
-    .. code-block::
-
-        {
-            'data': {
-                'emodb': {
-                    'version': '1.0.0',
-                    'format': 'wav',
-                },
-            },
-        }
-
-    with:
-
-    .. code-block::
-
-        {
-            'data': {
-                'emodb': {
-                    'version': '2.0.0',
-                },
-                'myai': {
-                    'version': '1.0.0',
-                    'format': 'wav',
-                }
-            },
-            'loss': 'ccc',
-        }
-
-    results in:
-
-    .. code-block::
-
-        {
-            'data': {
-                'emodb': {
-                    'version': '2.0.0',
-                    'format': 'wav',
-                },
-                'myai': {
-                    'version': '1.0.0',
-                    'format': 'wav',
-                }
-            },
-            'loss': 'ccc',
-        }
-
     Args:
         uid: unique model ID or short ID for latest version
         meta: dictionary with meta information
@@ -759,6 +780,36 @@ def update_meta(
         ConnectionError: if Artifactory is not available
         RuntimeError: if model does not exist
         RuntimeError: if ``meta`` cannot be serialized to a YAML file
+
+    Example:
+        >>> meta = {
+        ...     'model': {
+        ...         'cnn10': {'layers': 10},
+        ...     },
+        ... }
+        >>> d = update_meta('d4e9c65b-3.0.0', meta)
+        >>> print(yaml.dump(d))
+        data:
+          emodb:
+            version: 1.2.0
+        feature:
+          melspec:
+            win_dur: 32ms
+            hop_dur: 10ms
+            num_fft: 512
+            mel_bins: 64
+        model:
+          cnn10:
+            learning-rate: 0.01
+            optimizer: adam
+            layers: 10
+        <BLANKLINE>
+        >>> d = update_meta('d4e9c65b-3.0.0', meta, replace=True)
+        >>> print(yaml.dump(d))
+        model:
+          cnn10:
+            layers: 10
+        <BLANKLINE>
 
     """
     cache_root = audeer.safe_path(cache_root or default_cache_root())
@@ -826,15 +877,15 @@ def url(
         ValueError: if wrong ``type`` is given
 
     Example:
-        >>> path = url('5fbbaf38-3.0.0')
+        >>> path = url('d4e9c65b-3.0.0')
         >>> os.path.basename(path)
-        '5fbbaf38-3.0.0.zip'
-        >>> path = url('5fbbaf38-3.0.0', type='header')
+        'd4e9c65b-3.0.0.zip'
+        >>> path = url('d4e9c65b-3.0.0', type='header')
         >>> os.path.basename(path)
-        '5fbbaf38-3.0.0.header.yaml'
-        >>> path = url('5fbbaf38-3.0.0', type='meta')
+        'd4e9c65b-3.0.0.header.yaml'
+        >>> path = url('d4e9c65b-3.0.0', type='meta')
         >>> os.path.basename(path)
-        '5fbbaf38-3.0.0.meta.yaml'
+        'd4e9c65b-3.0.0.meta.yaml'
 
     """
     cache_root = audeer.safe_path(cache_root or default_cache_root())
@@ -891,7 +942,7 @@ def version(
         RuntimeError: if model does not exist
 
     Example:
-        >>> version('5fbbaf38-3.0.0')
+        >>> version('d4e9c65b-3.0.0')
         '3.0.0'
 
     """
@@ -918,10 +969,10 @@ def versions(
         RuntimeError: if model does not exist
 
     Example:
-        >>> versions('5fbbaf38')
-        ['1.0.0', '2.0.0', '3.0.0']
-        >>> versions('5fbbaf38-2.0.0')
-        ['1.0.0', '2.0.0', '3.0.0']
+        >>> versions('d4e9c65b')
+        ['1.0.0', '2.0.0', '3.0.0', '4.0.0']
+        >>> versions('d4e9c65b-2.0.0')
+        ['1.0.0', '2.0.0', '3.0.0', '4.0.0']
 
     """
     cache_root = audeer.safe_path(cache_root or default_cache_root())

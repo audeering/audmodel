@@ -16,6 +16,13 @@ pytest.ROOT = audeer.mkdir(
     )
 )
 
+pytest.NAME = 'torch'
+pytest.PARAMS = {
+    'model': 'cnn10',
+    'data': 'emodb',
+    'feature': 'melspec',
+    'sampling_rate': 16000,
+}
 pytest.AUTHOR = 'Calvin and Hobbes'
 pytest.CACHE_ROOT = os.path.join(pytest.ROOT, 'cache')
 pytest.DATE = datetime.date(1985, 11, 18)
@@ -24,66 +31,63 @@ pytest.ID = audeer.uid()
 pytest.META = {
     '1.0.0': {
         'data': {
-            'emodb': {
-                'version': '1.0.0',
-                'format': 'wav',
-                'mixdown': True,
-            }
+            'emodb': {'version': '1.2.0'},
         },
-        'melspec64': {
-            'win_dur': '32ms',
-            'hop_dur': '10ms',
-            'num_fft': 512,
+        'feature': {
+            'melspec': {
+                'win_dur': '32ms',
+                'hop_dur': '10ms',
+                'num_fft': 512,
+                'mel_bins': 64,
+            },
         },
-        'cnn10': {
-            'learning-rate': 1e-3,
-            'optimizer': 'sgd',
-        }
+        'model': {
+            'cnn10': {
+                'learning-rate': 1e-3,
+                'optimizer': 'sgd',
+            },
+        },
     },
     '2.0.0': {
         'data': {
-            'emodb': {
-                'version': '1.1.1',
-                'format': 'wav',
-                'mixdown': True,
-            }
+            'emodb': {'version': '1.2.0'},
         },
-        'melspec64': {
-            'win_dur': '32ms',
-            'hop_dur': '10ms',
-            'num_fft': 512,
+        'feature': {
+            'melspec': {
+                'win_dur': '64ms',
+                'hop_dur': '32ms',
+                'num_fft': 1024,
+                'mel_bins': 64,
+            },
         },
-        'cnn10': {
-            'learning-rate': 1e-3,
-            'optimizer': 'sgd',
-        }
+        'model': {
+            'cnn10': {
+                'learning-rate': 1e-3,
+                'optimizer': 'sgd',
+            },
+        },
     },
     '3.0.0': {
         'data': {
-            'emodb': {
-                'version': '1.1.1',
-                'format': 'wav',
-                'mixdown': True,
-            }
+            'emodb': {'version': '1.2.0'},
         },
-        'melspec64': {
-            'win_dur': '32ms',
-            'hop_dur': '10ms',
-            'num_fft': 512,
+        'feature': {
+            'melspec': {
+                'win_dur': '32ms',
+                'hop_dur': '10ms',
+                'num_fft': 512,
+                'mel_bins': 64,
+            },
         },
-        'cnn10': {
-            'learning-rate': 1e-2,
-            'optimizer': 'adam',
-        }
-    }
+        'model': {
+            'cnn10': {
+                'learning-rate': 1e-2,
+                'optimizer': 'adam',
+            },
+        },
+    },
 }
 pytest.MODEL_ROOT = audeer.mkdir(os.path.join(pytest.ROOT, pytest.ID, 'model'))
-pytest.NAME = 'test'
-pytest.PARAMS = {
-    'feature': 'melspec64',
-    'model': 'cnn10',
-    'sampling_rate': 16000,
-}
 pytest.REPOSITORIES = [
     audbackend.Repository(
         'repo1',
