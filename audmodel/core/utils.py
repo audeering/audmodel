@@ -77,7 +77,7 @@ def update_dict(
     for k, v in d_src.items():
         if (k in d_dst)\
                 and (isinstance(d_dst[k], dict)) \
-                and (isinstance(d_src[k], collections.Mapping)):
+                and (isinstance(d_src[k], collections.abc.Mapping)):
             update_dict(d_dst[k], d_src[k])
         else:
             d_dst[k] = d_src[k]
