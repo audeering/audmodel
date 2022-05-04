@@ -1,9 +1,6 @@
 Usage
 =====
 
-.. Preload some data to avoid stderr print outs from tqdm,
-.. but still avoid using the verbose=False flag later on
-
 .. jupyter-execute::
     :stderr:
     :hide-output:
@@ -12,8 +9,12 @@ Usage
     import os
     import glob
 
-    def create_model(name, files):
-        root = os.path.join(ROOT, 'models', name)
+    import audeer
+    import audmodel
+
+
+    def create_model(name, files, root):
+        root = os.path.join(root, name)
         audeer.mkdir(root)
         for file in files:
             path = os.path.join(root, file)
@@ -21,6 +22,7 @@ Usage
             with open(path, 'w'):
                 pass
         return root
+
 
     def show_model(path):
         path = audeer.safe_path(path)
@@ -33,80 +35,23 @@ Usage
                 print('{}{}'.format(subindent, f))
 
 
-To avoid publishing the
-following examples on Artifactory,
-we replace the default backend
-with a folder on the local file system.
-
-.. jupyter-execute::
-
-    import audbackend
-    import audeer
-    import audmodel
-
-
-    ROOT = audeer.mkdir('./docs/tmp')
-    repository = audbackend.Repository(
-        'models',
-        ROOT,
-        'file-system',
-    )
-    audmodel.config.REPOSITORIES = [repository]
-    audmodel.config.CACHE_ROOT = os.path.join(
-        ROOT,
-        'cache',
-    )
+    cache_dir = audeer.mkdir('./tmp/cache')
+    model_dir = audeer.mkdir('./tmp/models')
+    audmodel.config.CACHE_ROOT = cache_dir
 
 
 Introduction
 ------------
 
 :mod:`audmodel` is a versatile tool
-that
-
-* **publishes** models on Artifactory_
-* **loads** models from Artifactory_
-* tags models with **parameters**
-  (e.g. the sampling rate it was trained on)
-
-:mod:`audmodel` assumes
-a model consists of file(s)
-stored in a local folder,
-e.g:
-
-.. code-block::
-
-    <root>/
-        file.yaml
-        file.txt
-        bin/
-            another-file.pkl
-
-In addition,
-a dictionary holding the parameters
-needs to be passed, e.g.:
-
-.. code-block:: python
-
-    params = {
-        'feature': 'melspec64',
-        'model': 'cnn10',
-        'sampling_rate': 16000,
-    }
-
-When publishing the model,
-:mod:`audmodel`
-
-1. creates a unique ``<id>``
-2. publishes model header as artifact ``<id>-<version>.yaml``
-3. zips the model folder and publishes it as artifact ``<id>-<version>.zip``
-
-When downloading the model,
-:mod:`audmodel`
-
-1. requests the ``<id>`` on Artifactory_
-2. downloads the artifact ``<id>-<version>.zip``
-3. unpacks the archive to the local model cache folder
+to **publish**,
+**load**,
+and tag
+machine learning models
+with **parameters**,
+(e.g. data and sampling rate),
+and **metadata**
+(e.g. hyperparameter).
 
 
 Publish a model
@@ -118,77 +63,103 @@ consisting of the following files:
 .. jupyter-execute::
     :hide-code:
 
-    files = ['meta.yaml', 'network.txt', 'bin/weights_v1.pkl']
-    root_v1 = create_model('cnn-v1', files)
+    files = [
+        'model.yaml',
+        'model.onnx',
+        'readme.txt',
+        'log/eval.yaml',
+    ]
+    root_v1 = create_model('root_v1', files, model_dir)
     show_model(root_v1)
 
 Before we can publish a model,
 we have to define several arguments:
 
-* ``author``, name of the author
-* ``name``, name of the model, e.g ``cnn``
-* ``meta``, dictionary with meta information
+* ``name``, name of the model, e.g ``onnx``
 * ``params``, parameters of the model
-* ``subgroup``, subgroup of the model, e.g. ``emotion.onnx``
 * ``version``, version of the model, e.g. ``1.0.0``
+* ``author``, name of the author
+* ``meta``, dictionary with meta information
+* ``subgroup``, subgroup of the model, e.g. ``emotion.cnn``
 
 For a discussion on how to select those arguments,
 have a look at the discussion in the API documentation of
 :func:`audmodel.publish`.
 
-Let's define the four arguments for our example model:
+Let's define the arguments for our example model:
 
 .. jupyter-execute::
 
-    author='sphinx'
-    name = 'cnn'
-    meta_v1 = {
-        'data': {
-            'emodb': {
-                'version': '1.1.1',
-                'format': 'wav',
-                'mixdown': True,
-            }
-        },
-        'melspec64': {
-            'win_dur': '32ms',
-            'hop_dur': '10ms',
-            'num_fft': 512,
-        },
-        'cnn10': {
-            'learning-rate': 1e-2,
-            'optimizer': 'adam',
-        }
-    }
+    name = 'onnx'
     params = {
-        'feature': 'melspec64',
         'model': 'cnn10',
+        'data': ['emodb', 'msppodcast'],
+        'feature': 'melspec',
         'sampling_rate': 16000,
     }
-    subgroup = 'emotion.onnx'
     version = '1.0.0'
+    author='sphinx'
+    meta = {
+        'model': {
+            'cnn10': {
+                'learning-rate': 1e-2,
+                'optimizer': 'adam',
+            },
+        },
+        'data': {
+            'emodb': {'version': '1.1.1'},
+            'msppodcast': {'version': '2.6.0'},
+        },
+        'feature': {
+            'melspec': {
+                'win_dur': '32ms',
+                'hop_dur': '10ms',
+                'mel_bins': 64,
+            },
+        },
+    }
+    subgroup = 'emotion.cnn'
+
+Per default :mod:`audmodel` uses a repository
+on our internal Artifactory_ server,
+and you don't have to care about it.
+For this example
+we don't want to interfere with Artifactory_
+and create a local temporary repository
+in which the model is stored.
+
+.. jupyter-execute::
+
+    import audbackend
+    import audeer
+    import audmodel
+
+    repo_dir = audeer.mkdir('./tmp/repo')
+    repository = audbackend.Repository('models', repo_dir, 'file-system')
+    audmodel.config.REPOSITORIES = [repository]
+
+
 
 Now we can publish the model with
 
 .. jupyter-execute::
 
     uid = audmodel.publish(
+        root_v1,
+        name,
+        params,
+        version,
         author=author,
-        name=name,
-        meta=meta_v1,
-        params=params,
-        repository=repository,
-        root=root_v1,
+        meta=meta,
         subgroup=subgroup,
-        version=version,
+        repository=repository,
     )
     uid
 
 The publishing process returns a unique model ID,
 that can be used to access the model.
 The model ID is derived from
-``name``, ``params``, ``subgroup``, ``version``
-and can always be used to safely identify a model.
+``name``, ``params``, ``subgroup``, ``version``.
 
 
 Load a model
@@ -200,33 +171,53 @@ With the model ID we can check if a model exists:
 
     audmodel.exists(uid)
 
-Or get information, about its name, parameters or meta fields:
+Or get its name,
 
 .. jupyter-execute::
 
     audmodel.name(uid)
 
+parameters,
+
 .. jupyter-execute::
 
     audmodel.parameters(uid)
+
+and meta fields.
 
 .. jupyter-execute::
 
     audmodel.meta(uid)
 
-To actually load the actual model, we do
+To actually load the actual model, we do:
 
 .. jupyter-execute::
 
     model_root = audmodel.load(uid)
+
+Inside the :file:`model_root` folder
+we will then have the following structure.
+
+.. jupyter-execute::
+    :hide-code:
+
     show_model(model_root)
 
 
-Publish another model
+Publish a new version
 ---------------------
 
-Let's assume our published model wasn't very successful.
-Hence, we decide to train the model on more data.
+When making only minor changes to the model
+that does not affect any of its parameters,
+we can publish a new version of the model
+and update only the ``meta`` entry.
+As an example,
+let's assume we switch to less Mel frequency bins
+in the feature extractor.
+
+.. jupyter-execute::
+
+    meta['feature']['melspec']['mel_bins'] = 32
 
 Let's again assume we have a model folder,
 this time called ``root_v2``:
@@ -234,34 +225,24 @@ this time called ``root_v2``:
 .. jupyter-execute::
     :hide-code:
 
-    files = ['meta.yaml', 'network.txt', 'bin/weights_v2.pkl']
-    root_v2 = create_model('cnn-v2', files)
+    root_v2 = create_model('root_v2', files, model_dir)
     show_model(root_v2)
 
-We include information about the new data
-in the meta dictionary:
-
-.. jupyter-execute::
-
-    meta_v2 = meta_v1.copy()
-    meta_v2['data']['msppodcast'] = {
-        'version': '2.3.0',
-        'format': 'wav',
-        'mixdown': True,
-    }
-
-And publish it with
+As this model has the same parameters, name, and subgroup
+as our previous model,
+we choose a new version number,
+and publish it with:
 
 .. jupyter-execute::
 
     uid = audmodel.publish(
-        name=name,
-        meta=meta_v2,
-        params=params,
-        repository=repository,
-        root=root_v2,
+        root_v2,
+        name,
+        params,
+        '2.0.0',
+        meta=meta,
         subgroup=subgroup,
-        version='2.0.0',
+        repository=repository,
     )
     uid
 
@@ -294,15 +275,8 @@ this even works with nested fields.
 .. jupyter-execute::
 
     meta = {
-        'data': {
-            'msppodcast': {
-                'version': '2.3.1',  # fix version
-            },
-            'myai': {                # include another database
-                'version': '1.0.0',
-                'format': 'wav',
-                'mixdown': True,
-            },
+        'model': {
+            'cnn10': {'layers': 10},
         },
     }
     audmodel.update_meta(uid, meta)
@@ -322,13 +296,18 @@ Cache folder
 ------------
 
 Models are unpacked to the model cache folder,
-which can be checked by...
+which can be checked by:
 
 .. jupyter-execute::
 
-    audmodel.default_cache_root()
+    cache_root = audmodel.default_cache_root()
+    cache_root
 
-You can change the location of the cache folder
+.. jupyter-execute::
+
+    audeer.list_dir_names(cache_root, basenames=True)
+
+We can change the location of the cache folder
 by setting an environment variable:
 
 .. code-block:: bash
@@ -343,21 +322,17 @@ Or by changing it inside :class:`audmodel.config`:
 
 Or individually,
 by calling :func:`audmodel.load`
-with a non empty ``root`` argument.
+with a non empty ``cache_root`` argument.
 
 Within the model cache folder
 the model is placed in a unique sub-folder, namely
-``com/audeering/models/<subgroup>/<name>/<uid>/<version>``.
+``<uid>/<version>``.
 
 
 .. jupyter-execute::
     :hide-code:
 
-    import shutil
+    audeer.rmdir('./tmp')
 
 
-    shutil.rmtree(ROOT)
-
-
-.. _Artifactory:
-    https://artifactory.audeering.com/
+.. _Artifactory: https://artifactory.audeering.com/
