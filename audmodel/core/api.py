@@ -479,7 +479,7 @@ def publish(
     and benchmark results.
     For example,
     a ``meta`` entry
-    corresponding to the first ``params`` from the table
+    corresponding to the first ``params`` example from the table
     might contain:
 
     .. code-block::
