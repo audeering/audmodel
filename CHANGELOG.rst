@@ -7,6 +7,15 @@ The format is based on `Keep a Changelog`_,
 and this project adheres to `Semantic Versioning`_.
 
 
+Version 1.0.6 (2022-05-05)
+--------------------------
+
+* Changed: update naming conventions for publishing a model
+* Changed: add docstring examples for all API functions
+* Fixed: ``audmodel.update_meta()`` does now return the updated metadata
+  dictionary
+
+
 Version 1.0.5 (2021-12-30)
 --------------------------
 
