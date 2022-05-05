@@ -101,6 +101,12 @@ def default_cache_root() -> str:
     Returns:
         path to model cache
 
+    Example:
+        >>> import audeer
+        >>> cache_root = default_cache_root()
+        >>> audeer.list_dir_names(cache_root, basenames=True)
+        ['d4e9c65b']
+
     """
     return os.environ.get('AUDMODEL_CACHE_ROOT') or config.CACHE_ROOT
 
