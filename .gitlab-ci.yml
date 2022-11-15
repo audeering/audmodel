@@ -34,7 +34,7 @@ macos:
   extends: .pytest
   stage: test
   tags:
-    - osx
+    - os-macos
   before_script:
     - python3 -V
     - rm -rf venv
