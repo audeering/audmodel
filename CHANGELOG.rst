@@ -7,6 +7,13 @@ The format is based on `Keep a Changelog`_,
 and this project adheres to `Semantic Versioning`_.
 
 
+Version 1.0.7 (2023-01-04)
+--------------------------
+
+* Changed: split API documentation into sub-pages
+  for each function/class
+
+
 Version 1.0.6 (2022-05-05)
 --------------------------
 
