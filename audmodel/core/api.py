@@ -662,7 +662,7 @@ def publish(
             raise ex
         else:  # pragma: no cover
             raise RuntimeError(
-                f'Could not publish model due to an unexpected error.'
+                'Could not publish model due to an unexpected error.'
             )
 
     return uid

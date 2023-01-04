@@ -8,14 +8,11 @@ variables:
   ARTIFACTORY_GROUPS: "readers,deployers"
   ARTIFACTORY_TOKEN_VARS: "ARTIFACTORY_API_KEY,TWINE_PASSWORD"
   ARTIFACTORY_USERNAME_VARS: "ARTIFACTORY_USERNAME,TWINE_USERNAME"
+  PRE_COMMIT_HOME: "$CI_PROJECT_DIR/.cache/pre-commit"
 
 include:
   - project: 'devops/artifactory-token-helper'
     file: '/.gitlab-ci-artifactory-token.yml'
-
-cache:
-  paths:
-    - windows/
 
 .pytest:
   script:
@@ -23,14 +20,14 @@ cache:
     - pip install -r tests/requirements.txt
     - python -m pytest
 
-python-3.8:
+linux-python3.8:
   extends: .pytest
   stage: test
   image: docker.audeering.com/audeering/python-3.8:latest
   before_script:
     - python -V
 
-macos:
+macos-python3.8:
   extends: .pytest
   stage: test
   tags:
@@ -43,7 +40,7 @@ macos:
     - source venv/bin/activate
     - pip install --upgrade pip
 
-windows:
+windows-python3.8:
   extends: .pytest
   stage: test
   image: docker.audeering.com/audeering/windows-python-3.8:latest
@@ -51,6 +48,19 @@ windows:
     - docker-windows
   before_script:
     - python -V
+
+flake8:
+  stage: test
+  image: docker.audeering.com/audeering/python-3.8:latest
+  before_script:
+    - pip install pre-commit
+    - pre-commit install --install-hooks
+  script:
+    - pre-commit run --all-files
+  cache:
+    key: pre-commit
+    paths:
+      - .cache/pre-commit
 
 docs:
   extends: .pytest

@@ -6,10 +6,9 @@ request`_ . If you find errors, omissions, inconsistencies or other thingsh
 that need improvement, please create an issue_.
 Contributions are always welcome!
 
-.. _issue:
-    https://gitlab.audeering.com/tools/audmodel/issues/new?issue%5BD=
-.. _merge request:
-    https://gitlab.audeering.com/tools/audmodel/merge_requests/new
+.. _issue: https://gitlab.audeering.com/tools/audmodel/issues/new?issue%5BD=
+.. _merge request: https://gitlab.audeering.com/tools/audmodel/merge_requests/new
+
 
 Development Installation
 ------------------------
@@ -27,6 +26,40 @@ newest development version from Gitlab_::
 This way, your installation always stays up-to-date, even if you pull new
 changes from the Gitlab repository.
 
+
+Coding Convention
+-----------------
+
+We follow the PEP8_ convention for Python code
+and check for correct syntax with flake8_.
+Exceptions are defined under the ``[flake8]`` section
+in :file:`setup.cfg`.
+
+The checks are executed in the CI using `pre-commit`_.
+You can enable those checks locally by executing::
+
+    pip install pre-commit  # consider system wide installation
+    pre-commit install
+    pre-commit run --all-files
+
+Afterwards flake8_ is executed
+every time you create a commit.
+
+You can also install flake8_
+and call it directly::
+
+    pip install flake8  # consider system wide installation
+    flake8
+
+It can be restricted to specific folders::
+
+    flake8 audfoo/ tests/
+
+.. _PEP8: http://www.python.org/dev/peps/pep-0008/
+.. _flake8: https://flake8.pycqa.org/en/latest/index.html
+.. _pre-commit: https://pre-commit.com
+
+
 Building the Documentation
 --------------------------
 
@@ -43,25 +76,12 @@ To create the HTML pages, use::
 
 The generated files will be available in the directory ``build/sphinx/html/``.
 
-.. Note::
-
-    During the default building of the documentation
-    Jupyter notebooks are not executed to save time.
-
-To execute the notebooks as well, copy and paste
-the following into your terminal and press the enter key::
-
-    python -m sphinx -W docs/ \
-        -D nbsphinx_execute='always' \
-        -d build/sphinx/doctrees \
-        build/sphinx/html \
-        -b html
-
 It is also possible to automatically check if all links are still valid::
 
     python -m sphinx docs/ build/sphinx/linkcheck -b linkcheck
 
 .. _Sphinx: http://sphinx-doc.org/
+
 
 Running the Tests
 -----------------
@@ -78,12 +98,11 @@ To execute the tests, simply run::
 To run the tests on the Gitlab CI server,
 contributors have to make sure
 they have an existing ``artifactory-tokenizer`` repository
-with the content described in the `Artifactory tokenizer example`_.
+with the content described in the `Artifactory tokenizer documentation`_.
 
-.. _pytest:
-    https://pytest.org/
-.. _Artifactory tokenizer example:
-    http://devops.pp.audeering.com/focustalks/2019-focustalk-artifactory-security/#tokenizer-example
+.. _pytest: https://pytest.org/
+.. _Artifactory tokenizer documentation: https://gitlab.audeering.com/devops/artifactory/-/tree/master/token
+
 
 Creating a New Release
 ----------------------
