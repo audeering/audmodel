@@ -48,7 +48,7 @@ def author(
         ConnectionError: if Artifactory is not available
         RuntimeError: if model does not exist
 
-    Example:
+    Examples:
         >>> author('d4e9c65b-3.0.0')
         'Calvin and Hobbes'
 
@@ -75,7 +75,7 @@ def date(
         ConnectionError: if Artifactory is not available
         RuntimeError: if model does not exist
 
-    Example:
+    Examples:
         >>> date('d4e9c65b-3.0.0')
         '1985-11-18'
 
@@ -101,7 +101,7 @@ def default_cache_root() -> str:
     Returns:
         path to model cache
 
-    Example:
+    Examples:
         >>> import audeer
         >>> cache_root = default_cache_root()
         >>> audeer.list_dir_names(cache_root, basenames=True)
@@ -125,7 +125,7 @@ def exists(
     Raises:
         ConnectionError: if Artifactory is not available
 
-    Example:
+    Examples:
         >>> exists('d4e9c65b-3.0.0')
         True
         >>> exists('d4e9c65b-9.9.9')
@@ -161,7 +161,7 @@ def header(
     Returns:
         dictionary with header fields
 
-    Example:
+    Examples:
         >>> d = header('d4e9c65b-3.0.0')
         >>> print(yaml.dump(d))
         author: Calvin and Hobbes
@@ -197,7 +197,7 @@ def latest_version(
         ConnectionError: if Artifactory is not available
         RuntimeError: if model does not exist
 
-    Example:
+    Examples:
         >>> latest_version('d4e9c65b')
         '3.0.0'
         >>> latest_version('d4e9c65b-1.0.0')
@@ -237,7 +237,7 @@ def legacy_uid(
     Returns:
         unique model ID
 
-    Example:
+    Examples:
         >>> legacy_uid(
         ...     'test',
         ...     {
@@ -299,7 +299,7 @@ def load(
         ConnectionError: if Artifactory is not available
         RuntimeError: if model does not exist
 
-    Example:
+    Examples:
         >>> root = load('d4e9c65b-3.0.0')
         >>> '/'.join(root.split(os.path.sep)[-2:])
         'd4e9c65b/3.0.0'
@@ -331,7 +331,7 @@ def meta(
         ConnectionError: if Artifactory is not available
         RuntimeError: if model does not exist
 
-    Example:
+    Examples:
         >>> d = meta('d4e9c65b-3.0.0')
         >>> print(yaml.dump(d))
         data:
@@ -376,7 +376,7 @@ def name(
         ConnectionError: if Artifactory is not available
         RuntimeError: if model does not exist
 
-    Example:
+    Examples:
         >>> name('d4e9c65b-3.0.0')
         'torch'
 
@@ -405,7 +405,7 @@ def parameters(
         ConnectionError: if Artifactory is not available
         RuntimeError: if model does not exist
 
-    Example:
+    Examples:
         >>> parameters('d4e9c65b-3.0.0')
         {'model': 'cnn10', 'data': 'emodb', 'feature': 'melspec', 'sampling_rate': 16000}
 
@@ -519,7 +519,7 @@ def publish(
         ValueError: if subgroup is set to ``'_uid'``
         FileNotFoundError: if ``root`` folder cannot be found
 
-    Example:
+    Examples:
         >>> # Assuming your model files are stored under `model_root`
         >>> # and your repository is given by `repository`
         >>> # (which you usually don't specify, but use its default value)
@@ -689,7 +689,7 @@ def subgroup(
         ConnectionError: if Artifactory is not available
         RuntimeError: if model does not exist
 
-    Example:
+    Examples:
         >>> subgroup('d4e9c65b-3.0.0')
         'audmodel.dummy.cnn'
 
@@ -722,7 +722,7 @@ def uid(
     Returns:
         unique or short model ID
 
-    Example:
+    Examples:
         >>> uid(
         ...     'torch',
         ...     {
@@ -787,7 +787,7 @@ def update_meta(
         RuntimeError: if model does not exist
         RuntimeError: if ``meta`` cannot be serialized to a YAML file
 
-    Example:
+    Examples:
         >>> meta = {
         ...     'model': {
         ...         'cnn10': {'layers': 10},
@@ -882,7 +882,7 @@ def url(
         RuntimeError: if URL does not exist
         ValueError: if wrong ``type`` is given
 
-    Example:
+    Examples:
         >>> path = url('d4e9c65b-3.0.0')
         >>> os.path.basename(path)
         'd4e9c65b-3.0.0.zip'
@@ -947,7 +947,7 @@ def version(
         ConnectionError: if Artifactory is not available
         RuntimeError: if model does not exist
 
-    Example:
+    Examples:
         >>> version('d4e9c65b-3.0.0')
         '3.0.0'
 
@@ -974,7 +974,7 @@ def versions(
         ConnectionError: if Artifactory is not available
         RuntimeError: if model does not exist
 
-    Example:
+    Examples:
         >>> versions('d4e9c65b')
         ['1.0.0', '2.0.0', '3.0.0', '4.0.0']
         >>> versions('d4e9c65b-2.0.0')

@@ -8,3 +8,4 @@ venv/
 .coverage
 docs/pics/*.svg
 docs/.ipynb_checkpoints
+docs/api/
