@@ -49,7 +49,7 @@ windows-python3.8:
   before_script:
     - python -V
 
-flake8:
+linter:
   stage: test
   image: docker.audeering.com/audeering/python-3.8:latest
   before_script:
