@@ -20,30 +20,30 @@ include:
     - pip install -r tests/requirements.txt
     - python -m pytest
 
-linux-python3.8:
+linux-python3.10:
   extends: .pytest
   stage: test
-  image: docker.audeering.com/audeering/python-3.8:latest
+  image: docker.audeering.com/audeering/python-3.10:latest
   before_script:
     - python -V
 
-macos-python3.8:
+macos-python3.10:
   extends: .pytest
   stage: test
   tags:
     - os-macos
   before_script:
-    - python3 -V
     - rm -rf venv
     - pip3 install virtualenv
-    - virtualenv venv -p python3
+    - virtualenv venv -p python3.10
     - source venv/bin/activate
+    - python3 -V
     - pip install --upgrade pip
 
-windows-python3.8:
+windows-python3.10:
   extends: .pytest
   stage: test
-  image: docker.audeering.com/audeering/windows-python-3.8:latest
+  image: docker.audeering.com/audeering/windows-python-3.10:latest
   tags:
     - docker-windows
   before_script:
@@ -51,7 +51,7 @@ windows-python3.8:
 
 linter:
   stage: test
-  image: docker.audeering.com/audeering/python-3.8:latest
+  image: docker.audeering.com/audeering/python-3.10:latest
   before_script:
     - pip install pre-commit
     - pre-commit install --install-hooks
@@ -65,7 +65,7 @@ linter:
 docs:
   extends: .pytest
   stage: test
-  image: docker.audeering.com/audeering/python-3.8:latest
+  image: docker.audeering.com/audeering/python-3.10:latest
   script:
     - pip install -r requirements.txt
     - pip install -r docs/requirements.txt
@@ -94,7 +94,7 @@ pages:
 pypi:
   extends: .pytest
   stage: pypi
-  image: docker.audeering.com/audeering/python-3.8:latest
+  image: docker.audeering.com/audeering/python-3.10:latest
   script:
     - python setup.py sdist bdist_wheel
     - python -m twine upload --repository local dist/*
