@@ -4,6 +4,7 @@ import shutil
 import pytest
 
 import audeer
+
 import audmodel
 
 

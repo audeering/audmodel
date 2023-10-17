@@ -8,22 +8,20 @@ import oyaml as yaml
 import audbackend
 import audeer
 
-from audmodel.core.backend import (
-    archive_path,
-    get_archive,
-    get_backend,
-    get_header,
-    get_meta,
-    header_path,
-    header_versions,
-    meta_path,
-    put_archive,
-    put_header,
-    put_meta,
-    raise_model_not_found_error,
-    SERIALIZE_ERROR_MESSAGE,
-    split_uid,
-)
+from audmodel.core.backend import SERIALIZE_ERROR_MESSAGE
+from audmodel.core.backend import archive_path
+from audmodel.core.backend import get_archive
+from audmodel.core.backend import get_backend
+from audmodel.core.backend import get_header
+from audmodel.core.backend import get_meta
+from audmodel.core.backend import header_path
+from audmodel.core.backend import header_versions
+from audmodel.core.backend import meta_path
+from audmodel.core.backend import put_archive
+from audmodel.core.backend import put_header
+from audmodel.core.backend import put_meta
+from audmodel.core.backend import raise_model_not_found_error
+from audmodel.core.backend import split_uid
 from audmodel.core.config import config
 import audmodel.core.define as define
 import audmodel.core.utils as utils

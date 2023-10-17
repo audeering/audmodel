@@ -1,5 +1,3 @@
-.. audmodel documentation master file
-
 .. include:: ../README.rst
     :end-line: 9
 

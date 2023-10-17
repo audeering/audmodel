@@ -5,6 +5,7 @@ import time
 import pytest
 
 import audeer
+
 import audmodel
 
 

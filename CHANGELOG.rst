@@ -150,7 +150,7 @@ Version 0.6.0 (2020-06-22)
 * Changed: ``unittest-public-local`` repository for unit testing
 * Changed: replace ``Lookup`` class with :class:`audfactory.Lookup`
 * Removed: remove ``aumodel.interface`` module
-* Removed: depedencies to ``audiofile``, ``audsp``, ``numpy``, ``pandas``
+* Removed: dependencies to ``audiofile``, ``audsp``, ``numpy``, ``pandas``
 
 
 Version 0.5.2 (2020-04-24)
@@ -180,7 +180,7 @@ Version 0.4.1 (2020-04-20)
 --------------------------
 
 * Added: :meth:`audmodel.extend_params` and :meth:`audmodel.get_params`
-* Fixed: return tpye of :meth:`audmodel.interface.Generic.read_audio`
+* Fixed: return type of :meth:`audmodel.interface.Generic.read_audio`
 
 
 Version 0.4.0 (2020-04-16)

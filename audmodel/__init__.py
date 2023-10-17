@@ -1,23 +1,21 @@
-from audmodel.core.api import (
-    author,
-    date,
-    default_cache_root,
-    exists,
-    header,
-    latest_version,
-    legacy_uid,
-    load,
-    meta,
-    name,
-    parameters,
-    publish,
-    subgroup,
-    uid,
-    update_meta,
-    url,
-    version,
-    versions,
-)
+from audmodel.core.api import author
+from audmodel.core.api import date
+from audmodel.core.api import default_cache_root
+from audmodel.core.api import exists
+from audmodel.core.api import header
+from audmodel.core.api import latest_version
+from audmodel.core.api import legacy_uid
+from audmodel.core.api import load
+from audmodel.core.api import meta
+from audmodel.core.api import name
+from audmodel.core.api import parameters
+from audmodel.core.api import publish
+from audmodel.core.api import subgroup
+from audmodel.core.api import uid
+from audmodel.core.api import update_meta
+from audmodel.core.api import url
+from audmodel.core.api import version
+from audmodel.core.api import versions
 from audmodel.core.config import config
 
 

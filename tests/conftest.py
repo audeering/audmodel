@@ -108,6 +108,7 @@ audeer.mkdir(audeer.path(pytest.HOST, 'repo2'))
 # so it will raise an error when converted to yaml
 class CannotPickle:
     def __getstate__(self):
+        r"""Check if object can be pickled."""
         raise Exception('cannot pickle object')
 
 

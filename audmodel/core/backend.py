@@ -2,6 +2,7 @@ import os
 import shutil
 import tempfile
 import typing
+
 import oyaml as yaml
 
 import audbackend
@@ -24,7 +25,6 @@ def archive_path(
         verbose: bool,
 ) -> typing.Tuple[audbackend.Backend, str]:
     r"""Return backend, archive path and version."""
-
     backend, header = get_header(
         short_id,
         version,
@@ -45,7 +45,6 @@ def get_archive(
         verbose: bool,
 ) -> str:
     r"""Return backend and local archive path."""
-
     root = os.path.join(
         cache_root,
         short_id,
@@ -92,7 +91,6 @@ def get_backend(
         repository: audbackend.Repository,
 ) -> audbackend.Backend:
     r"""Return backend."""
-
     backend = audbackend.access(
         name=repository.backend,
         host=repository.host,
@@ -116,7 +114,6 @@ def get_header(
         verbose: bool,
 ) -> typing.Tuple[audbackend.Backend, typing.Dict[str, typing.Any]]:
     r"""Return backend and header content."""
-
     backend, remote_path = header_path(short_id, version)
     local_path = os.path.join(
         cache_root,
@@ -154,7 +151,6 @@ def get_meta(
         verbose: bool,
 ) -> (audbackend.Backend, typing.Dict[str, typing.Any]):
     r"""Return backend and metadata."""
-
     backend, remote_path = meta_path(
         short_id,
         version,
@@ -209,7 +205,6 @@ def header_path(
     typing.Tuple[audbackend.Backend, str],
 ]:
     r"""Return backend and header path."""
-
     # if we have only one repository
     # we assume the header exists there
     # and return without checking if file exists
@@ -238,7 +233,6 @@ def header_versions(
         short_id: str,
 ) -> typing.Sequence[typing.Tuple[audbackend.Backend, str, str]]:
     r"""Return list of backend, header path and version."""
-
     matches = []
 
     for repository in config.REPOSITORIES:
@@ -262,7 +256,6 @@ def meta_path(
         verbose: bool,
 ) -> typing.Tuple[audbackend.Backend, str]:
     r"""Return backend, metadata path and version."""
-
     backend, header = get_header(
         short_id,
         version,
@@ -288,7 +281,6 @@ def put_archive(
         verbose: bool,
 ) -> str:
     r"""Put archive to backend."""
-
     dst_path = backend.join(
         '/',
         *subgroup.split('.'),
@@ -323,7 +315,6 @@ def put_header(
         verbose: bool,
 ) -> str:
     r"""Put header to backend."""
-
     dst_path = backend.join(
         '/',
         define.UID_FOLDER,
@@ -351,7 +342,6 @@ def put_meta(
         verbose: bool,
 ) -> str:
     r"""Put meta to backend."""
-
     dst_path = backend.join(
         '/',
         define.UID_FOLDER,
@@ -392,7 +382,6 @@ def split_uid(
         cache_root: str,
 ) -> typing.Tuple[str, str]:
     r"""Split uid into short id and version."""
-
     if utils.is_legacy_uid(uid):
 
         short_id = uid

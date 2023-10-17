@@ -95,8 +95,10 @@ pypi:
   extends: .pytest
   stage: pypi
   image: docker.audeering.com/audeering/python-3.10:latest
+  before_script:
+    - pip install build virtualenv
   script:
-    - python setup.py sdist bdist_wheel
+    - python -m build
     - python -m twine upload --repository local dist/*
   only:
     refs:
