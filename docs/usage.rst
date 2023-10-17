@@ -134,8 +134,10 @@ in which the model is stored.
     import audeer
     import audmodel
 
-    repo_dir = audeer.mkdir('./tmp/repo')
-    repository = audbackend.Repository('models', repo_dir, 'file-system')
+    repo = 'models'
+    host = audeer.path('./tmp/repo')
+    audeer.mkdir(audeer.path(host, repo))
+    repository = audbackend.Repository(repo, host, 'file-system')
     audmodel.config.REPOSITORIES = [repository]
 
 

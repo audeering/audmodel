@@ -134,7 +134,7 @@ def exists(
     """
     try:
         url(uid)
-    except RuntimeError:
+    except (audbackend.BackendError, RuntimeError):
         return False
 
     return True
@@ -636,13 +636,15 @@ def publish(
         # remove files that were already published
         for ext in [define.HEADER_EXT, define.META_EXT]:
             path = backend.join(
+                '/',
                 define.UID_FOLDER,
                 f'{short_id}.{ext}',
             )
-            if backend.exists(path, version, ext=ext):
-                backend.remove_file(path, version, ext=ext)
+            if backend.exists(path, version):
+                backend.remove_file(path, version)
 
         path = backend.join(
+            '/',
             *subgroup.split('.'),
             name,
             short_id + '.zip',
@@ -904,10 +906,10 @@ def url(
             cache_root,
             verbose,
         )
-        return backend.path(path, version)
+        return str(backend._path(path, version))
     elif type == 'header':
         backend, path = header_path(short_id, version)
-        return backend.path(path, version, ext=define.HEADER_EXT)
+        return str(backend._path(path, version))
     elif type == 'meta':
         backend, path = meta_path(
             short_id,
@@ -915,7 +917,7 @@ def url(
             cache_root,
             verbose,
         )
-        return backend.path(path, version, ext=define.META_EXT)
+        return str(backend._path(path, version))
     else:
         raise ValueError(
             "'type' has to be one of "

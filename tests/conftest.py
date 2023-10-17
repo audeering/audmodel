@@ -100,6 +100,8 @@ pytest.REPOSITORIES = [
         'file-system',
     ),
 ]
+audeer.mkdir(audeer.path(pytest.HOST, 'repo1'))
+audeer.mkdir(audeer.path(pytest.HOST, 'repo2'))
 
 
 # create object that cannot be pickled

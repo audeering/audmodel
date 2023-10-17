@@ -33,7 +33,7 @@ def archive_path(
     )
     name = header['name']
     subgroup = header['subgroup'].split('.')
-    path = backend.join(*subgroup, name, short_id + '.zip')
+    path = backend.join('/', *subgroup, name, short_id + '.zip')
 
     return backend, path
 
@@ -93,11 +93,20 @@ def get_backend(
 ) -> audbackend.Backend:
     r"""Return backend."""
 
-    return audbackend.create(
+    backend = audbackend.access(
         name=repository.backend,
         host=repository.host,
         repository=repository.name,
     )
+    if isinstance(backend, (audbackend.Artifactory, audbackend.FileSystem)):
+        backend._use_legacy_file_structure(
+            extensions=[
+                define.HEADER_EXT,
+                define.META_EXT,
+            ]
+        )
+
+    return backend
 
 
 def get_header(
@@ -125,11 +134,10 @@ def get_header(
                     remote_path,
                     tmp_path,
                     version,
-                    ext=define.HEADER_EXT,
                     verbose=verbose,
                 )
                 shutil.move(tmp_path, local_path)
-    except FileNotFoundError:
+    except audbackend.BackendError:
         raise_model_not_found_error(short_id, version)
 
     # read header from local file
@@ -164,11 +172,10 @@ def get_meta(
     # figure out if it matches remote version
     # and delete it if this is not the case
     if os.path.exists(local_path):
-        local_checksum = audbackend.md5(local_path)
+        local_checksum = audeer.md5(local_path)
         remote_checksum = backend.checksum(
             remote_path,
             version,
-            ext=define.META_EXT,
         )
         if local_checksum != remote_checksum:
             os.remove(local_path)
@@ -182,7 +189,6 @@ def get_meta(
                 remote_path,
                 tmp_path,
                 version,
-                ext=define.META_EXT,
                 verbose=verbose,
             )
             shutil.move(tmp_path, local_path)
@@ -210,12 +216,16 @@ def header_path(
     for repository in config.REPOSITORIES:
         backend = get_backend(repository)
         path = backend.join(
+            '/',
             define.UID_FOLDER,
             f'{short_id}.{define.HEADER_EXT}',
         )
         if (
+            version and
+            (
                 len(config.REPOSITORIES) == 1
-                or backend.exists(path, version=version, ext=define.HEADER_EXT)
+                or backend.exists(path, version, suppress_backend_errors=True)
+            )
         ):
             return backend, path
 
@@ -234,10 +244,11 @@ def header_versions(
     for repository in config.REPOSITORIES:
         backend = get_backend(repository)
         path = backend.join(
+            '/',
             define.UID_FOLDER,
             f'{short_id}.{define.HEADER_EXT}',
         )
-        versions = backend.versions(path, ext=define.HEADER_EXT)
+        versions = backend.versions(path, suppress_backend_errors=True)
         for version in versions:
             matches.append((backend, path, version))
 
@@ -259,6 +270,7 @@ def meta_path(
         verbose,
     )
     path = backend.join(
+        '/',
         define.UID_FOLDER,
         f'{short_id}.{define.META_EXT}',
     )
@@ -278,6 +290,7 @@ def put_archive(
     r"""Put archive to backend."""
 
     dst_path = backend.join(
+        '/',
         *subgroup.split('.'),
         name,
         short_id + '.zip',
@@ -312,6 +325,7 @@ def put_header(
     r"""Put header to backend."""
 
     dst_path = backend.join(
+        '/',
         define.UID_FOLDER,
         f'{short_id}.{define.HEADER_EXT}',
     )
@@ -323,7 +337,6 @@ def put_header(
             src_path,
             dst_path,
             version,
-            ext=define.HEADER_EXT,
             verbose=verbose,
         )
 
@@ -340,6 +353,7 @@ def put_meta(
     r"""Put meta to backend."""
 
     dst_path = backend.join(
+        '/',
         define.UID_FOLDER,
         f'{short_id}.{define.META_EXT}',
     )
@@ -351,7 +365,6 @@ def put_meta(
             src_path,
             dst_path,
             version,
-            ext=define.META_EXT,
             verbose=verbose,
         )
 
@@ -407,10 +420,14 @@ def split_uid(
             for repository in config.REPOSITORIES:
                 backend = get_backend(repository)
                 remote_path = backend.join(
+                    '/',
                     define.UID_FOLDER,
-                    uid,
+                    f'{uid}.{define.HEADER_EXT}',
                 )
-                versions = backend.versions(remote_path)
+                versions = backend.versions(
+                    remote_path,
+                    suppress_backend_errors=True,
+                )
                 if versions:
                     # uid of legacy models encode version
                     # i.e. we cannot have more than one version
