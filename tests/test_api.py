@@ -185,6 +185,52 @@ def test_load(name, params, subgroup, version):
         assert os.path.getmtime(path) != mtime
 
 
+@pytest.mark.parametrize(
+    'name, params, version, subgroup, expected',
+    [
+        (
+            'name',
+            {},
+            None,
+            None,
+            audeer.uid(from_string='name' + str({}))[-8:],
+        ),
+        (
+            'name',
+            {},
+            None,
+            '',
+            audeer.uid(from_string='name' + str({}))[-8:],
+        ),
+        (
+            'name',
+            {},
+            None,
+            'subgroup',
+            audeer.uid(from_string='subgroup.name' + str({}))[-8:],
+        ),
+        (
+            'name',
+            {'a': 1},
+            '1.0.0',
+            None,
+            (
+                audeer.uid(from_string='name' + str({'a': 1}))[-8:]
+                + '-1.0.0'
+            ),
+        ),
+    ],
+)
+def test_uid(name, params, version, subgroup, expected):
+    uid = audmodel.uid(
+        name,
+        params,
+        version=version,
+        subgroup=subgroup,
+    )
+    assert uid == expected
+
+
 def test_update_meta():
     uid = audmodel.uid(
         pytest.NAME,

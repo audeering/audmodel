@@ -57,10 +57,10 @@ def short_id(
         subgroup: typing.Optional[str],
 ) -> str:
     r"""Return short model ID."""
-    group_id = name if subgroup is None \
-        else f'{subgroup}.{name}'
+    if subgroup is not None and subgroup != '':
+        name = f'{subgroup}.{name}'
     params = {key: params[key] for key in sorted(params)}
-    unique_string = group_id + str(params)
+    unique_string = name + str(params)
     return audeer.uid(from_string=unique_string)[-8:]
 
 
