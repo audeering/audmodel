@@ -193,14 +193,14 @@ def test_load(name, params, subgroup, version):
             {},
             None,
             None,
-            audeer.uid(from_string='name' + str({}))[-8:],
+            audeer.uid(from_string='.name' + str({}))[-8:],
         ),
         (
             'name',
             {},
             None,
             '',
-            audeer.uid(from_string='name' + str({}))[-8:],
+            audeer.uid(from_string='.name' + str({}))[-8:],
         ),
         (
             'name',
@@ -215,7 +215,7 @@ def test_load(name, params, subgroup, version):
             '1.0.0',
             None,
             (
-                audeer.uid(from_string='name' + str({'a': 1}))[-8:]
+                audeer.uid(from_string='.name' + str({'a': 1}))[-8:]
                 + '-1.0.0'
             ),
         ),
