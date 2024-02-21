@@ -16,92 +16,92 @@ pytest.ROOT = audeer.mkdir(
     )
 )
 
-pytest.NAME = 'torch'
+pytest.NAME = "torch"
 pytest.PARAMS = {
-    'model': 'cnn10',
-    'data': 'emodb',
-    'feature': 'melspec',
-    'sampling_rate': 16000,
+    "model": "cnn10",
+    "data": "emodb",
+    "feature": "melspec",
+    "sampling_rate": 16000,
 }
-pytest.AUTHOR = 'Calvin and Hobbes'
-pytest.CACHE_ROOT = os.path.join(pytest.ROOT, 'cache')
+pytest.AUTHOR = "Calvin and Hobbes"
+pytest.CACHE_ROOT = os.path.join(pytest.ROOT, "cache")
 pytest.DATE = datetime.date(1985, 11, 18)
-pytest.HOST = os.path.join(pytest.ROOT, 'host')
+pytest.HOST = os.path.join(pytest.ROOT, "host")
 pytest.ID = audeer.uid()
 pytest.META = {
-    '1.0.0': {
-        'data': {
-            'emodb': {'version': '1.2.0'},
+    "1.0.0": {
+        "data": {
+            "emodb": {"version": "1.2.0"},
         },
-        'feature': {
-            'melspec': {
-                'win_dur': '32ms',
-                'hop_dur': '10ms',
-                'num_fft': 512,
-                'mel_bins': 64,
+        "feature": {
+            "melspec": {
+                "win_dur": "32ms",
+                "hop_dur": "10ms",
+                "num_fft": 512,
+                "mel_bins": 64,
             },
         },
-        'model': {
-            'cnn10': {
-                'learning-rate': 1e-3,
-                'optimizer': 'sgd',
-            },
-        },
-    },
-    '2.0.0': {
-        'data': {
-            'emodb': {'version': '1.2.0'},
-        },
-        'feature': {
-            'melspec': {
-                'win_dur': '64ms',
-                'hop_dur': '32ms',
-                'num_fft': 1024,
-                'mel_bins': 64,
-            },
-        },
-        'model': {
-            'cnn10': {
-                'learning-rate': 1e-3,
-                'optimizer': 'sgd',
+        "model": {
+            "cnn10": {
+                "learning-rate": 1e-3,
+                "optimizer": "sgd",
             },
         },
     },
-    '3.0.0': {
-        'data': {
-            'emodb': {'version': '1.2.0'},
+    "2.0.0": {
+        "data": {
+            "emodb": {"version": "1.2.0"},
         },
-        'feature': {
-            'melspec': {
-                'win_dur': '32ms',
-                'hop_dur': '10ms',
-                'num_fft': 512,
-                'mel_bins': 64,
+        "feature": {
+            "melspec": {
+                "win_dur": "64ms",
+                "hop_dur": "32ms",
+                "num_fft": 1024,
+                "mel_bins": 64,
             },
         },
-        'model': {
-            'cnn10': {
-                'learning-rate': 1e-2,
-                'optimizer': 'adam',
+        "model": {
+            "cnn10": {
+                "learning-rate": 1e-3,
+                "optimizer": "sgd",
+            },
+        },
+    },
+    "3.0.0": {
+        "data": {
+            "emodb": {"version": "1.2.0"},
+        },
+        "feature": {
+            "melspec": {
+                "win_dur": "32ms",
+                "hop_dur": "10ms",
+                "num_fft": 512,
+                "mel_bins": 64,
+            },
+        },
+        "model": {
+            "cnn10": {
+                "learning-rate": 1e-2,
+                "optimizer": "adam",
             },
         },
     },
 }
-pytest.MODEL_ROOT = audeer.mkdir(os.path.join(pytest.ROOT, pytest.ID, 'model'))
+pytest.MODEL_ROOT = audeer.mkdir(os.path.join(pytest.ROOT, pytest.ID, "model"))
 pytest.REPOSITORIES = [
     audbackend.Repository(
-        'repo1',
+        "repo1",
         pytest.HOST,
-        'file-system',
+        "file-system",
     ),
     audbackend.Repository(
-        'repo2',
+        "repo2",
         pytest.HOST,
-        'file-system',
+        "file-system",
     ),
 ]
-audeer.mkdir(audeer.path(pytest.HOST, 'repo1'))
-audeer.mkdir(audeer.path(pytest.HOST, 'repo2'))
+audeer.mkdir(audeer.path(pytest.HOST, "repo1"))
+audeer.mkdir(audeer.path(pytest.HOST, "repo2"))
 
 
 # create object that cannot be pickled
@@ -109,18 +109,18 @@ audeer.mkdir(audeer.path(pytest.HOST, 'repo2'))
 class CannotPickle:
     def __getstate__(self):
         r"""Check if object can be pickled."""
-        raise Exception('cannot pickle object')
+        raise Exception("cannot pickle object")
 
 
 pytest.CANNOT_PICKLE = CannotPickle()
 
 
-@pytest.fixture(scope='session', autouse=True)
+@pytest.fixture(scope="session", autouse=True)
 def cleanup_session():
     path = os.path.join(
         pytest.ROOT,
-        '..',
-        '.coverage.*',
+        "..",
+        ".coverage.*",
     )
     for file in glob.glob(path):
         os.remove(file)

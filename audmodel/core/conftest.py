@@ -8,7 +8,7 @@ def docstring_examples(doctest_namespace):  # pragma: no cover
     r"""Publish model for doctests."""
     repository = pytest.REPOSITORIES[0]
     audmodel.config.REPOSITORIES = [repository]
-    subgroup = 'audmodel.dummy.cnn'
+    subgroup = "audmodel.dummy.cnn"
     for version, meta in pytest.META.items():
         uid = audmodel.uid(
             pytest.NAME,
@@ -29,7 +29,7 @@ def docstring_examples(doctest_namespace):  # pragma: no cover
                 subgroup=subgroup,
             )
     # Make model root and repo variables available in doctests
-    doctest_namespace['model_root'] = pytest.MODEL_ROOT
-    doctest_namespace['repository'] = repository
+    doctest_namespace["model_root"] = pytest.MODEL_ROOT
+    doctest_namespace["repository"] = repository
     yield
     audmodel.config.REPOSITORIES = pytest.REPOSITORIES

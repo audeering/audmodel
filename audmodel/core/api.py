@@ -28,9 +28,9 @@ import audmodel.core.utils as utils
 
 
 def author(
-        uid: str,
-        *,
-        cache_root: str = None,
+    uid: str,
+    *,
+    cache_root: str = None,
 ) -> str:
     r"""Author of model.
 
@@ -47,17 +47,17 @@ def author(
         RuntimeError: if model does not exist
 
     Examples:
-        >>> author('d4e9c65b-3.0.0')
+        >>> author("d4e9c65b-3.0.0")
         'Calvin and Hobbes'
 
     """
-    return header(uid, cache_root=cache_root)['author']
+    return header(uid, cache_root=cache_root)["author"]
 
 
 def date(
-        uid: str,
-        *,
-        cache_root: str = None,
+    uid: str,
+    *,
+    cache_root: str = None,
 ) -> str:
     r"""Publication date of model.
 
@@ -74,11 +74,11 @@ def date(
         RuntimeError: if model does not exist
 
     Examples:
-        >>> date('d4e9c65b-3.0.0')
+        >>> date("d4e9c65b-3.0.0")
         '1985-11-18'
 
     """
-    return str(header(uid, cache_root=cache_root)['date'])
+    return str(header(uid, cache_root=cache_root)["date"])
 
 
 def default_cache_root() -> str:
@@ -106,11 +106,11 @@ def default_cache_root() -> str:
         ['d4e9c65b']
 
     """
-    return os.environ.get('AUDMODEL_CACHE_ROOT') or config.CACHE_ROOT
+    return os.environ.get("AUDMODEL_CACHE_ROOT") or config.CACHE_ROOT
 
 
 def exists(
-        uid: str,
+    uid: str,
 ) -> bool:
     r"""Check if a model with this ID exists.
 
@@ -124,9 +124,9 @@ def exists(
         ConnectionError: if Artifactory is not available
 
     Examples:
-        >>> exists('d4e9c65b-3.0.0')
+        >>> exists("d4e9c65b-3.0.0")
         True
-        >>> exists('d4e9c65b-9.9.9')
+        >>> exists("d4e9c65b-9.9.9")
         False
 
     """
@@ -139,10 +139,10 @@ def exists(
 
 
 def header(
-        uid: str,
-        *,
-        cache_root: str = None,
-        verbose: bool = False,
+    uid: str,
+    *,
+    cache_root: str = None,
+    verbose: bool = False,
 ) -> typing.Dict[str, typing.Any]:
     r"""Load model header.
 
@@ -160,7 +160,7 @@ def header(
         dictionary with header fields
 
     Examples:
-        >>> d = header('d4e9c65b-3.0.0')
+        >>> d = header("d4e9c65b-3.0.0")
         >>> print(yaml.dump(d))
         author: Calvin and Hobbes
         date: 1985-11-18
@@ -181,7 +181,7 @@ def header(
 
 
 def latest_version(
-        uid: str,
+    uid: str,
 ) -> str:
     r"""Latest available version of model.
 
@@ -196,9 +196,9 @@ def latest_version(
         RuntimeError: if model does not exist
 
     Examples:
-        >>> latest_version('d4e9c65b')
+        >>> latest_version("d4e9c65b")
         '3.0.0'
-        >>> latest_version('d4e9c65b-1.0.0')
+        >>> latest_version("d4e9c65b-1.0.0")
         '3.0.0'
 
     """
@@ -209,12 +209,12 @@ def latest_version(
 
 
 def legacy_uid(
-        name: str,
-        params: typing.Dict[str, typing.Any],
-        version: str,
-        *,
-        subgroup: str = None,
-        private: bool = False,
+    name: str,
+    params: typing.Dict[str, typing.Any],
+    version: str,
+    *,
+    subgroup: str = None,
+    private: bool = False,
 ) -> str:
     r"""Unique model ID in legacy format.
 
@@ -237,44 +237,42 @@ def legacy_uid(
 
     Examples:
         >>> legacy_uid(
-        ...     'test',
+        ...     "test",
         ...     {
-        ...         'model': 'cnn10',
-        ...         'data': 'emodb',
-        ...         'feature': 'melspec',
-        ...         'sampling_rate': 16000,
+        ...         "model": "cnn10",
+        ...         "data": "emodb",
+        ...         "feature": "melspec",
+        ...         "sampling_rate": 16000,
         ...     },
-        ...     subgroup='audmodel.dummy.cnn',
-        ...     version='1.0.0',
+        ...     subgroup="audmodel.dummy.cnn",
+        ...     version="1.0.0",
         ... )
         '65206614-dbb7-d61a-b00c-153db7b525c0'
 
     """
-    group_id = f'com.audeering.models.{name}' if subgroup is None \
-        else f'com.audeering.models.{subgroup}.{name}'
-    repository = define.LEGACY_REPOSITORY_PRIVATE if private \
-        else define.LEGACY_REPOSITORY_PUBLIC
-    unique_string = (
-        str(params)
-        + group_id
-        + 'lookup'
-        + version
-        + repository
+    group_id = (
+        f"com.audeering.models.{name}"
+        if subgroup is None
+        else f"com.audeering.models.{subgroup}.{name}"
     )
+    repository = (
+        define.LEGACY_REPOSITORY_PRIVATE if private else define.LEGACY_REPOSITORY_PUBLIC
+    )
+    unique_string = str(params) + group_id + "lookup" + version + repository
     return audeer.uid(from_string=unique_string)
 
 
 @audeer.deprecated_keyword_argument(
-    deprecated_argument='root',
-    new_argument='cache_root',
+    deprecated_argument="root",
+    new_argument="cache_root",
     mapping=lambda value: value,
-    removal_version='1.2.0',
+    removal_version="1.2.0",
 )
 def load(
-        uid: str,
-        *,
-        cache_root: str = None,
-        verbose: bool = False,
+    uid: str,
+    *,
+    cache_root: str = None,
+    verbose: bool = False,
 ) -> str:
     r"""Download a model by its unique ID.
 
@@ -298,8 +296,8 @@ def load(
         RuntimeError: if model does not exist
 
     Examples:
-        >>> root = load('d4e9c65b-3.0.0')
-        >>> '/'.join(root.split(os.path.sep)[-2:])
+        >>> root = load("d4e9c65b-3.0.0")
+        >>> "/".join(root.split(os.path.sep)[-2:])
         'd4e9c65b/3.0.0'
 
     """
@@ -309,10 +307,10 @@ def load(
 
 
 def meta(
-        uid: str,
-        *,
-        cache_root: str = None,
-        verbose: bool = False,
+    uid: str,
+    *,
+    cache_root: str = None,
+    verbose: bool = False,
 ) -> typing.Dict[str, typing.Any]:
     r"""Meta information of model.
 
@@ -330,7 +328,7 @@ def meta(
         RuntimeError: if model does not exist
 
     Examples:
-        >>> d = meta('d4e9c65b-3.0.0')
+        >>> d = meta("d4e9c65b-3.0.0")
         >>> print(yaml.dump(d))
         data:
           emodb:
@@ -354,10 +352,10 @@ def meta(
 
 
 def name(
-        uid: str,
-        *,
-        cache_root: str = None,
-        verbose: bool = False,
+    uid: str,
+    *,
+    cache_root: str = None,
+    verbose: bool = False,
 ) -> str:
     r"""Name of model.
 
@@ -375,18 +373,18 @@ def name(
         RuntimeError: if model does not exist
 
     Examples:
-        >>> name('d4e9c65b-3.0.0')
+        >>> name("d4e9c65b-3.0.0")
         'torch'
 
     """
-    return header(uid, cache_root=cache_root, verbose=verbose)['name']
+    return header(uid, cache_root=cache_root, verbose=verbose)["name"]
 
 
 def parameters(
-        uid: str,
-        *,
-        cache_root: str = None,
-        verbose: bool = False,
+    uid: str,
+    *,
+    cache_root: str = None,
+    verbose: bool = False,
 ) -> typing.Dict:
     r"""Parameters of model.
 
@@ -404,29 +402,29 @@ def parameters(
         RuntimeError: if model does not exist
 
     Examples:
-        >>> parameters('d4e9c65b-3.0.0')
+        >>> parameters("d4e9c65b-3.0.0")
         {'model': 'cnn10', 'data': 'emodb', 'feature': 'melspec', 'sampling_rate': 16000}
 
     """  # noqa: E501
-    return header(uid, cache_root=cache_root, verbose=verbose)['parameters']
+    return header(uid, cache_root=cache_root, verbose=verbose)["parameters"]
 
 
 @audeer.deprecated_keyword_argument(
-    deprecated_argument='private',
-    removal_version='1.2.0',
+    deprecated_argument="private",
+    removal_version="1.2.0",
 )
 def publish(
-        root: str,
-        name: str,
-        params: typing.Dict[str, typing.Any],
-        version: str,
-        *,
-        author: str = None,
-        date: datetime.date = None,
-        meta: typing.Dict[str, typing.Any] = None,
-        repository: audbackend.Repository = config.REPOSITORIES[0],
-        subgroup: str = None,
-        verbose: bool = False,
+    root: str,
+    name: str,
+    params: typing.Dict[str, typing.Any],
+    version: str,
+    *,
+    author: str = None,
+    date: datetime.date = None,
+    meta: typing.Dict[str, typing.Any] = None,
+    repository: audbackend.Repository = config.REPOSITORIES[0],
+    subgroup: str = None,
+    verbose: bool = False,
 ) -> str:
     r"""Zip model and publish as a new artifact.
 
@@ -522,37 +520,37 @@ def publish(
         >>> # and your repository is given by `repository`
         >>> # (which you usually don't specify, but use its default value)
         >>> import datetime
-        >>> name = 'torch'
-        >>> subgroup = 'audmodel.dummy.cnn'
-        >>> version = '4.0.0'
-        >>> author = 'Calvin and Hobbes'
+        >>> name = "torch"
+        >>> subgroup = "audmodel.dummy.cnn"
+        >>> version = "4.0.0"
+        >>> author = "Calvin and Hobbes"
         >>> data = datetime.date(1985, 11, 18)
         >>> params = {
-        ...     'model': 'cnn10',
-        ...     'data': 'emodb',
-        ...     'feature': 'melspec',
-        ...     'sampling_rate': 16000,
+        ...     "model": "cnn10",
+        ...     "data": "emodb",
+        ...     "feature": "melspec",
+        ...     "sampling_rate": 16000,
         ... }
         >>> meta = {
-        ...     'model': {
-        ...         'cnn10': {
-        ...             'learning-rate': 1e-4,
-        ...             'optimizer': 'sgd',
+        ...     "model": {
+        ...         "cnn10": {
+        ...             "learning-rate": 1e-4,
+        ...             "optimizer": "sgd",
         ...         },
         ...     },
-        ...     'data': {
-        ...         'emodb': {
-        ...             'version': '1.2.0',
+        ...     "data": {
+        ...         "emodb": {
+        ...             "version": "1.2.0",
         ...         },
         ...     },
-        ...     'feature': {
-        ...         'melspec': {
-        ...             'win_dur': '32ms',
-        ...             'hop_dur': '10ms',
-        ...             'num_fft': 512,
-        ...             'mel_bins': 64,
+        ...     "feature": {
+        ...         "melspec": {
+        ...             "win_dur": "32ms",
+        ...             "hop_dur": "10ms",
+        ...             "num_fft": 512,
+        ...             "mel_bins": 64,
         ...         },
-        ...    },
+        ...     },
         ... }
         >>> publish(
         ...     model_root,
@@ -569,13 +567,10 @@ def publish(
 
     """  # noqa: E501
     root = audeer.safe_path(root)
-    subgroup = subgroup or ''
+    subgroup = subgroup or ""
 
     if subgroup == define.UID_FOLDER:
-        raise ValueError(
-            f"It is not allowed to set subgroup to "
-            f"'{define.UID_FOLDER}'."
-        )
+        raise ValueError(f"It is not allowed to set subgroup to '{define.UID_FOLDER}'.")
 
     if not os.path.isdir(root):
         raise FileNotFoundError(
@@ -585,14 +580,10 @@ def publish(
         )
 
     short_id = utils.short_id(name, params, subgroup)
-    uid = f'{short_id}-{version}'
+    uid = f"{short_id}-{version}"
 
     if exists(uid):
-        raise RuntimeError(
-            f"A model with ID "
-            f"'{uid}' "
-            "exists already."
-        )
+        raise RuntimeError(f"A model with ID '{uid}' exists already.")
 
     backend = get_backend(repository)
     header = utils.create_header(
@@ -634,18 +625,18 @@ def publish(
         # remove files that were already published
         for ext in [define.HEADER_EXT, define.META_EXT]:
             path = backend.join(
-                '/',
+                "/",
                 define.UID_FOLDER,
-                f'{short_id}.{ext}',
+                f"{short_id}.{ext}",
             )
             if backend.exists(path, version):
                 backend.remove_file(path, version)
 
         path = backend.join(
-            '/',
-            *subgroup.split('.'),
+            "/",
+            *subgroup.split("."),
             name,
-            short_id + '.zip',
+            short_id + ".zip",
         )
         if backend.exists(path, version):  # pragma: no cover
             # we can probably assume that the archive
@@ -655,24 +646,19 @@ def publish(
             backend.remove_file(path, version)
 
         # Reraise our custom error if params or meta cannot be serialized
-        if (
-                type(ex) == RuntimeError
-                and ex.args[0].startswith(SERIALIZE_ERROR_MESSAGE)
-        ):
+        if type(ex) == RuntimeError and ex.args[0].startswith(SERIALIZE_ERROR_MESSAGE):
             raise ex
         else:  # pragma: no cover
-            raise RuntimeError(
-                'Could not publish model due to an unexpected error.'
-            )
+            raise RuntimeError("Could not publish model due to an unexpected error.")
 
     return uid
 
 
 def subgroup(
-        uid: str,
-        *,
-        cache_root: str = None,
-        verbose: bool = False,
+    uid: str,
+    *,
+    cache_root: str = None,
+    verbose: bool = False,
 ) -> str:
     r"""Subgroup of model.
 
@@ -690,19 +676,19 @@ def subgroup(
         RuntimeError: if model does not exist
 
     Examples:
-        >>> subgroup('d4e9c65b-3.0.0')
+        >>> subgroup("d4e9c65b-3.0.0")
         'audmodel.dummy.cnn'
 
     """
-    return header(uid, cache_root=cache_root, verbose=verbose)['subgroup']
+    return header(uid, cache_root=cache_root, verbose=verbose)["subgroup"]
 
 
 def uid(
-        name: str,
-        params: typing.Dict[str, typing.Any],
-        version: str = None,
-        *,
-        subgroup: str = None,
+    name: str,
+    params: typing.Dict[str, typing.Any],
+    version: str = None,
+    *,
+    subgroup: str = None,
 ) -> str:
     r"""Unique model ID.
 
@@ -724,26 +710,26 @@ def uid(
 
     Examples:
         >>> uid(
-        ...     'torch',
+        ...     "torch",
         ...     {
-        ...         'model': 'cnn10',
-        ...         'data': 'emodb',
-        ...         'feature': 'melspec',
-        ...         'sampling_rate': 16000,
+        ...         "model": "cnn10",
+        ...         "data": "emodb",
+        ...         "feature": "melspec",
+        ...         "sampling_rate": 16000,
         ...     },
-        ...     subgroup='audmodel.dummy.cnn',
+        ...     subgroup="audmodel.dummy.cnn",
         ... )
         'd4e9c65b'
         >>> uid(
-        ...     'torch',
+        ...     "torch",
         ...     {
-        ...         'model': 'cnn10',
-        ...         'data': 'emodb',
-        ...         'feature': 'melspec',
-        ...         'sampling_rate': 16000,
+        ...         "model": "cnn10",
+        ...         "data": "emodb",
+        ...         "feature": "melspec",
+        ...         "sampling_rate": 16000,
         ...     },
-        ...     version='3.0.0',
-        ...     subgroup='audmodel.dummy.cnn',
+        ...     version="3.0.0",
+        ...     subgroup="audmodel.dummy.cnn",
         ... )
         'd4e9c65b-3.0.0'
 
@@ -752,16 +738,16 @@ def uid(
     if version is None:
         return sid
     else:
-        return f'{sid}-{version}'
+        return f"{sid}-{version}"
 
 
 def update_meta(
-        uid: str,
-        meta: typing.Dict[str, typing.Any],
-        *,
-        replace: bool = False,
-        cache_root: str = None,
-        verbose: bool = False,
+    uid: str,
+    meta: typing.Dict[str, typing.Any],
+    *,
+    replace: bool = False,
+    cache_root: str = None,
+    verbose: bool = False,
 ) -> typing.Dict[str, typing.Any]:
     r"""Update metadata of model on backend and in cache.
 
@@ -789,11 +775,11 @@ def update_meta(
 
     Examples:
         >>> meta = {
-        ...     'model': {
-        ...         'cnn10': {'layers': 10},
+        ...     "model": {
+        ...         "cnn10": {"layers": 10},
         ...     },
         ... }
-        >>> d = update_meta('d4e9c65b-3.0.0', meta)
+        >>> d = update_meta("d4e9c65b-3.0.0", meta)
         >>> print(yaml.dump(d))
         data:
           emodb:
@@ -810,7 +796,7 @@ def update_meta(
             optimizer: adam
             layers: 10
         <BLANKLINE>
-        >>> d = update_meta('d4e9c65b-3.0.0', meta, replace=True)
+        >>> d = update_meta("d4e9c65b-3.0.0", meta, replace=True)
         >>> print(yaml.dump(d))
         model:
           cnn10:
@@ -846,20 +832,20 @@ def update_meta(
     local_path = os.path.join(
         cache_root,
         short_id,
-        f'{version}.{define.META_EXT}',
+        f"{version}.{define.META_EXT}",
     )
-    with open(local_path, 'w') as fp:
+    with open(local_path, "w") as fp:
         yaml.dump(header, fp)
 
     return meta_backend
 
 
 def url(
-        uid: str,
-        *,
-        type: str = 'model',
-        cache_root: str = None,
-        verbose: bool = False,
+    uid: str,
+    *,
+    type: str = "model",
+    cache_root: str = None,
+    verbose: bool = False,
 ) -> str:
     r"""URL to model archive or header.
 
@@ -883,13 +869,13 @@ def url(
         ValueError: if wrong ``type`` is given
 
     Examples:
-        >>> path = url('d4e9c65b-3.0.0')
+        >>> path = url("d4e9c65b-3.0.0")
         >>> os.path.basename(path)
         'd4e9c65b-3.0.0.zip'
-        >>> path = url('d4e9c65b-3.0.0', type='header')
+        >>> path = url("d4e9c65b-3.0.0", type="header")
         >>> os.path.basename(path)
         'd4e9c65b-3.0.0.header.yaml'
-        >>> path = url('d4e9c65b-3.0.0', type='meta')
+        >>> path = url("d4e9c65b-3.0.0", type="meta")
         >>> os.path.basename(path)
         'd4e9c65b-3.0.0.meta.yaml'
 
@@ -897,7 +883,7 @@ def url(
     cache_root = audeer.safe_path(cache_root or default_cache_root())
     short_id, version = split_uid(uid, cache_root)
 
-    if type == 'model':
+    if type == "model":
         backend, path = archive_path(
             short_id,
             version,
@@ -905,10 +891,10 @@ def url(
             verbose,
         )
         return str(backend._path(path, version))
-    elif type == 'header':
+    elif type == "header":
         backend, path = header_path(short_id, version)
         return str(backend._path(path, version))
-    elif type == 'meta':
+    elif type == "meta":
         backend, path = meta_path(
             short_id,
             version,
@@ -927,10 +913,10 @@ def url(
 
 
 def version(
-        uid: str,
-        *,
-        cache_root: str = None,
-        verbose: bool = False,
+    uid: str,
+    *,
+    cache_root: str = None,
+    verbose: bool = False,
 ) -> str:
     r"""Version of model.
 
@@ -948,17 +934,17 @@ def version(
         RuntimeError: if model does not exist
 
     Examples:
-        >>> version('d4e9c65b-3.0.0')
+        >>> version("d4e9c65b-3.0.0")
         '3.0.0'
 
     """
-    return header(uid, cache_root=cache_root, verbose=verbose)['version']
+    return header(uid, cache_root=cache_root, verbose=verbose)["version"]
 
 
 def versions(
-        uid: str,
-        *,
-        cache_root: str = None,
+    uid: str,
+    *,
+    cache_root: str = None,
 ) -> typing.List[str]:
     r"""Available model versions.
 
@@ -975,9 +961,9 @@ def versions(
         RuntimeError: if model does not exist
 
     Examples:
-        >>> versions('d4e9c65b')
+        >>> versions("d4e9c65b")
         ['1.0.0', '2.0.0', '3.0.0', '4.0.0']
-        >>> versions('d4e9c65b-2.0.0')
+        >>> versions("d4e9c65b-2.0.0")
         ['1.0.0', '2.0.0', '3.0.0', '4.0.0']
 
     """
@@ -990,6 +976,6 @@ def versions(
         except RuntimeError:
             return []
     else:
-        short_id = uid.split('-')[0]
+        short_id = uid.split("-")[0]
         matches = header_versions(short_id)
         return [match[2] for match in matches]
