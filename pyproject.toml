@@ -34,8 +34,8 @@ dependencies = [
 dynamic = ['version']
 
 [project.urls]
-repository = 'https://github.com/audeering/audmodel/'
-documentation = 'https://audeering.github.io/audmodel/'
+repository = 'https://gitlab.audeering.com/tools/audmodel'
+documentation = 'http://tools.pp.audeering.com/audmodel/'
 
 
 # ===== BUILD-SYSTEM ======================================================
