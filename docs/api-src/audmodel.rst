@@ -20,6 +20,7 @@ audmodel
     name
     parameters
     publish
+    Repository
     subgroup
     uid
     update_meta

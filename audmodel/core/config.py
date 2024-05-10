@@ -1,4 +1,4 @@
-import audbackend
+from audmodel.core.repository import Repository
 
 
 class config:
@@ -8,7 +8,7 @@ class config:
     r"""Default cache folder for storing models."""
 
     REPOSITORIES = [
-        audbackend.Repository(
+        Repository(
             "models-local",
             "https://artifactory.audeering.com/artifactory",
             "artifactory",

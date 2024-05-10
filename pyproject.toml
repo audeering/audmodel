@@ -26,7 +26,7 @@ classifiers = [
     'Topic :: Scientific/Engineering',
 ]
 dependencies = [
-    'audbackend[artifactory] >=1.0.0',
+    'audbackend[artifactory] >=2.0.0',
     'oyaml',
 ]
 # Get version dynamically from git

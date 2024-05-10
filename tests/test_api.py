@@ -4,6 +4,7 @@ import time
 
 import pytest
 
+import audbackend
 import audeer
 
 import audmodel
@@ -55,6 +56,48 @@ def fixture_publish_model():
     yield
 
     clear_root(pytest.MODEL_ROOT)
+
+
+@pytest.mark.parametrize(
+    "function",
+    [
+        audmodel.author,
+        audmodel.date,
+        audmodel.exists,
+        audmodel.header,
+        audmodel.latest_version,
+        audmodel.load,
+        audmodel.meta,
+        audmodel.name,
+        audmodel.parameters,
+        audmodel.subgroup,
+        lambda uid: audmodel.update_meta(uid, {}),
+        audmodel.url,
+        audmodel.version,
+        audmodel.versions,
+    ],
+)
+def test_bad_repository(non_existing_repository, function):
+    """Test for non existing repository.
+
+    If no connection can be established to the backend,
+    an ``audbackend.BackendError``
+    should be raised.
+
+    """
+    uid = audmodel.uid(
+        pytest.NAME,
+        pytest.PARAMS,
+        "1.0.0",
+        subgroup=SUBGROUP,
+    )
+    error = audbackend.BackendError
+    error_msg = (
+        "An exception was raised by the backend, "
+        "please see stack trace for further information."
+    )
+    with pytest.raises(error, match=error_msg):
+        function(uid)
 
 
 @pytest.mark.parametrize(

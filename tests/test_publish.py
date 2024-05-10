@@ -2,6 +2,8 @@ import os
 
 import pytest
 
+import audbackend
+
 import audmodel
 
 
@@ -186,63 +188,61 @@ def test_publish(root, name, subgroup, params, author, date, meta, version, repo
     assert os.path.exists(audmodel.url(uid, type="meta"))
 
 
-def test_publish_interrupt():
+@pytest.mark.parametrize(
+    "params, meta, repository, error, error_msg",
+    [
+        (
+            {},
+            {"object": pytest.CANNOT_PICKLE},
+            pytest.REPOSITORIES[0],
+            RuntimeError,
+            r"Cannot serialize",
+        ),
+        (
+            {"object": pytest.CANNOT_PICKLE},
+            {},
+            pytest.REPOSITORIES[0],
+            RuntimeError,
+            r"Cannot serialize",
+        ),
+        (
+            {},
+            {},
+            audmodel.Repository("repo", "non-existing", "file-system"),
+            audbackend.BackendError,
+            (
+                "An exception was raised by the backend, "
+                "please see stack trace for further information."
+            ),
+        ),
+    ],
+)
+def test_publish_error(params, meta, repository, error, error_msg):
+    r"""Tests for errors during publication.
+
+    This tests for the errors,
+    that ``audb.publish()``
+    might raise during publication.
+
+    Args:
+        params: model parameter
+        meta: model metadata
+        repository: repository to publish the model to
+        error: expected error
+        error_msg: expected (part of the) error message
+
+    """
     name = pytest.NAME
     version = "1.0.0"
-
-    # Fail if meta cannot be serialized
-    params = {}
-    meta = {"object": pytest.CANNOT_PICKLE}
-    err_msg = r"Cannot serialize"
-    with pytest.raises(RuntimeError, match=err_msg):
+    with pytest.raises(error, match=error_msg):
         audmodel.publish(
             pytest.MODEL_ROOT,
             name,
             params,
             version,
             meta=meta,
-            repository=audmodel.config.REPOSITORIES[0],
+            repository=repository,
         )
-
-    # Fail if params cannot be serialized
-    params = {"object": pytest.CANNOT_PICKLE}
-    meta = {}
-    err_msg = r"Cannot serialize"
-    with pytest.raises(RuntimeError, match=err_msg):
-        audmodel.publish(
-            pytest.MODEL_ROOT,
-            name,
-            params,
-            version,
-            meta=meta,
-            repository=audmodel.config.REPOSITORIES[0],
-        )
-
-    # Enable this test
-    # as soon as https://github.com/audeering/audbackend/issues/24
-    # is fixed
-    #
-    # Fail if repo does not exist
-    # params = {}
-    # meta = {}
-    # repository = audmodel.config.REPOSITORIES[0]
-    # repository.name = 'non-existent'
-    # repository = audbackend.Repository(
-    #     'repo',
-    #     'https://non-existing.audeering.com/artifactory',
-    #     'artifactory',
-    # )
-    # err_msg = 'Could not publish model due to an unexpected error.'
-    # with pytest.raises(RuntimeError, match=err_msg):
-    #     audmodel.publish(
-    #         pytest.MODEL_ROOT,
-    #         name,
-    #         params,
-    #         version,
-    #         meta=meta,
-    #         repository=repository,
-    #     )
-
     uid = audmodel.uid(
         name,
         params,

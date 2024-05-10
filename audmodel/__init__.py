@@ -17,6 +17,7 @@ from audmodel.core.api import url
 from audmodel.core.api import version
 from audmodel.core.api import versions
 from audmodel.core.config import config
+from audmodel.core.repository import Repository
 
 
 # Discourage from audmodel import *

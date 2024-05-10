@@ -11,7 +11,6 @@ import audeer
 from audmodel.core.backend import SERIALIZE_ERROR_MESSAGE
 from audmodel.core.backend import archive_path
 from audmodel.core.backend import get_archive
-from audmodel.core.backend import get_backend
 from audmodel.core.backend import get_header
 from audmodel.core.backend import get_meta
 from audmodel.core.backend import header_path
@@ -24,6 +23,7 @@ from audmodel.core.backend import raise_model_not_found_error
 from audmodel.core.backend import split_uid
 from audmodel.core.config import config
 import audmodel.core.define as define
+from audmodel.core.repository import Repository
 import audmodel.core.utils as utils
 
 
@@ -43,7 +43,8 @@ def author(
         model author
 
     Raises:
-        ConnectionError: if Artifactory is not available
+        audbackend.BackendError: if connection to repository on backend
+            cannot be established
         RuntimeError: if model does not exist
 
     Examples:
@@ -70,7 +71,8 @@ def date(
         model publication date
 
     Raises:
-        ConnectionError: if Artifactory is not available
+        audbackend.BackendError: if connection to repository on backend
+            cannot be established
         RuntimeError: if model does not exist
 
     Examples:
@@ -121,7 +123,8 @@ def exists(
         ``True`` if a model with this ID is found
 
     Raises:
-        ConnectionError: if Artifactory is not available
+        audbackend.BackendError: if connection to repository on backend
+            cannot be established
 
     Examples:
         >>> exists("d4e9c65b-3.0.0")
@@ -132,7 +135,7 @@ def exists(
     """
     try:
         url(uid)
-    except (audbackend.BackendError, RuntimeError):
+    except RuntimeError:
         return False
 
     return True
@@ -153,7 +156,8 @@ def header(
         verbose: show debug messages
 
     Raises:
-        ConnectionError: if Artifactory is not available
+        audbackend.BackendError: if connection to repository on backend
+            cannot be established
         RuntimeError: if model does not exist on backend
 
     Returns:
@@ -192,7 +196,8 @@ def latest_version(
         latest version of model
 
     Raises:
-        ConnectionError: if Artifactory is not available
+        audbackend.BackendError: if connection to repository on backend
+            cannot be established
         RuntimeError: if model does not exist
 
     Examples:
@@ -292,7 +297,8 @@ def load(
         path to model folder
 
     Raises:
-        ConnectionError: if Artifactory is not available
+        audbackend.BackendError: if connection to repository on backend
+            cannot be established
         RuntimeError: if model does not exist
 
     Examples:
@@ -324,7 +330,8 @@ def meta(
         dictionary with meta fields
 
     Raises:
-        ConnectionError: if Artifactory is not available
+        audbackend.BackendError: if connection to repository on backend
+            cannot be established
         RuntimeError: if model does not exist
 
     Examples:
@@ -369,7 +376,8 @@ def name(
         model name
 
     Raises:
-        ConnectionError: if Artifactory is not available
+        audbackend.BackendError: if connection to repository on backend
+            cannot be established
         RuntimeError: if model does not exist
 
     Examples:
@@ -398,7 +406,8 @@ def parameters(
         model parameters
 
     Raises:
-        ConnectionError: if Artifactory is not available
+        audbackend.BackendError: if connection to repository on backend
+            cannot be established
         RuntimeError: if model does not exist
 
     Examples:
@@ -422,7 +431,7 @@ def publish(
     author: str = None,
     date: datetime.date = None,
     meta: typing.Dict[str, typing.Any] = None,
-    repository: audbackend.Repository = config.REPOSITORIES[0],
+    repository: Repository = config.REPOSITORIES[0],
     subgroup: str = None,
     verbose: bool = False,
 ) -> str:
@@ -508,6 +517,8 @@ def publish(
         unique model ID
 
     Raises:
+        audbackend.BackendError: if connection to repository on backend
+            cannot be established
         RuntimeError: if a model with same UID exists already
         RuntimeError: if an unexpected error occurs during publishing
         RuntimeError: if ``meta`` or ``params``
@@ -585,7 +596,7 @@ def publish(
     if exists(uid):
         raise RuntimeError(f"A model with ID '{uid}' exists already.")
 
-    backend = get_backend(repository)
+    backend_interface = repository.create_backend_interface()
     header = utils.create_header(
         uid,
         author=author,
@@ -601,14 +612,14 @@ def publish(
             short_id,
             version,
             header,
-            backend,
+            backend_interface,
             verbose,
         )
         put_meta(
             short_id,
             version,
             meta,
-            backend,
+            backend_interface,
             verbose,
         )
         put_archive(
@@ -617,36 +628,38 @@ def publish(
             name,
             subgroup,
             root,
-            backend,
+            backend_interface,
             verbose,
         )
     except Exception as ex:
-        # if something goes wrong
-        # remove files that were already published
-        for ext in [define.HEADER_EXT, define.META_EXT]:
-            path = backend.join(
-                "/",
-                define.UID_FOLDER,
-                f"{short_id}.{ext}",
-            )
-            if backend.exists(path, version):
-                backend.remove_file(path, version)
+        # Otherwise remove already published files
+        with backend_interface.backend:
+            for ext in [define.HEADER_EXT, define.META_EXT]:
+                path = backend_interface.join(
+                    "/",
+                    define.UID_FOLDER,
+                    f"{short_id}.{ext}",
+                )
+                if backend_interface.exists(path, version):
+                    backend_interface.remove_file(path, version)
 
-        path = backend.join(
-            "/",
-            *subgroup.split("."),
-            name,
-            short_id + ".zip",
-        )
-        if backend.exists(path, version):  # pragma: no cover
-            # we can probably assume that the archive
-            # does not exist on the backend
-            # if something goes wrong during 'put_archive()'
-            # so it's not likely we'll ever end up in this case
-            backend.remove_file(path, version)
+            path = backend_interface.join(
+                "/",
+                *subgroup.split("."),
+                name,
+                short_id + ".zip",
+            )
+            if backend_interface.exists(path, version):  # pragma: no cover
+                # we can probably assume that the archive
+                # does not exist on the backend
+                # if something goes wrong during 'put_archive()'
+                # so it's not likely we'll ever end up in this case
+                backend_interface.remove_file(path, version)
 
         # Reraise our custom error if params or meta cannot be serialized
-        if type(ex) == RuntimeError and ex.args[0].startswith(SERIALIZE_ERROR_MESSAGE):
+        if isinstance(ex, RuntimeError) and ex.args[0].startswith(
+            SERIALIZE_ERROR_MESSAGE
+        ):
             raise ex
         else:  # pragma: no cover
             raise RuntimeError("Could not publish model due to an unexpected error.")
@@ -672,7 +685,8 @@ def subgroup(
         model subgroup
 
     Raises:
-        ConnectionError: if Artifactory is not available
+        audbackend.BackendError: if connection to repository on backend
+            cannot be established
         RuntimeError: if model does not exist
 
     Examples:
@@ -769,7 +783,8 @@ def update_meta(
         new meta dictionary
 
     Raises:
-        ConnectionError: if Artifactory is not available
+        audbackend.BackendError: if connection to repository on backend
+            cannot be established
         RuntimeError: if model does not exist
         RuntimeError: if ``meta`` cannot be serialized to a YAML file
 
@@ -808,7 +823,7 @@ def update_meta(
     short_id, version = split_uid(uid, cache_root)
 
     # update metadata
-    backend, meta_backend = get_meta(
+    backend_interface, meta_backend = get_meta(
         short_id,
         version,
         cache_root,
@@ -824,7 +839,7 @@ def update_meta(
         short_id,
         version,
         meta_backend,
-        backend,
+        backend_interface,
         verbose,
     )
 
@@ -864,7 +879,8 @@ def url(
         URL
 
     Raises:
-        ConnectionError: if Artifactory is not available
+        audbackend.BackendError: if connection to repository on backend
+            cannot be established
         RuntimeError: if URL does not exist
         ValueError: if wrong ``type`` is given
 
@@ -884,24 +900,21 @@ def url(
     short_id, version = split_uid(uid, cache_root)
 
     if type == "model":
-        backend, path = archive_path(
+        backend_interface, path = archive_path(
             short_id,
             version,
             cache_root,
             verbose,
         )
-        return str(backend._path(path, version))
     elif type == "header":
-        backend, path = header_path(short_id, version)
-        return str(backend._path(path, version))
+        backend_interface, path = header_path(short_id, version)
     elif type == "meta":
-        backend, path = meta_path(
+        backend_interface, path = meta_path(
             short_id,
             version,
             cache_root,
             verbose,
         )
-        return str(backend._path(path, version))
     else:
         raise ValueError(
             "'type' has to be one of "
@@ -910,6 +923,20 @@ def url(
             "'meta', "
             f"not '{type}'"
         )
+    path = backend_interface._path_with_version(path, version)
+    # Check for underlying backend of backend interface
+    if isinstance(backend_interface.backend, audbackend.backend.FileSystem):
+        path = backend_interface.sep.join([backend_interface.backend._root, path])
+    elif isinstance(
+        backend_interface.backend, audbackend.backend.Artifactory
+    ):  # pragma: nocover
+        # The tests should work locally,
+        # so we don't test using a repository on Artifactory.
+        # I tested the following line,
+        # by manually calling
+        # audmodel.url("90398682-2.0.0")
+        path = str(backend_interface.backend.path(path))
+    return path
 
 
 def version(
@@ -930,7 +957,8 @@ def version(
         model version
 
     Raises:
-        ConnectionError: if Artifactory is not available
+        audbackend.BackendError: if connection to repository on backend
+            cannot be established
         RuntimeError: if model does not exist
 
     Examples:
@@ -957,7 +985,8 @@ def versions(
         list with versions
 
     Raises:
-        ConnectionError: if Artifactory is not available
+        audbackend.BackendError: if connection to repository on backend
+            cannot be established
         RuntimeError: if model does not exist
 
     Examples:

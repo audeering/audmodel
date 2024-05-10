@@ -21,9 +21,27 @@ def archive_path(
     version: str,
     cache_root: str,
     verbose: bool,
-) -> typing.Tuple[audbackend.Backend, str]:
-    r"""Return backend, archive path and version."""
-    backend, header = get_header(
+) -> typing.Tuple[audbackend.interface.Maven, str]:
+    r"""Return backend, archive path and version.
+
+    Args:
+        short_id: model ID without version
+        version: model version
+        cache_root: path of cache root
+        verbose: if ``True`` show message
+            or progress bar
+            when downloading header file
+
+    Returns:
+        backend interface, model path on backend
+
+    Raises:
+        BackendError: if connection to backend
+            cannot be established
+        RuntimeError: if requested model does not exists
+
+    """
+    backend_interface, header = get_header(
         short_id,
         version,
         cache_root,
@@ -31,9 +49,9 @@ def archive_path(
     )
     name = header["name"]
     subgroup = header["subgroup"].split(".")
-    path = backend.join("/", *subgroup, name, short_id + ".zip")
+    path = backend_interface.join("/", *subgroup, name, short_id + ".zip")
 
-    return backend, path
+    return backend_interface, path
 
 
 def get_archive(
@@ -42,7 +60,24 @@ def get_archive(
     cache_root: str,
     verbose: bool,
 ) -> str:
-    r"""Return backend and local archive path."""
+    r"""Return backend and local archive path.
+
+    Args:
+        short_id: model ID without version
+        version: model version
+        cache_root: path of cache root
+        verbose: if ``True`` show message
+            or progress bar
+            when downloading file
+
+    Returns:
+        backend interface, path to downloaded model folder
+
+    Raises:
+        BackendError: if connection to backend
+            cannot be established
+
+    """
     root = os.path.join(
         cache_root,
         short_id,
@@ -51,22 +86,23 @@ def get_archive(
 
     if not os.path.exists(root) or len(os.listdir(root)) == 0:
         tmp_root = audeer.mkdir(root + "~")
-        backend, path = archive_path(
+        backend_interface, path = archive_path(
             short_id,
             version,
             cache_root,
             verbose,
         )
 
-        # get archive
-        src_path = path
-        dst_path = os.path.join(tmp_root, "model.zip")
-        backend.get_file(
-            src_path,
-            dst_path,
-            version,
-            verbose=verbose,
-        )
+        with backend_interface.backend:
+            # get archive
+            src_path = path
+            dst_path = os.path.join(tmp_root, "model.zip")
+            backend_interface.get_file(
+                src_path,
+                dst_path,
+                version,
+                verbose=verbose,
+            )
 
         # extract files
         audeer.extract_archive(
@@ -84,34 +120,32 @@ def get_archive(
     return root
 
 
-def get_backend(
-    repository: audbackend.Repository,
-) -> audbackend.Backend:
-    r"""Return backend."""
-    backend = audbackend.access(
-        name=repository.backend,
-        host=repository.host,
-        repository=repository.name,
-    )
-    if isinstance(backend, (audbackend.Artifactory, audbackend.FileSystem)):
-        backend._use_legacy_file_structure(
-            extensions=[
-                define.HEADER_EXT,
-                define.META_EXT,
-            ]
-        )
-
-    return backend
-
-
 def get_header(
     short_id: str,
     version: str,
     cache_root: str,
     verbose: bool,
-) -> typing.Tuple[audbackend.Backend, typing.Dict[str, typing.Any]]:
-    r"""Return backend and header content."""
-    backend, remote_path = header_path(short_id, version)
+) -> typing.Tuple[audbackend.interface.Maven, typing.Dict[str, typing.Any]]:
+    r"""Return backend and header content.
+
+    Args:
+        short_id: model ID without version
+        version: model version
+        cache_root: path of cache root
+        verbose: if ``True`` show message
+            or progress bar
+            when downloading file
+
+    Returns:
+        backend interface, model header
+
+    Raises:
+        BackendError: if connection to backend
+            cannot be established
+        RuntimeError: if requested model does not exist
+
+    """
+    backend_interface, remote_path = header_path(short_id, version)
     local_path = os.path.join(
         cache_root,
         short_id,
@@ -119,26 +153,24 @@ def get_header(
     )
 
     # header is not in cache download it
-    try:
-        if not os.path.exists(local_path):
+    if not os.path.exists(local_path):
+        with backend_interface.backend:
             audeer.mkdir(os.path.dirname(local_path))
             with tempfile.TemporaryDirectory() as root:
                 tmp_path = os.path.join(root, "model.yaml")
-                backend.get_file(
+                backend_interface.get_file(
                     remote_path,
                     tmp_path,
                     version,
                     verbose=verbose,
                 )
                 shutil.move(tmp_path, local_path)
-    except audbackend.BackendError:
-        raise_model_not_found_error(short_id, version)
 
     # read header from local file
     with open(local_path, "r") as fp:
         header = yaml.load(fp, Loader=yaml.Loader)
 
-    return backend, header
+    return backend_interface, header
 
 
 def get_meta(
@@ -146,9 +178,26 @@ def get_meta(
     version: str,
     cache_root: str,
     verbose: bool,
-) -> (audbackend.Backend, typing.Dict[str, typing.Any]):
-    r"""Return backend and metadata."""
-    backend, remote_path = meta_path(
+) -> (audbackend.interface.Maven, typing.Dict[str, typing.Any]):
+    r"""Return backend and metadata.
+
+    Args:
+        short_id: model ID without version
+        version: model version
+        cache_root: path of cache root
+        verbose: if ``True`` show message
+            or progress bar
+            when downloading file
+
+    Returns:
+        backend interface, model metadata
+
+    Raises:
+        BackendError: if connection to backend
+            cannot be established
+
+    """
+    backend_interface, remote_path = meta_path(
         short_id,
         version,
         cache_root,
@@ -161,30 +210,31 @@ def get_meta(
         f"{version}.{define.META_EXT}",
     )
 
-    # if metadata in cache,
-    # figure out if it matches remote version
-    # and delete it if this is not the case
-    if os.path.exists(local_path):
-        local_checksum = audeer.md5(local_path)
-        remote_checksum = backend.checksum(
-            remote_path,
-            version,
-        )
-        if local_checksum != remote_checksum:
-            os.remove(local_path)
-
-    # download metadata if it is not in cache yet
-    if not os.path.exists(local_path):
-        audeer.mkdir(os.path.dirname(local_path))
-        with tempfile.TemporaryDirectory() as root:
-            tmp_path = os.path.join(root, "meta.yaml")
-            backend.get_file(
+    with backend_interface.backend:
+        # if metadata in cache,
+        # figure out if it matches remote version
+        # and delete it if this is not the case
+        if os.path.exists(local_path):
+            local_checksum = audeer.md5(local_path)
+            remote_checksum = backend_interface.checksum(
                 remote_path,
-                tmp_path,
                 version,
-                verbose=verbose,
             )
-            shutil.move(tmp_path, local_path)
+            if local_checksum != remote_checksum:
+                os.remove(local_path)
+
+        # download metadata if it is not in cache yet
+        if not os.path.exists(local_path):
+            audeer.mkdir(os.path.dirname(local_path))
+            with tempfile.TemporaryDirectory() as root:
+                tmp_path = os.path.join(root, "meta.yaml")
+                backend_interface.get_file(
+                    remote_path,
+                    tmp_path,
+                    version,
+                    verbose=verbose,
+                )
+                shutil.move(tmp_path, local_path)
 
     # read metadata from local file
     with open(local_path, "r") as fp:
@@ -192,51 +242,84 @@ def get_meta(
         if meta is None:
             meta = {}
 
-    return backend, meta
+    return backend_interface, meta
 
 
 def header_path(
     short_id: str,
     version: str,
-) -> typing.Union[typing.Tuple[audbackend.Backend, str],]:
-    r"""Return backend and header path."""
-    # if we have only one repository
-    # we assume the header exists there
-    # and return without checking if file exists
+) -> typing.Union[typing.Tuple[audbackend.interface.Maven, str],]:
+    r"""Return backend and header path.
+
+    Args:
+        short_id: model ID without version
+        version: model version
+
+    Returns:
+        backend interface, path to header on backend
+
+    Raises:
+        BackendError: if connection to backend
+            cannot be established
+        RuntimeError: if requested model does not exist
+
+    """
     for repository in config.REPOSITORIES:
-        backend = get_backend(repository)
-        path = backend.join(
+        if not version:
+            break
+
+        backend_interface = repository.create_backend_interface()
+        path = backend_interface.join(
             "/",
             define.UID_FOLDER,
             f"{short_id}.{define.HEADER_EXT}",
         )
-        if version and (
-            len(config.REPOSITORIES) == 1
-            or backend.exists(path, version, suppress_backend_errors=True)
-        ):
-            return backend, path
 
-    # This error is only raised if we have several repos,
-    # so we need to tackle it in get_header() as well
+        # Look for the repository,
+        # that contains the requested header
+        with backend_interface.backend:
+            header_exists = backend_interface.exists(
+                path,
+                version,
+                suppress_backend_errors=True,
+            )
+        if header_exists:
+            return backend_interface, path
+
+    # If no repository can be found,
+    # reuested model does not exist
     raise_model_not_found_error(short_id, version)
 
 
 def header_versions(
     short_id: str,
-) -> typing.Sequence[typing.Tuple[audbackend.Backend, str, str]]:
-    r"""Return list of backend, header path and version."""
+) -> typing.Sequence[typing.Tuple[audbackend.interface.Maven, str, str]]:
+    r"""Return list of backend, header path and version.
+
+    Args:
+        short_id: model ID without version
+
+    Returns:
+        list of backend interface, model header path on backend, model version
+
+    Raises:
+        BackendError: if connection to backend
+            cannot be established
+
+    """
     matches = []
 
     for repository in config.REPOSITORIES:
-        backend = get_backend(repository)
-        path = backend.join(
+        backend_interface = repository.create_backend_interface()
+        path = backend_interface.join(
             "/",
             define.UID_FOLDER,
             f"{short_id}.{define.HEADER_EXT}",
         )
-        versions = backend.versions(path, suppress_backend_errors=True)
-        for version in versions:
-            matches.append((backend, path, version))
+        with backend_interface.backend:
+            versions = backend_interface.versions(path, suppress_backend_errors=True)
+            for version in versions:
+                matches.append((backend_interface, path, version))
 
     return matches
 
@@ -246,21 +329,39 @@ def meta_path(
     version: str,
     cache_root: str,
     verbose: bool,
-) -> typing.Tuple[audbackend.Backend, str]:
-    r"""Return backend, metadata path and version."""
-    backend, header = get_header(
+) -> typing.Tuple[audbackend.interface.Maven, str]:
+    r"""Return backend, metadata path and version.
+
+    Args:
+        short_id: model ID without version
+        version: model version
+        cache_root: path of cache root
+        verbose: if ``True`` show message
+            or progress bar
+            when downloading file
+
+    Returns:
+        backend interface, model metadata path on backend
+
+    Raises:
+        BackendError: if connection to backend
+            cannot be established
+        RuntimeError: if requested model does not exists
+
+    """
+    backend_interface, header = get_header(
         short_id,
         version,
         cache_root,
         verbose,
     )
-    path = backend.join(
+    path = backend_interface.join(
         "/",
         define.UID_FOLDER,
         f"{short_id}.{define.META_EXT}",
     )
 
-    return backend, path
+    return backend_interface, path
 
 
 def put_archive(
@@ -269,11 +370,30 @@ def put_archive(
     name: str,
     subgroup: str,
     root: str,
-    backend: audbackend.Backend,
+    backend_interface: audbackend.interface.Maven,
     verbose: bool,
 ) -> str:
-    r"""Put archive to backend."""
-    dst_path = backend.join(
+    r"""Put archive to backend.
+
+    Args:
+        short_id: model ID without version
+        version: model version
+        name: model name
+        subgroup: model subgroup
+        root: path to model root folder
+        backend_interface: backend interface instance
+        verbose: if ``True`` show message
+            when uploading file
+
+    Returns:
+        archive path on backend
+
+    Raises:
+        BackendError: if connection to backend
+            cannot be established
+
+    """
+    dst_path = backend_interface.join(
         "/",
         *subgroup.split("."),
         name,
@@ -289,12 +409,13 @@ def put_archive(
             src_path,
             verbose=verbose,
         )
-        backend.put_file(
-            src_path,
-            dst_path,
-            version,
-            verbose=verbose,
-        )
+        with backend_interface.backend:
+            backend_interface.put_file(
+                src_path,
+                dst_path,
+                version,
+                verbose=verbose,
+            )
 
     return dst_path
 
@@ -303,11 +424,28 @@ def put_header(
     short_id: str,
     version: str,
     header: typing.Dict[str, typing.Any],
-    backend: audbackend.Backend,
+    backend_interface: audbackend.interface.Maven,
     verbose: bool,
 ) -> str:
-    r"""Put header to backend."""
-    dst_path = backend.join(
+    r"""Put header to backend.
+
+    Args:
+        short_id: model ID without version
+        version: model version
+        header: model header
+        backend_interface: backend interface instance
+        verbose: if ``True`` show message
+            when uploading file
+
+    Returns:
+        header path on backend
+
+    Raises:
+        BackendError: if connection to backend
+            cannot be established
+
+    """
+    dst_path = backend_interface.join(
         "/",
         define.UID_FOLDER,
         f"{short_id}.{define.HEADER_EXT}",
@@ -316,12 +454,13 @@ def put_header(
     with tempfile.TemporaryDirectory() as tmp_root:
         src_path = os.path.join(tmp_root, "model.yaml")
         write_yaml(src_path, header)
-        backend.put_file(
-            src_path,
-            dst_path,
-            version,
-            verbose=verbose,
-        )
+        with backend_interface.backend:
+            backend_interface.put_file(
+                src_path,
+                dst_path,
+                version,
+                verbose=verbose,
+            )
 
     return dst_path
 
@@ -330,11 +469,28 @@ def put_meta(
     short_id: str,
     version: str,
     meta: typing.Dict[str, typing.Any],
-    backend: audbackend.Backend,
+    backend_interface: audbackend.interface.Maven,
     verbose: bool,
 ) -> str:
-    r"""Put meta to backend."""
-    dst_path = backend.join(
+    r"""Put meta to backend.
+
+    Args:
+        short_id: model ID without version
+        version: model version
+        meta: model metadata
+        backend_interface: backend interface instance
+        verbose: if ``True`` show message
+            when uploading file
+
+    Returns:
+        metadata path on backend
+
+    Raises:
+        BackendError: if connection to backend
+            cannot be established
+
+    """
+    dst_path = backend_interface.join(
         "/",
         define.UID_FOLDER,
         f"{short_id}.{define.META_EXT}",
@@ -343,12 +499,13 @@ def put_meta(
     with tempfile.TemporaryDirectory() as tmp_root:
         src_path = os.path.join(tmp_root, "meta.yaml")
         write_yaml(src_path, meta)
-        backend.put_file(
-            src_path,
-            dst_path,
-            version,
-            verbose=verbose,
-        )
+        with backend_interface.backend:
+            backend_interface.put_file(
+                src_path,
+                dst_path,
+                version,
+                verbose=verbose,
+            )
 
     return dst_path
 
@@ -369,7 +526,23 @@ def split_uid(
     uid: str,
     cache_root: str,
 ) -> typing.Tuple[str, str]:
-    r"""Split uid into short id and version."""
+    r"""Split uid into short id and version.
+
+    Args:
+        uid: model ID, or model ID without version
+        cache_root: path to cache root
+
+    Returns:
+        model ID without version (short ID), model version
+
+    Raises:
+        BackendError: if short or legacy model ID is provided,
+            and connection to backend
+            cannot be established
+        RuntimeError: if short or legacy model ID is provided,
+            and requested model does not exists
+
+    """
     if utils.is_legacy_uid(uid):
         short_id = uid
         version = None
@@ -393,21 +566,22 @@ def split_uid(
             # otherwise try to derive from header on backend (still faster)
 
             for repository in config.REPOSITORIES:
-                backend = get_backend(repository)
-                remote_path = backend.join(
-                    "/",
-                    define.UID_FOLDER,
-                    f"{uid}.{define.HEADER_EXT}",
-                )
-                versions = backend.versions(
-                    remote_path,
-                    suppress_backend_errors=True,
-                )
-                if versions:
-                    # uid of legacy models encode version
-                    # i.e. we cannot have more than one version
-                    version = versions[0]
-                    break
+                backend_interface = repository.create_backend_interface()
+                with backend_interface.backend:
+                    remote_path = backend_interface.join(
+                        "/",
+                        define.UID_FOLDER,
+                        f"{uid}.{define.HEADER_EXT}",
+                    )
+                    versions = backend_interface.versions(
+                        remote_path,
+                        suppress_backend_errors=True,
+                    )
+                    if versions:
+                        # uid of legacy models encode version
+                        # i.e. we cannot have more than one version
+                        version = versions[0]
+                        break
 
         if version is None:
             raise_model_not_found_error(short_id, version)
@@ -433,7 +607,17 @@ def write_yaml(
     src_path: str,
     obj: typing.Dict,
 ):
-    r"""Write dictionary to YAML file."""
+    r"""Write dictionary to YAML file.
+
+    Args:
+        src_path: path to YAML file
+        obj: object that should be serialized as YAML file
+
+    Raises:
+        RuntimeError: if ``obj`` cannot be serialized,
+            or file cannot be opened
+
+    """
     with open(src_path, "w") as fp:
         try:
             yaml.dump(obj, fp)

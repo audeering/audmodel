@@ -130,14 +130,13 @@ in which the model is stored.
 
 .. jupyter-execute::
 
-    import audbackend
     import audeer
     import audmodel
 
     repo = "models"
     host = audeer.path("./tmp/repo")
     audeer.mkdir(audeer.path(host, repo))
-    repository = audbackend.Repository(repo, host, "file-system")
+    repository = audmodel.Repository(repo, host, "file-system")
     audmodel.config.REPOSITORIES = [repository]
 
 

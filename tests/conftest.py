@@ -5,8 +5,9 @@ import shutil
 
 import pytest
 
-import audbackend
 import audeer
+
+import audmodel
 
 
 pytest.ROOT = audeer.mkdir(
@@ -89,16 +90,8 @@ pytest.META = {
 }
 pytest.MODEL_ROOT = audeer.mkdir(os.path.join(pytest.ROOT, pytest.ID, "model"))
 pytest.REPOSITORIES = [
-    audbackend.Repository(
-        "repo1",
-        pytest.HOST,
-        "file-system",
-    ),
-    audbackend.Repository(
-        "repo2",
-        pytest.HOST,
-        "file-system",
-    ),
+    audmodel.Repository("repo1", pytest.HOST, "file-system"),
+    audmodel.Repository("repo2", pytest.HOST, "file-system"),
 ]
 audeer.mkdir(audeer.path(pytest.HOST, "repo1"))
 audeer.mkdir(audeer.path(pytest.HOST, "repo2"))
@@ -127,3 +120,14 @@ def cleanup_session():
     yield
     if os.path.exists(pytest.ROOT):
         shutil.rmtree(pytest.ROOT)
+
+
+@pytest.fixture(scope="function", autouse=False)
+def non_existing_repository():
+    repository = audmodel.Repository("repo", "non-existing", "file-system")
+    current_repositories = audmodel.config.REPOSITORIES
+    audmodel.config.REPOSITORIES = [repository]
+
+    yield repository
+
+    audmodel.config.REPOSITORIES = current_repositories
