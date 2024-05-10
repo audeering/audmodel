@@ -7,6 +7,14 @@ The format is based on `Keep a Changelog`_,
 and this project adheres to `Semantic Versioning`_.
 
 
+Version 1.2.0 (2024-05-10)
+--------------------------
+
+* Added: ``audmodel.Repository``
+  to handle repositories for model storage
+* Changed: depend on ``audbackend>=2.0.0``
+
+
 Version 1.1.2 (2024-02-21)
 --------------------------
 
