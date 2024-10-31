@@ -1,7 +1,7 @@
+from collections.abc import Sequence
 import os
 import shutil
 import tempfile
-import typing
 
 import oyaml as yaml
 
@@ -21,7 +21,7 @@ def archive_path(
     version: str,
     cache_root: str,
     verbose: bool,
-) -> typing.Tuple[audbackend.interface.Maven, str]:
+) -> tuple[audbackend.interface.Maven, str]:
     r"""Return backend, archive path and version.
 
     Args:
@@ -125,7 +125,7 @@ def get_header(
     version: str,
     cache_root: str,
     verbose: bool,
-) -> typing.Tuple[audbackend.interface.Maven, typing.Dict[str, typing.Any]]:
+) -> tuple[audbackend.interface.Maven, dict[str, object]]:
     r"""Return backend and header content.
 
     Args:
@@ -167,7 +167,7 @@ def get_header(
                 shutil.move(tmp_path, local_path)
 
     # read header from local file
-    with open(local_path, "r") as fp:
+    with open(local_path) as fp:
         header = yaml.load(fp, Loader=yaml.Loader)
 
     return backend_interface, header
@@ -178,7 +178,7 @@ def get_meta(
     version: str,
     cache_root: str,
     verbose: bool,
-) -> (audbackend.interface.Maven, typing.Dict[str, typing.Any]):
+) -> (audbackend.interface.Maven, dict[str, object]):
     r"""Return backend and metadata.
 
     Args:
@@ -237,7 +237,7 @@ def get_meta(
                 shutil.move(tmp_path, local_path)
 
     # read metadata from local file
-    with open(local_path, "r") as fp:
+    with open(local_path) as fp:
         meta = yaml.load(fp, Loader=yaml.Loader)
         if meta is None:
             meta = {}
@@ -248,7 +248,7 @@ def get_meta(
 def header_path(
     short_id: str,
     version: str,
-) -> typing.Union[typing.Tuple[audbackend.interface.Maven, str],]:
+) -> tuple[audbackend.interface.Maven, str]:
     r"""Return backend and header path.
 
     Args:
@@ -293,7 +293,7 @@ def header_path(
 
 def header_versions(
     short_id: str,
-) -> typing.Sequence[typing.Tuple[audbackend.interface.Maven, str, str]]:
+) -> Sequence[tuple[audbackend.interface.Maven, str, str]]:
     r"""Return list of backend, header path and version.
 
     Args:
@@ -329,7 +329,7 @@ def meta_path(
     version: str,
     cache_root: str,
     verbose: bool,
-) -> typing.Tuple[audbackend.interface.Maven, str]:
+) -> tuple[audbackend.interface.Maven, str]:
     r"""Return backend, metadata path and version.
 
     Args:
@@ -423,7 +423,7 @@ def put_archive(
 def put_header(
     short_id: str,
     version: str,
-    header: typing.Dict[str, typing.Any],
+    header: dict[str, object],
     backend_interface: audbackend.interface.Maven,
     verbose: bool,
 ) -> str:
@@ -468,7 +468,7 @@ def put_header(
 def put_meta(
     short_id: str,
     version: str,
-    meta: typing.Dict[str, typing.Any],
+    meta: dict[str, object],
     backend_interface: audbackend.interface.Maven,
     verbose: bool,
 ) -> str:
@@ -525,7 +525,7 @@ def raise_model_not_found_error(
 def split_uid(
     uid: str,
     cache_root: str,
-) -> typing.Tuple[str, str]:
+) -> tuple[str, str]:
     r"""Split uid into short id and version.
 
     Args:
@@ -605,7 +605,7 @@ def split_uid(
 
 def write_yaml(
     src_path: str,
-    obj: typing.Dict,
+    obj: dict,
 ):
     r"""Write dictionary to YAML file.
 

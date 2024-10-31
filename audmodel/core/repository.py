@@ -1,5 +1,3 @@
-import typing
-
 import audbackend
 
 import audmodel.core.define as define
@@ -100,7 +98,7 @@ class Repository:
     def register(
         cls,
         backend_name: str,
-        backend_class: typing.Type[audbackend.backend.Base],
+        backend_class: type[audbackend.backend.Base],
     ):
         r"""Register backend class.
 

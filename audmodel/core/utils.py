@@ -1,8 +1,10 @@
+from __future__ import annotations
+
 import collections
+from collections.abc import Sequence
 import datetime
 import getpass
 import os
-import typing
 
 import audeer
 
@@ -10,13 +12,13 @@ import audeer
 def create_header(
     uid: str,
     *,
-    author: typing.Optional[str],
-    date: typing.Optional[datetime.date],
+    author: str | None,
+    date: datetime.date | None,
     name: str,
-    parameters: typing.Dict[str, typing.Any],
+    parameters: dict[str, object],
     subgroup: str,
     version: str,
-) -> typing.Dict[str, typing.Dict[str, typing.Any]]:
+) -> dict[str, dict[str, object]]:
     r"""Create header dictionary."""
     return {
         "author": author or getpass.getuser(),
@@ -38,7 +40,7 @@ def is_short_uid(uid: str) -> bool:
     return len(uid) == 8
 
 
-def scan_files(root: str) -> typing.Sequence[str]:
+def scan_files(root: str) -> Sequence[str]:
     r"""Helper function to find all files in directory."""
 
     def help(root: str, sub_dir: str = ""):
@@ -53,8 +55,8 @@ def scan_files(root: str) -> typing.Sequence[str]:
 
 def short_id(
     name: str,
-    params: typing.Dict[str, typing.Any],
-    subgroup: typing.Optional[str],
+    params: dict[str, object],
+    subgroup: str | None,
 ) -> str:
     r"""Return short model ID."""
     subgroup = subgroup or ""

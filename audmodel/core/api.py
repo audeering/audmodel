@@ -1,7 +1,6 @@
 import datetime
 import errno
 import os
-import typing
 
 import oyaml as yaml
 
@@ -146,7 +145,7 @@ def header(
     *,
     cache_root: str = None,
     verbose: bool = False,
-) -> typing.Dict[str, typing.Any]:
+) -> dict[str, object]:
     r"""Load model header.
 
     Args:
@@ -215,7 +214,7 @@ def latest_version(
 
 def legacy_uid(
     name: str,
-    params: typing.Dict[str, typing.Any],
+    params: dict[str, object],
     version: str,
     *,
     subgroup: str = None,
@@ -317,7 +316,7 @@ def meta(
     *,
     cache_root: str = None,
     verbose: bool = False,
-) -> typing.Dict[str, typing.Any]:
+) -> dict[str, object]:
     r"""Meta information of model.
 
     Args:
@@ -393,7 +392,7 @@ def parameters(
     *,
     cache_root: str = None,
     verbose: bool = False,
-) -> typing.Dict:
+) -> dict:
     r"""Parameters of model.
 
     Args:
@@ -425,12 +424,12 @@ def parameters(
 def publish(
     root: str,
     name: str,
-    params: typing.Dict[str, typing.Any],
+    params: dict[str, object],
     version: str,
     *,
     author: str = None,
     date: datetime.date = None,
-    meta: typing.Dict[str, typing.Any] = None,
+    meta: dict[str, object] = None,
     repository: Repository = config.REPOSITORIES[0],
     subgroup: str = None,
     verbose: bool = False,
@@ -699,7 +698,7 @@ def subgroup(
 
 def uid(
     name: str,
-    params: typing.Dict[str, typing.Any],
+    params: dict[str, object],
     version: str = None,
     *,
     subgroup: str = None,
@@ -757,12 +756,12 @@ def uid(
 
 def update_meta(
     uid: str,
-    meta: typing.Dict[str, typing.Any],
+    meta: dict[str, object],
     *,
     replace: bool = False,
     cache_root: str = None,
     verbose: bool = False,
-) -> typing.Dict[str, typing.Any]:
+) -> dict[str, object]:
     r"""Update metadata of model on backend and in cache.
 
     Unless ``replace`` is set to ``True``
@@ -973,7 +972,7 @@ def versions(
     uid: str,
     *,
     cache_root: str = None,
-) -> typing.List[str]:
+) -> list[str]:
     r"""Available model versions.
 
     Args:
