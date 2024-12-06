@@ -121,10 +121,10 @@ Let's define the arguments for our example model:
     subgroup = "emotion.cnn"
 
 Per default :mod:`audmodel` uses a repository
-on our internal Artifactory_ server,
+on our internal Artifactory server,
 and you don't have to care about it.
 For this example
-we don't want to interfere with Artifactory_
+we don't want to interfere with Artifactory
 and create a local temporary repository
 in which the model is stored.
 
@@ -334,6 +334,3 @@ the model is placed in a unique sub-folder, namely
     :hide-code:
 
     audeer.rmdir("./tmp")
-
-
-.. _Artifactory: https://artifactory.audeering.com/
