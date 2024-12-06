@@ -1,5 +1,4 @@
 .. include:: ../README.rst
-    :end-line: 9
 
 .. toctree::
     :caption: Getting started
