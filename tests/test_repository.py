@@ -82,7 +82,7 @@ def test_repository_repr(backend, host, repo, expected):
             "artifactory",
             "host",
             "repo",
-            audbackend.backend.Artifactory,
+            artifactory_backend,
             audbackend.interface.Maven,
             marks=pytest.mark.skipif(
                 sys.version_info >= (3, 12),

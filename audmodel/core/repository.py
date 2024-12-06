@@ -23,10 +23,14 @@ class Repository:
 
     """
 
-    backend_registry = {
+    _backends = {
         "file-system": audbackend.backend.FileSystem,
-        "artifactory": audbackend.backend.Artifactory,
     }
+
+    if hasattr(audbackend.backend, "Artifactory"):
+        _backends["artifactory"] = audbackend.backend.Artifactory  # pragma: no cover
+
+    backend_registry = _backends
     r"""Backend registry.
 
     Holds mapping between registered backend names,
