@@ -7,6 +7,18 @@ The format is based on `Keep a Changelog`_,
 and this project adheres to `Semantic Versioning`_.
 
 
+Version 1.3.0 (2024-12-11)
+--------------------------
+
+* Added: open-source release
+* Added: ``audmodel-internal`` repository
+  on S3
+* Added: support for Python 3.11
+* Added: support for Python 3.12 (without Artifactory backend)
+* Added: support for Python 3.13 (without Artifactory backend)
+* Changed: switch to MIT license
+
+
 Version 1.2.0 (2024-05-10)
 --------------------------
 
