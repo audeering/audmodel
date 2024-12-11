@@ -454,7 +454,7 @@ def publish(
     |              |    the model        |                                      |
     +--------------+---------------------+--------------------------------------+
     | ``subgroup`` | - project           | - ser.dimensions.wav2vec2            |
-    |              | - task the model    | - projectsmile.sex.cnn               |
+    |              | - task the model    | - age.cnn                            |
     |              |   was trained for   |                                      |
     |              | - model architecture|                                      |
     +--------------+---------------------+--------------------------------------+
@@ -502,14 +502,10 @@ def publish(
         date: date, defaults to current timestamp
         meta: dictionary with meta information
         repository: repository where the model will be published
-        subgroup: extend group ID to
-            ``com.audeering.models.<subgroup>``.
-            You can increase the depth
-            by using dot-notation,
-            e.g. setting
-            ``subgroup=foo.bar``
-            will result in
-            ``com.audeering.models.foo.bar``
+        subgroup: subgroup under which
+            the model is stored on backend.
+            ``.`` are replaced by ``/``
+            on the backend
         verbose: show debug messages
 
     Returns:
