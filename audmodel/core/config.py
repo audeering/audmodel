@@ -13,5 +13,10 @@ class config:
             "https://artifactory.audeering.com/artifactory",
             "artifactory",
         ),
+        Repository(
+            "audmodel-internal",
+            "s3.dualstack.eu-north-1.amazonaws.com",
+            "s3",
+        ),
     ]
     r"""Default repositories (will be searched in given order)."""
