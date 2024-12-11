@@ -120,12 +120,10 @@ Let's define the arguments for our example model:
     }
     subgroup = "emotion.cnn"
 
-Per default :mod:`audmodel` uses a repository
-on our internal Artifactory server,
-and you don't have to care about it.
+Per default :mod:`audmodel` uses repositories
+on Artifactory and S3.
 For this example
-we don't want to interfere with Artifactory
-and create a local temporary repository
+we create a local temporary repository
 in which the model is stored.
 
 .. jupyter-execute::
