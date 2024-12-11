@@ -1,3 +1,5 @@
+import sys
+
 import audbackend
 
 import audmodel.core.define as define
@@ -11,6 +13,10 @@ class Repository:
     the repository name,
     host,
     and the backend name.
+    With :meth:`Repository.create_backend_interface`
+    it also provides a method
+    to create a backend interface
+    to access the repository.
 
     Args:
         name: repository name
@@ -25,6 +31,8 @@ class Repository:
 
     _backends = {
         "file-system": audbackend.backend.FileSystem,
+        "minio": audbackend.backend.Minio,
+        "s3": audbackend.backend.Minio,
     }
 
     if hasattr(audbackend.backend, "Artifactory"):
@@ -35,6 +43,8 @@ class Repository:
 
     Holds mapping between registered backend names,
     and their corresponding backend classes.
+    The ``"artifactory"`` backend is currently not available
+    under Python >=3.12.
 
     """
 
@@ -72,31 +82,49 @@ class Repository:
             f")"
         )
 
-    def create_backend_interface(self) -> audbackend.interface.Maven:
-        r"""Return interface to access repository.
+    def create_backend_interface(self) -> type[audbackend.interface.Base]:
+        r"""Create backend interface to access repository.
+
+        It wraps an :class:`audbackend.interface.Versioned` interface
+        around it.
 
         When :attr:`Repository.backend` equals ``artifactory``,
-        it creates an instance of :class:`audbackend.backend.Artifactory`.
-        When :attr:`Repository.backend` equals ``file-system``,
-        it creates an instance of :class:`audbackend.backend.FileSystem`.
+        it wraps an :class:`audbackend.interface.Maven` interface
+        around it.
 
-        A :class:`audbackend.interface.Maven` interface
-        is then wrapped around the backend.
+        The returned backend instance
+        has not yet established a connection to the backend.
+        To establish a connection,
+        use the backend with a ``with`` statement,
+        or use the ``open()`` and ``close()`` methods of the backend class.
+        The backend is stored as the inside the ``backend`` attribute
+        of the returned backend interface.
 
         Returns:
             interface to repository
 
+        Raises:
+            ValueError: if an artifactory backend is requested in Python>=3.12
+            ValueError: if a non-supported backend is requested
+
         """
+        if sys.version_info >= (3, 12) and self.backend == "artifactory":
+            raise ValueError(  # pragma: no cover
+                "The 'artifactory' backend is not supported in Python>=3.12"
+            )
+        if self.backend not in self.backend_registry:
+            raise ValueError(f"'{self.backend}' is not a registered backend")
         backend_class = self.backend_registry[self.backend]
         backend = backend_class(self.host, self.name)
-        interface = audbackend.interface.Maven(
-            backend,
-            extensions=[
-                define.HEADER_EXT,
-                define.META_EXT,
-            ],
-        )
-        return interface
+        if self.backend == "artifactory":
+            return audbackend.interface.Maven(  # pragma: no cover
+                backend,
+                extensions=[
+                    define.HEADER_EXT,
+                    define.META_EXT,
+                ],
+            )
+        return audbackend.interface.Versioned(backend)
 
     @classmethod
     def register(
