@@ -1,0 +1,554 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Changelog &mdash; Documentation</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="_static/favicon.png"/>
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/css/audeering.css" type="text/css" />
+  <link rel="stylesheet" href="_static/jupyter-sphinx.css" type="text/css" />
+  <link rel="stylesheet" href="_static/thebelab.css" type="text/css" />
+  <link rel="stylesheet" href="_static/copybutton.css" type="text/css" />
+  <link rel="stylesheet" href="_static/css/custom.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Contributing" href="contributing.html" />
+    
+  
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          <a href="index.html">
+          
+            <img src="_static/images/audeering.png" class="logo" alt="audEERING"/>
+          
+          
+            <span> audmodel</span>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                v1.3.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="authentication.html">Authentication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api/audmodel.html">audmodel</a></li>
+<li class="toctree-l1"><a class="reference internal" href="genindex.html">Index</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Changelog</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#version-1-3-0-2024-12-11">Version 1.3.0 (2024-12-11)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#version-1-2-0-2024-05-10">Version 1.2.0 (2024-05-10)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#version-1-1-2-2024-02-21">Version 1.1.2 (2024-02-21)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#version-1-1-1-2023-11-13">Version 1.1.1 (2023-11-13)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#version-1-1-0-2023-10-17">Version 1.1.0 (2023-10-17)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#version-1-0-7-2023-01-04">Version 1.0.7 (2023-01-04)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#version-1-0-6-2022-05-05">Version 1.0.6 (2022-05-05)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#version-1-0-5-2021-12-30">Version 1.0.5 (2021-12-30)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#version-1-0-4-2021-11-26">Version 1.0.4 (2021-11-26)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#version-1-0-3-2021-09-29">Version 1.0.3 (2021-09-29)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#version-1-0-2-2021-09-14">Version 1.0.2 (2021-09-14)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#version-1-0-1-2021-07-23">Version 1.0.1 (2021-07-23)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#version-1-0-0-2021-07-20">Version 1.0.0 (2021-07-20)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#version-0-10-0-2021-04-06">Version 0.10.0 (2021-04-06)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#version-0-9-1-2021-01-26">Version 0.9.1 (2021-01-26)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#version-0-9-0-2021-01-25">Version 0.9.0 (2021-01-25)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#version-0-8-0-2020-09-14">Version 0.8.0 (2020-09-14)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#version-0-6-1-2020-07-01">Version 0.6.1 (2020-07-01)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#version-0-6-0-2020-06-22">Version 0.6.0 (2020-06-22)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#version-0-5-2-2020-04-24">Version 0.5.2 (2020-04-24)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#version-0-5-1-2020-04-23">Version 0.5.1 (2020-04-23)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#version-0-5-0-2020-04-23">Version 0.5.0 (2020-04-23)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#version-0-4-1-2020-04-20">Version 0.4.1 (2020-04-20)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#version-0-4-0-2020-04-16">Version 0.4.0 (2020-04-16)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#version-0-3-3-2020-03-18">Version 0.3.3 (2020-03-18)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#version-0-3-2-2020-03-10">Version 0.3.2 (2020-03-10)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#version-0-3-1-2020-02-27">Version 0.3.1 (2020-02-27)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#version-0-3-0-2020-02-27">Version 0.3.0 (2020-02-27)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#version-0-2-0-2020-02-25">Version 0.2.0 (2020-02-25)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#version-0-1-0-2020-02-24">Version 0.1.0 (2020-02-24)</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">audmodel</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>Changelog</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://gitlab.audeering.com/audeering/audmodel/" class="fa fa-gitlab"> GitLab</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="changelog">
+<h1>Changelog<a class="headerlink" href="#changelog" title="Permalink to this heading">¶</a></h1>
+<p>All notable changes to this project will be documented in this file.</p>
+<p>The format is based on <a class="reference external" href="https://keepachangelog.com/en/1.0.0/">Keep a Changelog</a>,
+and this project adheres to <a class="reference external" href="https://semver.org/spec/v2.0.0.html">Semantic Versioning</a>.</p>
+<div class="section" id="version-1-3-0-2024-12-11">
+<h2>Version 1.3.0 (2024-12-11)<a class="headerlink" href="#version-1-3-0-2024-12-11" title="Permalink to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>Added: open-source release</p></li>
+<li><p>Added: <code class="docutils literal notranslate"><span class="pre">audmodel-internal</span></code> repository
+on S3</p></li>
+<li><p>Added: support for Python 3.11</p></li>
+<li><p>Added: support for Python 3.12 (without Artifactory backend)</p></li>
+<li><p>Added: support for Python 3.13 (without Artifactory backend)</p></li>
+<li><p>Changed: switch to MIT license</p></li>
+</ul>
+</div>
+<div class="section" id="version-1-2-0-2024-05-10">
+<h2>Version 1.2.0 (2024-05-10)<a class="headerlink" href="#version-1-2-0-2024-05-10" title="Permalink to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>Added: <code class="docutils literal notranslate"><span class="pre">audmodel.Repository</span></code>
+to handle repositories for model storage</p></li>
+<li><p>Changed: depend on <code class="docutils literal notranslate"><span class="pre">audbackend&gt;=2.0.0</span></code></p></li>
+</ul>
+</div>
+<div class="section" id="version-1-1-2-2024-02-21">
+<h2>Version 1.1.2 (2024-02-21)<a class="headerlink" href="#version-1-1-2-2024-02-21" title="Permalink to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>Fixed: link to repository
+and documentation
+inside the Python package</p></li>
+</ul>
+</div>
+<div class="section" id="version-1-1-1-2023-11-13">
+<h2>Version 1.1.1 (2023-11-13)<a class="headerlink" href="#version-1-1-1-2023-11-13" title="Permalink to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>Fixed: ensure <code class="docutils literal notranslate"><span class="pre">audmodel.uid()</span></code> returns the same ID
+when <code class="docutils literal notranslate"><span class="pre">subgroup</span></code> is <code class="docutils literal notranslate"><span class="pre">None</span></code> or <code class="docutils literal notranslate"><span class="pre">''</span></code></p></li>
+</ul>
+</div>
+<div class="section" id="version-1-1-0-2023-10-17">
+<h2>Version 1.1.0 (2023-10-17)<a class="headerlink" href="#version-1-1-0-2023-10-17" title="Permalink to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>Added: support for new backend API</p></li>
+<li><p>Changed: depend on <code class="docutils literal notranslate"><span class="pre">audbackend&gt;=1.0.0</span></code></p></li>
+</ul>
+</div>
+<div class="section" id="version-1-0-7-2023-01-04">
+<h2>Version 1.0.7 (2023-01-04)<a class="headerlink" href="#version-1-0-7-2023-01-04" title="Permalink to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>Changed: split API documentation into sub-pages
+for each function/class</p></li>
+</ul>
+</div>
+<div class="section" id="version-1-0-6-2022-05-05">
+<h2>Version 1.0.6 (2022-05-05)<a class="headerlink" href="#version-1-0-6-2022-05-05" title="Permalink to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>Changed: update naming conventions for publishing a model</p></li>
+<li><p>Changed: add docstring examples for all API functions</p></li>
+<li><p>Fixed: <code class="docutils literal notranslate"><span class="pre">audmodel.update_meta()</span></code> does now return the updated metadata
+dictionary</p></li>
+</ul>
+</div>
+<div class="section" id="version-1-0-5-2021-12-30">
+<h2>Version 1.0.5 (2021-12-30)<a class="headerlink" href="#version-1-0-5-2021-12-30" title="Permalink to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>Changed: support Python 3.8 as default version</p></li>
+</ul>
+</div>
+<div class="section" id="version-1-0-4-2021-11-26">
+<h2>Version 1.0.4 (2021-11-26)<a class="headerlink" href="#version-1-0-4-2021-11-26" title="Permalink to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>Added: <code class="docutils literal notranslate"><span class="pre">verbose</span></code> argument to functions that interact with the backend</p></li>
+<li><p>Changed: use new sphinx-audeering-theme</p></li>
+</ul>
+</div>
+<div class="section" id="version-1-0-3-2021-09-29">
+<h2>Version 1.0.3 (2021-09-29)<a class="headerlink" href="#version-1-0-3-2021-09-29" title="Permalink to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>Fixed: <code class="docutils literal notranslate"><span class="pre">audmodel.load()</span></code> could fail when broken folders
+loaded by older versions of <code class="docutils literal notranslate"><span class="pre">audmodel</span></code> were present in the cache</p></li>
+</ul>
+</div>
+<div class="section" id="version-1-0-2-2021-09-14">
+<h2>Version 1.0.2 (2021-09-14)<a class="headerlink" href="#version-1-0-2-2021-09-14" title="Permalink to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>Added: tests for Windows</p></li>
+<li><p>Added: tests for macOS</p></li>
+<li><p>Fixed: folder creation bug under Windows when loading a model</p></li>
+</ul>
+</div>
+<div class="section" id="version-1-0-1-2021-07-23">
+<h2>Version 1.0.1 (2021-07-23)<a class="headerlink" href="#version-1-0-1-2021-07-23" title="Permalink to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>Changed: raise error if meta or parameters cannot be serialized</p></li>
+<li><p>Fixed: clean up files when <a class="reference internal" href="api/audmodel.publish.html#audmodel.publish" title="audmodel.publish"><code class="xref py py-func docutils literal notranslate"><span class="pre">audmodel.publish()</span></code></a> is interrupted</p></li>
+</ul>
+</div>
+<div class="section" id="version-1-0-0-2021-07-20">
+<h2>Version 1.0.0 (2021-07-20)<a class="headerlink" href="#version-1-0-0-2021-07-20" title="Permalink to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>Added: <a class="reference internal" href="api/audmodel.header.html#audmodel.header" title="audmodel.header"><code class="xref py py-func docutils literal notranslate"><span class="pre">audmodel.header()</span></code></a></p></li>
+<li><p>Added: <a class="reference internal" href="api/audmodel.meta.html#audmodel.meta" title="audmodel.meta"><code class="xref py py-func docutils literal notranslate"><span class="pre">audmodel.meta()</span></code></a></p></li>
+<li><p>Added: <a class="reference internal" href="api/audmodel.legacy_uid.html#audmodel.legacy_uid" title="audmodel.legacy_uid"><code class="xref py py-func docutils literal notranslate"><span class="pre">audmodel.legacy_uid()</span></code></a></p></li>
+<li><p>Added: <a class="reference internal" href="api/audmodel.update_meta.html#audmodel.update_meta" title="audmodel.update_meta"><code class="xref py py-func docutils literal notranslate"><span class="pre">audmodel.update_meta()</span></code></a></p></li>
+<li><p>Added: argument <code class="docutils literal notranslate"><span class="pre">cache_root</span></code> to several functions</p></li>
+<li><p>Added: argument <code class="docutils literal notranslate"><span class="pre">type</span></code> to <a class="reference internal" href="api/audmodel.url.html#audmodel.url" title="audmodel.url"><code class="xref py py-func docutils literal notranslate"><span class="pre">audmodel.url()</span></code></a></p></li>
+<li><p>Changed: make <code class="docutils literal notranslate"><span class="pre">'models-local'</span></code> default repository</p></li>
+<li><p>Changed: shorter model ID format, e.g. <code class="docutils literal notranslate"><span class="pre">'5fbbaf38-3.0.0'</span></code></p></li>
+<li><p>Changed: support for different backends</p></li>
+<li><p>Deprecated: <code class="docutils literal notranslate"><span class="pre">private</span></code> in <a class="reference internal" href="api/audmodel.publish.html#audmodel.publish" title="audmodel.publish"><code class="xref py py-func docutils literal notranslate"><span class="pre">audmodel.publish()</span></code></a></p></li>
+<li><p>Deprecated: <code class="docutils literal notranslate"><span class="pre">root</span></code> in <a class="reference internal" href="api/audmodel.load.html#audmodel.load" title="audmodel.load"><code class="xref py py-func docutils literal notranslate"><span class="pre">audmodel.load()</span></code></a></p></li>
+<li><p>Removed: <code class="docutils literal notranslate"><span class="pre">audmodel.lookup_table()</span></code></p></li>
+<li><p>Removed: <code class="docutils literal notranslate"><span class="pre">audmodel.remove()</span></code></p></li>
+</ul>
+</div>
+<div class="section" id="version-0-10-0-2021-04-06">
+<h2>Version 0.10.0 (2021-04-06)<a class="headerlink" href="#version-0-10-0-2021-04-06" title="Permalink to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>Changed: use audfactory&gt;=1.0.0</p></li>
+</ul>
+</div>
+<div class="section" id="version-0-9-1-2021-01-26">
+<h2>Version 0.9.1 (2021-01-26)<a class="headerlink" href="#version-0-9-1-2021-01-26" title="Permalink to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>Fixed: allow for newer versions of <code class="docutils literal notranslate"><span class="pre">audfactory</span></code></p></li>
+</ul>
+</div>
+<div class="section" id="version-0-9-0-2021-01-25">
+<h2>Version 0.9.0 (2021-01-25)<a class="headerlink" href="#version-0-9-0-2021-01-25" title="Permalink to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>Added: <a class="reference internal" href="api/audmodel.date.html#audmodel.date" title="audmodel.date"><code class="xref py py-func docutils literal notranslate"><span class="pre">audmodel.date()</span></code></a></p></li>
+<li><p>Added: <a class="reference internal" href="api/audmodel.author.html#audmodel.author" title="audmodel.author"><code class="xref py py-func docutils literal notranslate"><span class="pre">audmodel.author()</span></code></a></p></li>
+<li><p>Added: <a class="reference internal" href="api/audmodel.exists.html#audmodel.exists" title="audmodel.exists"><code class="xref py py-func docutils literal notranslate"><span class="pre">audmodel.exists()</span></code></a></p></li>
+<li><p>Changed: include the repository name in the folders created in cache</p></li>
+<li><p>Changed: <a class="reference internal" href="api/audmodel.url.html#audmodel.url" title="audmodel.url"><code class="xref py py-func docutils literal notranslate"><span class="pre">audmodel.url()</span></code></a> raises now <code class="docutils literal notranslate"><span class="pre">ConnectionError</span></code>
+instead of <code class="docutils literal notranslate"><span class="pre">RuntimeError</span></code> if Artifactory is offline</p></li>
+</ul>
+</div>
+<div class="section" id="version-0-8-0-2020-09-14">
+<h2>Version 0.8.0 (2020-09-14)<a class="headerlink" href="#version-0-8-0-2020-09-14" title="Permalink to this heading">¶</a></h2>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>With this version it becomes possible
+to load models only by their unique id.
+This introduces several breaking changes.
+For more details see the following
+<a class="reference external" href="https://gitlab.audeering.com/tools/audmodel/-/merge_requests/41">issue</a>.</p>
+</div>
+<ul class="simple">
+<li><p>Added:</p>
+<ul>
+<li><p><a class="reference internal" href="api/audmodel.default_cache_root.html#audmodel.default_cache_root" title="audmodel.default_cache_root"><code class="xref py py-meth docutils literal notranslate"><span class="pre">audmodel.default_cache_root()</span></code></a></p></li>
+<li><p><a class="reference internal" href="api/audmodel.name.html#audmodel.name" title="audmodel.name"><code class="xref py py-meth docutils literal notranslate"><span class="pre">audmodel.name()</span></code></a></p></li>
+<li><p><a class="reference internal" href="api/audmodel.parameters.html#audmodel.parameters" title="audmodel.parameters"><code class="xref py py-meth docutils literal notranslate"><span class="pre">audmodel.parameters()</span></code></a></p></li>
+<li><p><a class="reference internal" href="api/audmodel.subgroup.html#audmodel.subgroup" title="audmodel.subgroup"><code class="xref py py-meth docutils literal notranslate"><span class="pre">audmodel.subgroup()</span></code></a></p></li>
+<li><p><a class="reference internal" href="api/audmodel.uid.html#audmodel.uid" title="audmodel.uid"><code class="xref py py-meth docutils literal notranslate"><span class="pre">audmodel.uid()</span></code></a></p></li>
+<li><p><a class="reference internal" href="api/audmodel.url.html#audmodel.url" title="audmodel.url"><code class="xref py py-meth docutils literal notranslate"><span class="pre">audmodel.url()</span></code></a></p></li>
+<li><p><a class="reference internal" href="api/audmodel.version.html#audmodel.version" title="audmodel.version"><code class="xref py py-meth docutils literal notranslate"><span class="pre">audmodel.version()</span></code></a></p></li>
+</ul>
+</li>
+<li><p>Changed:</p>
+<ul>
+<li><p><a class="reference internal" href="api/audmodel.latest_version.html#audmodel.latest_version" title="audmodel.latest_version"><code class="xref py py-meth docutils literal notranslate"><span class="pre">audmodel.latest_version()</span></code></a></p></li>
+<li><p><a class="reference internal" href="api/audmodel.load.html#audmodel.load" title="audmodel.load"><code class="xref py py-meth docutils literal notranslate"><span class="pre">audmodel.load()</span></code></a></p></li>
+<li><p><code class="xref py py-meth docutils literal notranslate"><span class="pre">audmodel.remove()</span></code></p></li>
+<li><p><a class="reference internal" href="api/audmodel.versions.html#audmodel.versions" title="audmodel.versions"><code class="xref py py-meth docutils literal notranslate"><span class="pre">audmodel.versions()</span></code></a></p></li>
+</ul>
+</li>
+<li><p>Removed:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">audmodel.create_lookup_table</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">audmodel.delete_lookup_table</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">audmodel.extend_params</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">audmodel.get_*</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">audmodel.load_by_id</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">audmodel.Parameter</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">audmodel.Parameters</span></code></p></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="version-0-6-1-2020-07-01">
+<h2>Version 0.6.1 (2020-07-01)<a class="headerlink" href="#version-0-6-1-2020-07-01" title="Permalink to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>Fixed: <a class="reference internal" href="api/audmodel.versions.html#audmodel.versions" title="audmodel.versions"><code class="xref py py-func docutils literal notranslate"><span class="pre">audmodel.versions()</span></code></a> where not using the correct lookup table name
+and was broken</p></li>
+</ul>
+</div>
+<div class="section" id="version-0-6-0-2020-06-22">
+<h2>Version 0.6.0 (2020-06-22)<a class="headerlink" href="#version-0-6-0-2020-06-22" title="Permalink to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>Added: <code class="xref py py-class docutils literal notranslate"><span class="pre">audmodel.Parameter</span></code> and <code class="xref py py-class docutils literal notranslate"><span class="pre">audmodel.Parameters</span></code></p></li>
+<li><p>Changed: <code class="docutils literal notranslate"><span class="pre">unittest-public-local</span></code> repository for unit testing</p></li>
+<li><p>Changed: replace <code class="docutils literal notranslate"><span class="pre">Lookup</span></code> class with <a class="reference external" href="https://audeering.github.io/audfactory/api/audfactory.Lookup.html#audfactory.Lookup" title="(in audfactory vv1.0.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">audfactory.Lookup</span></code></a></p></li>
+<li><p>Removed: remove <code class="docutils literal notranslate"><span class="pre">aumodel.interface</span></code> module</p></li>
+<li><p>Removed: dependencies to <code class="docutils literal notranslate"><span class="pre">audiofile</span></code>, <code class="docutils literal notranslate"><span class="pre">audsp</span></code>, <code class="docutils literal notranslate"><span class="pre">numpy</span></code>, <code class="docutils literal notranslate"><span class="pre">pandas</span></code></p></li>
+</ul>
+</div>
+<div class="section" id="version-0-5-2-2020-04-24">
+<h2>Version 0.5.2 (2020-04-24)<a class="headerlink" href="#version-0-5-2-2020-04-24" title="Permalink to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>Added: <code class="xref py py-class docutils literal notranslate"><span class="pre">audmodel.interface.ProcessWithContext</span></code></p></li>
+<li><p>Changed: <a class="reference internal" href="api/audmodel.load.html#audmodel.load" title="audmodel.load"><code class="xref py py-meth docutils literal notranslate"><span class="pre">audmodel.load()</span></code></a> prints more informative error message</p></li>
+</ul>
+</div>
+<div class="section" id="version-0-5-1-2020-04-23">
+<h2>Version 0.5.1 (2020-04-23)<a class="headerlink" href="#version-0-5-1-2020-04-23" title="Permalink to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>Fixed: <code class="xref py py-meth docutils literal notranslate"><span class="pre">audmodel.interface.Process.process_signal()</span></code> uses correct
+sampling rate after resampling</p></li>
+</ul>
+</div>
+<div class="section" id="version-0-5-0-2020-04-23">
+<h2>Version 0.5.0 (2020-04-23)<a class="headerlink" href="#version-0-5-0-2020-04-23" title="Permalink to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>Added: <code class="xref py py-class docutils literal notranslate"><span class="pre">audmodel.interface.Segment</span></code></p></li>
+<li><p>Added: <code class="xref py py-meth docutils literal notranslate"><span class="pre">audmodel.get_model_url()</span></code></p></li>
+<li><p>Changed: renamed interface class <cite>Generic</cite> to <code class="xref py py-class docutils literal notranslate"><span class="pre">audmodel.interface.Process</span></code></p></li>
+<li><p>Changed: <a class="reference internal" href="api/audmodel.publish.html#audmodel.publish" title="audmodel.publish"><code class="xref py py-meth docutils literal notranslate"><span class="pre">audmodel.publish()</span></code></a> returns the model’s uid instead of url</p></li>
+</ul>
+</div>
+<div class="section" id="version-0-4-1-2020-04-20">
+<h2>Version 0.4.1 (2020-04-20)<a class="headerlink" href="#version-0-4-1-2020-04-20" title="Permalink to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>Added: <code class="xref py py-meth docutils literal notranslate"><span class="pre">audmodel.extend_params()</span></code> and <code class="xref py py-meth docutils literal notranslate"><span class="pre">audmodel.get_params()</span></code></p></li>
+<li><p>Fixed: return type of <code class="xref py py-meth docutils literal notranslate"><span class="pre">audmodel.interface.Generic.read_audio()</span></code></p></li>
+</ul>
+</div>
+<div class="section" id="version-0-4-0-2020-04-16">
+<h2>Version 0.4.0 (2020-04-16)<a class="headerlink" href="#version-0-4-0-2020-04-16" title="Permalink to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>Added: <code class="xref py py-class docutils literal notranslate"><span class="pre">audmodel.interface.Generic</span></code></p></li>
+</ul>
+</div>
+<div class="section" id="version-0-3-3-2020-03-18">
+<h2>Version 0.3.3 (2020-03-18)<a class="headerlink" href="#version-0-3-3-2020-03-18" title="Permalink to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>Added: verbose flag</p></li>
+<li><p>Added: publish models under a subgroup</p></li>
+</ul>
+</div>
+<div class="section" id="version-0-3-2-2020-03-10">
+<h2>Version 0.3.2 (2020-03-10)<a class="headerlink" href="#version-0-3-2-2020-03-10" title="Permalink to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>Changed: <a class="reference internal" href="api/audmodel.config.html#audmodel.config" title="audmodel.config"><code class="xref py py-class docutils literal notranslate"><span class="pre">audmodel.config</span></code></a> now member of <a class="reference internal" href="api/audmodel.html#module-audmodel" title="audmodel"><code class="xref py py-mod docutils literal notranslate"><span class="pre">audmodel</span></code></a></p></li>
+<li><p>Fixed: url of tutorial notebook</p></li>
+</ul>
+</div>
+<div class="section" id="version-0-3-1-2020-02-27">
+<h2>Version 0.3.1 (2020-02-27)<a class="headerlink" href="#version-0-3-1-2020-02-27" title="Permalink to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>Changed: update documentation</p></li>
+</ul>
+</div>
+<div class="section" id="version-0-3-0-2020-02-27">
+<h2>Version 0.3.0 (2020-02-27)<a class="headerlink" href="#version-0-3-0-2020-02-27" title="Permalink to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>Added: Sphinx documentation</p></li>
+<li><p>Added: Jupyter tutorial</p></li>
+<li><p>Changed: request (latest) version(s) for specific parameters (see
+<a class="reference internal" href="api/audmodel.version.html#audmodel.version" title="audmodel.version"><code class="xref py py-func docutils literal notranslate"><span class="pre">audmodel.version()</span></code></a> and <a class="reference internal" href="api/audmodel.latest_version.html#audmodel.latest_version" title="audmodel.latest_version"><code class="xref py py-func docutils literal notranslate"><span class="pre">audmodel.latest_version()</span></code></a>)</p></li>
+<li><p>Changed: running tests in parallel</p></li>
+</ul>
+</div>
+<div class="section" id="version-0-2-0-2020-02-25">
+<h2>Version 0.2.0 (2020-02-25)<a class="headerlink" href="#version-0-2-0-2020-02-25" title="Permalink to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>Added: unit tests with full code coverage</p></li>
+<li><p>Added: <code class="xref py py-func docutils literal notranslate"><span class="pre">audmodel.delete_lookup_table()</span></code></p></li>
+<li><p>Added: <code class="xref py py-func docutils literal notranslate"><span class="pre">audmodel.get_default_cache_root()</span></code></p></li>
+<li><p>Added: <a class="reference internal" href="api/audmodel.latest_version.html#audmodel.latest_version" title="audmodel.latest_version"><code class="xref py py-func docutils literal notranslate"><span class="pre">audmodel.latest_version()</span></code></a></p></li>
+<li><p>Added: <a class="reference internal" href="api/audmodel.versions.html#audmodel.versions" title="audmodel.versions"><code class="xref py py-func docutils literal notranslate"><span class="pre">audmodel.versions()</span></code></a></p></li>
+</ul>
+</div>
+<div class="section" id="version-0-1-0-2020-02-24">
+<h2>Version 0.1.0 (2020-02-24)<a class="headerlink" href="#version-0-1-0-2020-02-24" title="Permalink to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>Added: initial release</p></li>
+</ul>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="contributing.html" class="btn btn-neutral float-left" title="Contributing" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div>
+      
+      
+      
+      
+      
+      
+      
+      
+        <ul>
+          <li><a href="http://data.pp.audeering.com">Data</a></li>
+          <li><a href="http://devops.pp.audeering.com/sphinx/">Docs</a></li>
+          <li><a href="http://devops.pp.audeering.com/">Infra</a></li>
+          <li><a href="http://models.pp.audeering.com">Models</a></li>
+          <li><a href="http://research.pp.audeering.com">Research</a></li>
+          <li><a href="http://tools.pp.audeering.com">Tools</a></li>
+        </ul>
+      
+    <p>
+        
+        
+        
+          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2024/12/11 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+        
+    </p>
+  </div>
+
+  <div role="contentinfo">
+    <p>
+        
+      &copy; 2019-2024 audEERING GmbH
+    </p>
+  </div> 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+        <script src="_static/thebelab-helper.js"></script>
+        <script src="_static/clipboard.min.js"></script>
+        <script src="_static/copybutton.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
+    
+
+  
+
+  <script type="text/javascript" src="_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

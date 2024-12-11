@@ -1,0 +1,6 @@
+﻿versions\(\)
+============
+
+.. currentmodule:: audmodel
+
+.. autofunction:: audmodel.versions

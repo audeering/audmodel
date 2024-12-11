@@ -1,0 +1,6 @@
+﻿exists\(\)
+==========
+
+.. currentmodule:: audmodel
+
+.. autofunction:: audmodel.exists

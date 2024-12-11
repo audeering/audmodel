@@ -1,0 +1,6 @@
+﻿header\(\)
+==========
+
+.. currentmodule:: audmodel
+
+.. autofunction:: audmodel.header

@@ -1,0 +1,6 @@
+﻿name\(\)
+========
+
+.. currentmodule:: audmodel
+
+.. autofunction:: audmodel.name

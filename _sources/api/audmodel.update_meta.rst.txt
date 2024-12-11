@@ -1,0 +1,6 @@
+﻿update\_meta\(\)
+================
+
+.. currentmodule:: audmodel
+
+.. autofunction:: audmodel.update_meta

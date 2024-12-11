@@ -1,0 +1,6 @@
+﻿load\(\)
+========
+
+.. currentmodule:: audmodel
+
+.. autofunction:: audmodel.load

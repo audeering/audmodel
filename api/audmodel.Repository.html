@@ -1,0 +1,407 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Repository &mdash; Documentation</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="../_static/favicon.png"/>
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/audeering.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/jupyter-sphinx.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/thebelab.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="subgroup()" href="audmodel.subgroup.html" />
+    <link rel="prev" title="publish()" href="audmodel.publish.html" />
+    
+  
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          <a href="../index.html">
+          
+            <img src="../_static/images/audeering.png" class="logo" alt="audEERING"/>
+          
+          
+            <span> audmodel</span>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                v1.3.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../authentication.html">Authentication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usage.html">Usage</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Documentation</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="audmodel.html">audmodel</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="audmodel.author.html">author()</a></li>
+<li class="toctree-l2"><a class="reference internal" href="audmodel.config.html">config</a></li>
+<li class="toctree-l2"><a class="reference internal" href="audmodel.date.html">date()</a></li>
+<li class="toctree-l2"><a class="reference internal" href="audmodel.default_cache_root.html">default_cache_root()</a></li>
+<li class="toctree-l2"><a class="reference internal" href="audmodel.exists.html">exists()</a></li>
+<li class="toctree-l2"><a class="reference internal" href="audmodel.header.html">header()</a></li>
+<li class="toctree-l2"><a class="reference internal" href="audmodel.latest_version.html">latest_version()</a></li>
+<li class="toctree-l2"><a class="reference internal" href="audmodel.legacy_uid.html">legacy_uid()</a></li>
+<li class="toctree-l2"><a class="reference internal" href="audmodel.load.html">load()</a></li>
+<li class="toctree-l2"><a class="reference internal" href="audmodel.meta.html">meta()</a></li>
+<li class="toctree-l2"><a class="reference internal" href="audmodel.name.html">name()</a></li>
+<li class="toctree-l2"><a class="reference internal" href="audmodel.parameters.html">parameters()</a></li>
+<li class="toctree-l2"><a class="reference internal" href="audmodel.publish.html">publish()</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Repository</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#backend">backend</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#backend-registry">backend_registry</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#create-backend-interface">create_backend_interface()</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#host">host</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#name">name</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#register">register()</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="audmodel.subgroup.html">subgroup()</a></li>
+<li class="toctree-l2"><a class="reference internal" href="audmodel.uid.html">uid()</a></li>
+<li class="toctree-l2"><a class="reference internal" href="audmodel.update_meta.html">update_meta()</a></li>
+<li class="toctree-l2"><a class="reference internal" href="audmodel.url.html">url()</a></li>
+<li class="toctree-l2"><a class="reference internal" href="audmodel.version.html">version()</a></li>
+<li class="toctree-l2"><a class="reference internal" href="audmodel.versions.html">versions()</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../genindex.html">Index</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../changelog.html">Changelog</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">audmodel</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="audmodel.html">audmodel</a> &raquo;</li>
+      <li>Repository</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://gitlab.audeering.com/audeering/audmodel/" class="fa fa-gitlab"> GitLab</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="repository">
+<h1>Repository<a class="headerlink" href="#repository" title="Permalink to this heading">¶</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="audmodel.Repository">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">audmodel.</span></span><span class="sig-name descname"><span class="pre">Repository</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">host</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">backend</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/audmodel/core/repository.html#Repository"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audmodel.Repository" title="Permalink to this definition">¶</a></dt>
+<dd><p>Repository object.</p>
+<p>It stores all information
+needed to address a repository:
+the repository name,
+host,
+and the backend name.
+With <a class="reference internal" href="#audmodel.Repository.create_backend_interface" title="audmodel.Repository.create_backend_interface"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Repository.create_backend_interface()</span></code></a>
+it also provides a method
+to create a backend interface
+to access the repository.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – repository name</p></li>
+<li><p><strong>host</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – repository host</p></li>
+<li><p><strong>backend</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – repository backend</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Repository</span><span class="p">(</span><span class="s2">&quot;data-local&quot;</span><span class="p">,</span> <span class="s2">&quot;/data&quot;</span><span class="p">,</span> <span class="s2">&quot;file-system&quot;</span><span class="p">)</span>
+<span class="go">Repository(&#39;data-local&#39;, &#39;/data&#39;, &#39;file-system&#39;)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<div class="section" id="backend">
+<h2>backend<a class="headerlink" href="#backend" title="Permalink to this heading">¶</a></h2>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="audmodel.Repository.backend">
+<span class="sig-prename descclassname"><span class="pre">Repository.</span></span><span class="sig-name descname"><span class="pre">backend</span></span><a class="headerlink" href="#audmodel.Repository.backend" title="Permalink to this definition">¶</a></dt>
+<dd><p>Repository backend.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="backend-registry">
+<h2>backend_registry<a class="headerlink" href="#backend-registry" title="Permalink to this heading">¶</a></h2>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="audmodel.Repository.backend_registry">
+<span class="sig-prename descclassname"><span class="pre">Repository.</span></span><span class="sig-name descname"><span class="pre">backend_registry</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'artifactory':</span> <span class="pre">&lt;class</span> <span class="pre">'audbackend.core.backend.artifactory.Artifactory'&gt;,</span> <span class="pre">'file-system':</span> <span class="pre">&lt;class</span> <span class="pre">'audbackend.core.backend.filesystem.FileSystem'&gt;,</span> <span class="pre">'minio':</span> <span class="pre">&lt;class</span> <span class="pre">'audbackend.core.backend.minio.Minio'&gt;,</span> <span class="pre">'s3':</span> <span class="pre">&lt;class</span> <span class="pre">'audbackend.core.backend.minio.Minio'&gt;}</span></em><a class="headerlink" href="#audmodel.Repository.backend_registry" title="Permalink to this definition">¶</a></dt>
+<dd><p>Backend registry.</p>
+<p>Holds mapping between registered backend names,
+and their corresponding backend classes.
+The <code class="docutils literal notranslate"><span class="pre">&quot;artifactory&quot;</span></code> backend is currently not available
+under Python &gt;=3.12.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="create-backend-interface">
+<h2>create_backend_interface()<a class="headerlink" href="#create-backend-interface" title="Permalink to this heading">¶</a></h2>
+<dl class="py method">
+<dt class="sig sig-object py" id="audmodel.Repository.create_backend_interface">
+<span class="sig-prename descclassname"><span class="pre">Repository.</span></span><span class="sig-name descname"><span class="pre">create_backend_interface</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/audmodel/core/repository.html#Repository.create_backend_interface"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audmodel.Repository.create_backend_interface" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create backend interface to access repository.</p>
+<p>It wraps an <a class="reference external" href="https://audeering.github.io/audbackend/api/audbackend.interface.Maven.html#audbackend.interface.Maven" title="(in audbackend v2.2.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">audbackend.interface.Maven</span></code></a> interface
+around the backend.</p>
+<p>The returned backend instance
+has not yet established a connection to the backend.
+To establish a connection,
+use the backend with a <code class="docutils literal notranslate"><span class="pre">with</span></code> statement,
+or use the <code class="docutils literal notranslate"><span class="pre">open()</span></code> and <code class="docutils literal notranslate"><span class="pre">close()</span></code> methods of the backend class.
+The backend is stored as the inside the <code class="docutils literal notranslate"><span class="pre">backend</span></code> attribute
+of the returned backend interface.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#type" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">type</span></code></a>[<a class="reference external" href="https://audeering.github.io/audbackend/api/audbackend.interface.Base.html#audbackend.interface.Base" title="(in audbackend v2.2.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Base</span></code></a>]</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>interface to repository</p>
+</dd>
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.13)"><strong>ValueError</strong></a> – if an artifactory backend is requested in Python&gt;=3.12</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.13)"><strong>ValueError</strong></a> – if a non-supported backend is requested</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="host">
+<h2>host<a class="headerlink" href="#host" title="Permalink to this heading">¶</a></h2>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="audmodel.Repository.host">
+<span class="sig-prename descclassname"><span class="pre">Repository.</span></span><span class="sig-name descname"><span class="pre">host</span></span><a class="headerlink" href="#audmodel.Repository.host" title="Permalink to this definition">¶</a></dt>
+<dd><p>Repository host.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="name">
+<h2>name<a class="headerlink" href="#name" title="Permalink to this heading">¶</a></h2>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="audmodel.Repository.name">
+<span class="sig-prename descclassname"><span class="pre">Repository.</span></span><span class="sig-name descname"><span class="pre">name</span></span><a class="headerlink" href="#audmodel.Repository.name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Repository name.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="register">
+<h2>register()<a class="headerlink" href="#register" title="Permalink to this heading">¶</a></h2>
+<dl class="py method">
+<dt class="sig sig-object py" id="audmodel.Repository.register">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">Repository.</span></span><span class="sig-name descname"><span class="pre">register</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">backend_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">backend_class</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/audmodel/core/repository.html#Repository.register"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audmodel.Repository.register" title="Permalink to this definition">¶</a></dt>
+<dd><p>Register backend class.</p>
+<p>Adds an entry to the dictionary
+stored in the class variable <a class="reference internal" href="#audmodel.Repository.backend_registry" title="audmodel.Repository.backend_registry"><code class="xref py py-data docutils literal notranslate"><span class="pre">Repository.backend_registry</span></code></a>,
+mapping a backend name
+to an actual backend class.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>backend_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – name of the backend,
+e.g. <code class="docutils literal notranslate"><span class="pre">&quot;file-system&quot;</span></code></p></li>
+<li><p><strong>backend_class</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#type" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">type</span></code></a>[<a class="reference external" href="https://audeering.github.io/audbackend/api/audbackend.backend.Base.html#audbackend.backend.Base" title="(in audbackend v2.2.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Base</span></code></a>]) – class of the backend,
+that should be associated with <code class="docutils literal notranslate"><span class="pre">backend_name</span></code>,
+e.g. <code class="docutils literal notranslate"><span class="pre">&quot;audbackend.backend.Filesystem&quot;</span></code></p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">audbackend</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Repository</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="s2">&quot;file-system&quot;</span><span class="p">,</span> <span class="n">audbackend</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">FileSystem</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="audmodel.subgroup.html" class="btn btn-neutral float-right" title="subgroup()" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="audmodel.publish.html" class="btn btn-neutral float-left" title="publish()" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div>
+      
+      
+      
+      
+      
+      
+      
+      
+        <ul>
+          <li><a href="http://data.pp.audeering.com">Data</a></li>
+          <li><a href="http://devops.pp.audeering.com/sphinx/">Docs</a></li>
+          <li><a href="http://devops.pp.audeering.com/">Infra</a></li>
+          <li><a href="http://models.pp.audeering.com">Models</a></li>
+          <li><a href="http://research.pp.audeering.com">Research</a></li>
+          <li><a href="http://tools.pp.audeering.com">Tools</a></li>
+        </ul>
+      
+    <p>
+        
+        
+        
+          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2024/12/11 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+        
+    </p>
+  </div>
+
+  <div role="contentinfo">
+    <p>
+        
+      &copy; 2019-2024 audEERING GmbH
+    </p>
+  </div> 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+        <script src="../_static/thebelab-helper.js"></script>
+        <script src="../_static/clipboard.min.js"></script>
+        <script src="../_static/copybutton.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
+    
+
+  
+
+  <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

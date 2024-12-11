@@ -1,0 +1,656 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Usage &mdash; Documentation</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="_static/favicon.png"/>
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/css/audeering.css" type="text/css" />
+  <link rel="stylesheet" href="_static/jupyter-sphinx.css" type="text/css" />
+  <link rel="stylesheet" href="_static/thebelab.css" type="text/css" />
+  <link rel="stylesheet" href="_static/copybutton.css" type="text/css" />
+  <link rel="stylesheet" href="_static/css/custom.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="audmodel" href="api/audmodel.html" />
+    <link rel="prev" title="Authentication" href="authentication.html" />
+    
+  
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          <a href="index.html">
+          
+            <img src="_static/images/audeering.png" class="logo" alt="audEERING"/>
+          
+          
+            <span> audmodel</span>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                v1.3.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="authentication.html">Authentication</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Usage</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#introduction">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#publish-a-model">Publish a model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#load-a-model">Load a model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#publish-a-new-version">Publish a new version</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#update-metadata">Update metadata</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#cache-folder">Cache folder</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api/audmodel.html">audmodel</a></li>
+<li class="toctree-l1"><a class="reference internal" href="genindex.html">Index</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">audmodel</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>Usage</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://gitlab.audeering.com/audeering/audmodel/" class="fa fa-gitlab"> GitLab</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="usage">
+<h1>Usage<a class="headerlink" href="#usage" title="Permalink to this heading">¶</a></h1>
+<div class="jupyter_cell docutils container">
+<div class="cell_output docutils container">
+</div>
+</div>
+<div class="section" id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this heading">¶</a></h2>
+<p><a class="reference internal" href="api/audmodel.html#module-audmodel" title="audmodel"><code class="xref py py-mod docutils literal notranslate"><span class="pre">audmodel</span></code></a> is a versatile tool
+to <strong>publish</strong>,
+<strong>load</strong>,
+and tag
+machine learning models
+with <strong>parameters</strong>,
+(e.g. data and sampling rate),
+and <strong>metadata</strong>
+(e.g. hyperparameter).</p>
+</div>
+<div class="section" id="publish-a-model">
+<h2>Publish a model<a class="headerlink" href="#publish-a-model" title="Permalink to this heading">¶</a></h2>
+<p>Let’s assume we have a model folder <code class="docutils literal notranslate"><span class="pre">root_v1</span></code>,
+consisting of the following files:</p>
+<div class="jupyter_cell docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-none notranslate"><div class="highlight"><pre><span></span>root_v1/
+    readme.txt
+    model.onnx
+    model.yaml
+    log/
+        eval.yaml
+</pre></div>
+</div>
+</div>
+</div>
+<p>Before we can publish a model,
+we have to define several arguments:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">name</span></code>, name of the model, e.g <code class="docutils literal notranslate"><span class="pre">onnx</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">params</span></code>, parameters of the model</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">version</span></code>, version of the model, e.g. <code class="docutils literal notranslate"><span class="pre">1.0.0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">author</span></code>, name of the author</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">meta</span></code>, dictionary with meta information</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">subgroup</span></code>, subgroup of the model, e.g. <code class="docutils literal notranslate"><span class="pre">emotion.cnn</span></code></p></li>
+</ul>
+<p>For a discussion on how to select those arguments,
+have a look at the discussion in the API documentation of
+<a class="reference internal" href="api/audmodel.publish.html#audmodel.publish" title="audmodel.publish"><code class="xref py py-func docutils literal notranslate"><span class="pre">audmodel.publish()</span></code></a>.</p>
+<p>Let’s define the arguments for our example model:</p>
+<div class="jupyter_cell jupyter_container docutils container">
+<div class="cell_input code_cell docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;onnx&quot;</span>
+<span class="n">params</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;model&quot;</span><span class="p">:</span> <span class="s2">&quot;cnn10&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;data&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;emodb&quot;</span><span class="p">,</span> <span class="s2">&quot;msppodcast&quot;</span><span class="p">],</span>
+    <span class="s2">&quot;feature&quot;</span><span class="p">:</span> <span class="s2">&quot;melspec&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;sampling_rate&quot;</span><span class="p">:</span> <span class="mi">16000</span><span class="p">,</span>
+<span class="p">}</span>
+<span class="n">version</span> <span class="o">=</span> <span class="s2">&quot;1.0.0&quot;</span>
+<span class="n">author</span><span class="o">=</span><span class="s2">&quot;sphinx&quot;</span>
+<span class="n">meta</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;model&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;cnn10&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;learning-rate&quot;</span><span class="p">:</span> <span class="mf">1e-2</span><span class="p">,</span>
+            <span class="s2">&quot;optimizer&quot;</span><span class="p">:</span> <span class="s2">&quot;adam&quot;</span><span class="p">,</span>
+        <span class="p">},</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;data&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;emodb&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;version&quot;</span><span class="p">:</span> <span class="s2">&quot;1.1.1&quot;</span><span class="p">},</span>
+        <span class="s2">&quot;msppodcast&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;version&quot;</span><span class="p">:</span> <span class="s2">&quot;2.6.0&quot;</span><span class="p">},</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;feature&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;melspec&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;win_dur&quot;</span><span class="p">:</span> <span class="s2">&quot;32ms&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;hop_dur&quot;</span><span class="p">:</span> <span class="s2">&quot;10ms&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;mel_bins&quot;</span><span class="p">:</span> <span class="mi">64</span><span class="p">,</span>
+        <span class="p">},</span>
+    <span class="p">},</span>
+<span class="p">}</span>
+<span class="n">subgroup</span> <span class="o">=</span> <span class="s2">&quot;emotion.cnn&quot;</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+</div>
+</div>
+<p>Per default <a class="reference internal" href="api/audmodel.html#module-audmodel" title="audmodel"><code class="xref py py-mod docutils literal notranslate"><span class="pre">audmodel</span></code></a> uses repositories
+on Artifactory and S3.
+For this example
+we create a local temporary repository
+in which the model is stored.</p>
+<div class="jupyter_cell jupyter_container docutils container">
+<div class="cell_input code_cell docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">audeer</span>
+<span class="kn">import</span> <span class="nn">audmodel</span>
+
+<span class="n">repo</span> <span class="o">=</span> <span class="s2">&quot;models&quot;</span>
+<span class="n">host</span> <span class="o">=</span> <span class="n">audeer</span><span class="o">.</span><span class="n">path</span><span class="p">(</span><span class="s2">&quot;./tmp/repo&quot;</span><span class="p">)</span>
+<span class="n">audeer</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">audeer</span><span class="o">.</span><span class="n">path</span><span class="p">(</span><span class="n">host</span><span class="p">,</span> <span class="n">repo</span><span class="p">))</span>
+<span class="n">repository</span> <span class="o">=</span> <span class="n">audmodel</span><span class="o">.</span><span class="n">Repository</span><span class="p">(</span><span class="n">repo</span><span class="p">,</span> <span class="n">host</span><span class="p">,</span> <span class="s2">&quot;file-system&quot;</span><span class="p">)</span>
+<span class="n">audmodel</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">REPOSITORIES</span> <span class="o">=</span> <span class="p">[</span><span class="n">repository</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+</div>
+</div>
+<p>Now we can publish the model with</p>
+<div class="jupyter_cell jupyter_container docutils container">
+<div class="cell_input code_cell docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">uid</span> <span class="o">=</span> <span class="n">audmodel</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span>
+    <span class="n">root_v1</span><span class="p">,</span>
+    <span class="n">name</span><span class="p">,</span>
+    <span class="n">params</span><span class="p">,</span>
+    <span class="n">version</span><span class="p">,</span>
+    <span class="n">author</span><span class="o">=</span><span class="n">author</span><span class="p">,</span>
+    <span class="n">meta</span><span class="o">=</span><span class="n">meta</span><span class="p">,</span>
+    <span class="n">subgroup</span><span class="o">=</span><span class="n">subgroup</span><span class="p">,</span>
+    <span class="n">repository</span><span class="o">=</span><span class="n">repository</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">uid</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>&#39;3e120e8d-1.0.0&#39;
+</pre></div>
+</div>
+</div>
+</div>
+<p>The publishing process returns a unique model ID,
+that can be used to access the model.
+The model ID is derived from
+<code class="docutils literal notranslate"><span class="pre">name</span></code>, <code class="docutils literal notranslate"><span class="pre">params</span></code>, <code class="docutils literal notranslate"><span class="pre">subgroup</span></code>, <code class="docutils literal notranslate"><span class="pre">version</span></code>.</p>
+</div>
+<div class="section" id="load-a-model">
+<h2>Load a model<a class="headerlink" href="#load-a-model" title="Permalink to this heading">¶</a></h2>
+<p>With the model ID we can check if a model exists:</p>
+<div class="jupyter_cell jupyter_container docutils container">
+<div class="cell_input code_cell docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">audmodel</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">uid</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+<p>Or get its name,</p>
+<div class="jupyter_cell jupyter_container docutils container">
+<div class="cell_input code_cell docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">audmodel</span><span class="o">.</span><span class="n">name</span><span class="p">(</span><span class="n">uid</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>&#39;onnx&#39;
+</pre></div>
+</div>
+</div>
+</div>
+<p>parameters,</p>
+<div class="jupyter_cell jupyter_container docutils container">
+<div class="cell_input code_cell docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">audmodel</span><span class="o">.</span><span class="n">parameters</span><span class="p">(</span><span class="n">uid</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>{&#39;model&#39;: &#39;cnn10&#39;,
+ &#39;data&#39;: [&#39;emodb&#39;, &#39;msppodcast&#39;],
+ &#39;feature&#39;: &#39;melspec&#39;,
+ &#39;sampling_rate&#39;: 16000}
+</pre></div>
+</div>
+</div>
+</div>
+<p>and meta fields.</p>
+<div class="jupyter_cell jupyter_container docutils container">
+<div class="cell_input code_cell docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">audmodel</span><span class="o">.</span><span class="n">meta</span><span class="p">(</span><span class="n">uid</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>{&#39;model&#39;: {&#39;cnn10&#39;: {&#39;learning-rate&#39;: 0.01, &#39;optimizer&#39;: &#39;adam&#39;}},
+ &#39;data&#39;: {&#39;emodb&#39;: {&#39;version&#39;: &#39;1.1.1&#39;}, &#39;msppodcast&#39;: {&#39;version&#39;: &#39;2.6.0&#39;}},
+ &#39;feature&#39;: {&#39;melspec&#39;: {&#39;win_dur&#39;: &#39;32ms&#39;,
+   &#39;hop_dur&#39;: &#39;10ms&#39;,
+   &#39;mel_bins&#39;: 64}}}
+</pre></div>
+</div>
+</div>
+</div>
+<p>To actually load the actual model, we do:</p>
+<div class="jupyter_cell jupyter_container docutils container">
+<div class="cell_input code_cell docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">model_root</span> <span class="o">=</span> <span class="n">audmodel</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">uid</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+</div>
+</div>
+<p>Inside the <code class="file docutils literal notranslate"><span class="pre">model_root</span></code> folder
+we will then have the following structure.</p>
+<div class="jupyter_cell docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-none notranslate"><div class="highlight"><pre><span></span>1.0.0/
+    readme.txt
+    model.onnx
+    model.yaml
+    log/
+        eval.yaml
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="publish-a-new-version">
+<h2>Publish a new version<a class="headerlink" href="#publish-a-new-version" title="Permalink to this heading">¶</a></h2>
+<p>When making only minor changes to the model
+that does not affect any of its parameters,
+we can publish a new version of the model
+and update only the <code class="docutils literal notranslate"><span class="pre">meta</span></code> entry.
+As an example,
+let’s assume we switch to less Mel frequency bins
+in the feature extractor.</p>
+<div class="jupyter_cell jupyter_container docutils container">
+<div class="cell_input code_cell docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">meta</span><span class="p">[</span><span class="s2">&quot;feature&quot;</span><span class="p">][</span><span class="s2">&quot;melspec&quot;</span><span class="p">][</span><span class="s2">&quot;mel_bins&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">32</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+</div>
+</div>
+<p>Let’s again assume we have a model folder,
+this time called <code class="docutils literal notranslate"><span class="pre">root_v2</span></code>:</p>
+<div class="jupyter_cell docutils container">
+<div class="cell_output docutils container">
+<div class="output stream highlight-none notranslate"><div class="highlight"><pre><span></span>root_v2/
+    readme.txt
+    model.onnx
+    model.yaml
+    log/
+        eval.yaml
+</pre></div>
+</div>
+</div>
+</div>
+<p>As this model has the same parameters, name, and subgroup
+as our previous model,
+we choose a new version number,
+and publish it with:</p>
+<div class="jupyter_cell jupyter_container docutils container">
+<div class="cell_input code_cell docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">uid</span> <span class="o">=</span> <span class="n">audmodel</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span>
+    <span class="n">root_v2</span><span class="p">,</span>
+    <span class="n">name</span><span class="p">,</span>
+    <span class="n">params</span><span class="p">,</span>
+    <span class="s2">&quot;2.0.0&quot;</span><span class="p">,</span>
+    <span class="n">meta</span><span class="o">=</span><span class="n">meta</span><span class="p">,</span>
+    <span class="n">subgroup</span><span class="o">=</span><span class="n">subgroup</span><span class="p">,</span>
+    <span class="n">repository</span><span class="o">=</span><span class="n">repository</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">uid</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>&#39;3e120e8d-2.0.0&#39;
+</pre></div>
+</div>
+</div>
+</div>
+<p>Now we have published two versions of the model:</p>
+<div class="jupyter_cell jupyter_container docutils container">
+<div class="cell_input code_cell docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">audmodel</span><span class="o">.</span><span class="n">versions</span><span class="p">(</span><span class="n">uid</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>[&#39;1.0.0&#39;, &#39;2.0.0&#39;]
+</pre></div>
+</div>
+</div>
+</div>
+<p>To find the latest version we can do:</p>
+<div class="jupyter_cell jupyter_container docutils container">
+<div class="cell_input code_cell docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">audmodel</span><span class="o">.</span><span class="n">latest_version</span><span class="p">(</span><span class="n">uid</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>&#39;2.0.0&#39;
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="update-metadata">
+<h2>Update metadata<a class="headerlink" href="#update-metadata" title="Permalink to this heading">¶</a></h2>
+<p>While the parameters of a model cannot be changed,
+it is possible to update its metadata.</p>
+<p>For instance,
+we can update or add fields
+by passing a dictionary
+that holds new / altered information.
+As the following example shows
+this even works with nested fields.</p>
+<div class="jupyter_cell jupyter_container docutils container">
+<div class="cell_input code_cell docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">meta</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;model&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;cnn10&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;layers&quot;</span><span class="p">:</span> <span class="mi">10</span><span class="p">},</span>
+    <span class="p">},</span>
+<span class="p">}</span>
+<span class="n">audmodel</span><span class="o">.</span><span class="n">update_meta</span><span class="p">(</span><span class="n">uid</span><span class="p">,</span> <span class="n">meta</span><span class="p">)</span>
+<span class="n">audmodel</span><span class="o">.</span><span class="n">meta</span><span class="p">(</span><span class="n">uid</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>{&#39;model&#39;: {&#39;cnn10&#39;: {&#39;learning-rate&#39;: 0.01,
+   &#39;optimizer&#39;: &#39;adam&#39;,
+   &#39;layers&#39;: 10}},
+ &#39;data&#39;: {&#39;emodb&#39;: {&#39;version&#39;: &#39;1.1.1&#39;}, &#39;msppodcast&#39;: {&#39;version&#39;: &#39;2.6.0&#39;}},
+ &#39;feature&#39;: {&#39;melspec&#39;: {&#39;win_dur&#39;: &#39;32ms&#39;,
+   &#39;hop_dur&#39;: &#39;10ms&#39;,
+   &#39;mel_bins&#39;: 32}}}
+</pre></div>
+</div>
+</div>
+</div>
+<p>Alternatively,
+we can replace the metadata.</p>
+<div class="jupyter_cell jupyter_container docutils container">
+<div class="cell_input code_cell docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">meta</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;new&quot;</span><span class="p">:</span> <span class="s2">&quot;meta&quot;</span><span class="p">}</span>
+<span class="n">audmodel</span><span class="o">.</span><span class="n">update_meta</span><span class="p">(</span><span class="n">uid</span><span class="p">,</span> <span class="n">meta</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">audmodel</span><span class="o">.</span><span class="n">meta</span><span class="p">(</span><span class="n">uid</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>{&#39;new&#39;: &#39;meta&#39;}
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="cache-folder">
+<h2>Cache folder<a class="headerlink" href="#cache-folder" title="Permalink to this heading">¶</a></h2>
+<p>Models are unpacked to the model cache folder,
+which can be checked by:</p>
+<div class="jupyter_cell jupyter_container docutils container">
+<div class="cell_input code_cell docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">cache_root</span> <span class="o">=</span> <span class="n">audmodel</span><span class="o">.</span><span class="n">default_cache_root</span><span class="p">()</span>
+<span class="n">cache_root</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>&#39;/home/runner/work/audmodel/audmodel/tmp/cache&#39;
+</pre></div>
+</div>
+</div>
+</div>
+<div class="jupyter_cell jupyter_container docutils container">
+<div class="cell_input code_cell docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">audeer</span><span class="o">.</span><span class="n">list_dir_names</span><span class="p">(</span><span class="n">cache_root</span><span class="p">,</span> <span class="n">basenames</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>[&#39;3e120e8d&#39;]
+</pre></div>
+</div>
+</div>
+</div>
+<p>We can change the location of the cache folder
+by setting an environment variable:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">AUDMODEL_CACHE_ROOT</span><span class="o">=</span>/path/to/your/cache
+</pre></div>
+</div>
+<p>Or by changing it inside <a class="reference internal" href="api/audmodel.config.html#audmodel.config" title="audmodel.config"><code class="xref py py-class docutils literal notranslate"><span class="pre">audmodel.config</span></code></a>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">audmodel</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">CACHE_ROOT</span><span class="o">=</span><span class="s2">&quot;/path/to/your/cache&quot;</span>
+</pre></div>
+</div>
+<p>Or individually,
+by calling <a class="reference internal" href="api/audmodel.load.html#audmodel.load" title="audmodel.load"><code class="xref py py-func docutils literal notranslate"><span class="pre">audmodel.load()</span></code></a>
+with a non empty <code class="docutils literal notranslate"><span class="pre">cache_root</span></code> argument.</p>
+<p>Within the model cache folder
+the model is placed in a unique sub-folder, namely
+<code class="docutils literal notranslate"><span class="pre">&lt;uid&gt;/&lt;version&gt;</span></code>.</p>
+<div class="jupyter_cell docutils container">
+<div class="cell_output docutils container">
+</div>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="api/audmodel.html" class="btn btn-neutral float-right" title="audmodel" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="authentication.html" class="btn btn-neutral float-left" title="Authentication" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div>
+      
+      
+      
+      
+      
+      
+      
+      
+        <ul>
+          <li><a href="http://data.pp.audeering.com">Data</a></li>
+          <li><a href="http://devops.pp.audeering.com/sphinx/">Docs</a></li>
+          <li><a href="http://devops.pp.audeering.com/">Infra</a></li>
+          <li><a href="http://models.pp.audeering.com">Models</a></li>
+          <li><a href="http://research.pp.audeering.com">Research</a></li>
+          <li><a href="http://tools.pp.audeering.com">Tools</a></li>
+        </ul>
+      
+    <p>
+        
+        
+        
+          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2024/12/11 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+        
+    </p>
+  </div>
+
+  <div role="contentinfo">
+    <p>
+        
+      &copy; 2019-2024 audEERING GmbH
+    </p>
+  </div> 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+        <script src="_static/thebelab-helper.js"></script>
+        <script src="_static/clipboard.min.js"></script>
+        <script src="_static/copybutton.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
+    
+
+  
+
+  <script type="text/javascript" src="_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

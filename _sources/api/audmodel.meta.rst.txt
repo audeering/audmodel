@@ -1,0 +1,6 @@
+﻿meta\(\)
+========
+
+.. currentmodule:: audmodel
+
+.. autofunction:: audmodel.meta

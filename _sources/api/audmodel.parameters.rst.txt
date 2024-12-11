@@ -1,0 +1,6 @@
+﻿parameters\(\)
+==============
+
+.. currentmodule:: audmodel
+
+.. autofunction:: audmodel.parameters

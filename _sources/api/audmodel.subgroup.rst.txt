@@ -1,0 +1,6 @@
+﻿subgroup\(\)
+============
+
+.. currentmodule:: audmodel
+
+.. autofunction:: audmodel.subgroup

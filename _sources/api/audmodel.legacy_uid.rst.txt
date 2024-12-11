@@ -1,0 +1,6 @@
+﻿legacy\_uid\(\)
+===============
+
+.. currentmodule:: audmodel
+
+.. autofunction:: audmodel.legacy_uid

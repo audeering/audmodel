@@ -1,0 +1,6 @@
+﻿author\(\)
+==========
+
+.. currentmodule:: audmodel
+
+.. autofunction:: audmodel.author

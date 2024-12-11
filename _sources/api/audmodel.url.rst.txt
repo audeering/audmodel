@@ -1,0 +1,6 @@
+﻿url\(\)
+=======
+
+.. currentmodule:: audmodel
+
+.. autofunction:: audmodel.url

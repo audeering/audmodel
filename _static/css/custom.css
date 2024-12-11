@@ -1,0 +1,78 @@
+/** Disable shadows and make code cells of jupyter-sphinx
+ *  look like other code cells.
+ **/
+div.jupyter_container {
+    -moz-box-shadow: none;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+    border: none;
+}
+
+.jupyter_container div.code_cell {
+    background: #efeff0;
+    border: 1px solid #e1e4e5;
+}
+
+.jupyter_container div.code_cell pre {
+    padding: 12px;
+}
+
+.jupyter_container div.cell_output {
+    padding: 0;
+}
+
+.jupyter_container div.highlight-default {
+    padding: 0;
+}
+
+.jupyter_container div.output pre {
+    padding: 12px;
+}
+
+.jupyter_container div.text_html {
+    padding: 12px;
+    padding-top: 6px;
+}
+
+.rst-content .jupyter_container div[class^='highlight'], .document .jupyter_container div[class^='highlight'] {
+    padding: 0;
+}
+
+/** Disable copy-button in nbsphinx **/
+.prompt a.copybtn {
+    display: none;
+}
+
+/* Some additional styling taken form the Jupyter notebook CSS */
+div.text_html table {
+  border: none;
+  border-collapse: collapse;
+  border-spacing: 0;
+  color: black;
+  font-size: 12px;
+  table-layout: fixed;
+}
+div.text_html thead {
+  border-bottom: 1px solid black;
+  vertical-align: bottom;
+}
+div.text_html tr, 
+div.text_html th, 
+div.text_html td {
+  text-align: right;
+  vertical-align: middle;
+  padding: 0.5em 0.5em;
+  line-height: normal;
+  white-space: normal;
+  max-width: none;
+  border: none;
+}
+div.text_html th {
+  font-weight: bold;
+}
+div.text_html tbody tr:nth-child(odd) {
+  background: #f5f5f5;
+}
+div.text_html tbody tr:hover {
+  background: rgba(66, 165, 245, 0.2);
+}

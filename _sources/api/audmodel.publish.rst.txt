@@ -1,0 +1,6 @@
+﻿publish\(\)
+===========
+
+.. currentmodule:: audmodel
+
+.. autofunction:: audmodel.publish

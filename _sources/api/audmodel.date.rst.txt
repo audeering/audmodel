@@ -1,0 +1,6 @@
+﻿date\(\)
+========
+
+.. currentmodule:: audmodel
+
+.. autofunction:: audmodel.date
