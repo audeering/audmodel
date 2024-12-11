@@ -85,12 +85,8 @@ class Repository:
     def create_backend_interface(self) -> type[audbackend.interface.Base]:
         r"""Create backend interface to access repository.
 
-        It wraps an :class:`audbackend.interface.Versioned` interface
-        around it.
-
-        When :attr:`Repository.backend` equals ``artifactory``,
-        it wraps an :class:`audbackend.interface.Maven` interface
-        around it.
+        It wraps an :class:`audbackend.interface.Maven` interface
+        around the backend.
 
         The returned backend instance
         has not yet established a connection to the backend.
@@ -116,15 +112,13 @@ class Repository:
             raise ValueError(f"'{self.backend}' is not a registered backend")
         backend_class = self.backend_registry[self.backend]
         backend = backend_class(self.host, self.name)
-        if self.backend == "artifactory":
-            return audbackend.interface.Maven(  # pragma: no cover
-                backend,
-                extensions=[
-                    define.HEADER_EXT,
-                    define.META_EXT,
-                ],
-            )
-        return audbackend.interface.Versioned(backend)
+        return audbackend.interface.Maven(
+            backend,
+            extensions=[
+                define.HEADER_EXT,
+                define.META_EXT,
+            ],
+        )
 
     @classmethod
     def register(
