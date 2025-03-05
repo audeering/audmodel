@@ -66,7 +66,7 @@
             
             
               <div class="version">
-                v1.3.0
+                v1.3.1
               </div>
             
           
@@ -142,14 +142,14 @@
            <div itemprop="articleBody">
             
   <h1>Source code for audmodel.core.repository</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">sys</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
 
-<span class="kn">import</span> <span class="nn">audbackend</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">audbackend</span>
 
-<span class="kn">import</span> <span class="nn">audmodel.core.define</span> <span class="k">as</span> <span class="nn">define</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">audmodel.core.define</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">define</span>
 
 
-<div class="viewcode-block" id="Repository"><a class="viewcode-back" href="../../../api/audmodel.Repository.html#audmodel.Repository">[docs]</a><span class="k">class</span> <span class="nc">Repository</span><span class="p">:</span>
+<div class="viewcode-block" id="Repository"><a class="viewcode-back" href="../../../api/audmodel.Repository.html#audmodel.Repository">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">Repository</span><span class="p">:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Repository object.</span>
 
 <span class="sd">    It stores all information</span>
@@ -188,11 +188,11 @@
 <span class="sd">    Holds mapping between registered backend names,</span>
 <span class="sd">    and their corresponding backend classes.</span>
 <span class="sd">    The ``&quot;artifactory&quot;`` backend is currently not available</span>
-<span class="sd">    under Python &gt;=3.12.</span>
+<span class="sd">    under Python &gt;=3.13.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">host</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
@@ -205,7 +205,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">backend</span> <span class="o">=</span> <span class="n">backend</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Repository backend.&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Compare two repository instances.</span>
 
 <span class="sd">        Args:</span>
@@ -217,7 +217,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">==</span> <span class="nb">str</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>  <span class="c1"># noqa: D105</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>  <span class="c1"># noqa: D105</span>
         <span class="k">return</span> <span class="p">(</span>
             <span class="sa">f</span><span class="s2">&quot;Repository(&quot;</span>
             <span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39;, &quot;</span>
@@ -226,7 +226,7 @@
             <span class="sa">f</span><span class="s2">&quot;)&quot;</span>
         <span class="p">)</span>
 
-<div class="viewcode-block" id="Repository.create_backend_interface"><a class="viewcode-back" href="../../../api/audmodel.Repository.html#audmodel.Repository.create_backend_interface">[docs]</a>    <span class="k">def</span> <span class="nf">create_backend_interface</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">type</span><span class="p">[</span><span class="n">audbackend</span><span class="o">.</span><span class="n">interface</span><span class="o">.</span><span class="n">Base</span><span class="p">]:</span>
+<div class="viewcode-block" id="Repository.create_backend_interface"><a class="viewcode-back" href="../../../api/audmodel.Repository.html#audmodel.Repository.create_backend_interface">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">create_backend_interface</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">type</span><span class="p">[</span><span class="n">audbackend</span><span class="o">.</span><span class="n">interface</span><span class="o">.</span><span class="n">Base</span><span class="p">]:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create backend interface to access repository.</span>
 
 <span class="sd">        It wraps an :class:`audbackend.interface.Maven` interface</span>
@@ -244,13 +244,13 @@
 <span class="sd">            interface to repository</span>
 
 <span class="sd">        Raises:</span>
-<span class="sd">            ValueError: if an artifactory backend is requested in Python&gt;=3.12</span>
+<span class="sd">            ValueError: if an artifactory backend is requested in Python&gt;=3.13</span>
 <span class="sd">            ValueError: if a non-supported backend is requested</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">version_info</span> <span class="o">&gt;=</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">12</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">backend</span> <span class="o">==</span> <span class="s2">&quot;artifactory&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">version_info</span> <span class="o">&gt;=</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">13</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">backend</span> <span class="o">==</span> <span class="s2">&quot;artifactory&quot;</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>  <span class="c1"># pragma: no cover</span>
-                <span class="s2">&quot;The &#39;artifactory&#39; backend is not supported in Python&gt;=3.12&quot;</span>
+                <span class="s2">&quot;The &#39;artifactory&#39; backend is not supported in Python&gt;=3.13&quot;</span>
             <span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">backend</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">backend_registry</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">backend</span><span class="si">}</span><span class="s2">&#39; is not a registered backend&quot;</span><span class="p">)</span>
@@ -265,7 +265,7 @@
         <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Repository.register"><a class="viewcode-back" href="../../../api/audmodel.Repository.html#audmodel.Repository.register">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">register</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">register</span><span class="p">(</span>
         <span class="bp">cls</span><span class="p">,</span>
         <span class="n">backend_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">backend_class</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">audbackend</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">Base</span><span class="p">],</span>
@@ -322,7 +322,7 @@
         
         
         
-          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2024/12/11 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2025/03/05 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>
@@ -330,7 +330,7 @@
   <div role="contentinfo">
     <p>
         
-      &copy; 2019-2024 audEERING GmbH
+      &copy; 2019-2025 audEERING GmbH
     </p>
   </div> 
 
