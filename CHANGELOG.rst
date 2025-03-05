@@ -7,6 +7,13 @@ The format is based on `Keep a Changelog`_,
 and this project adheres to `Semantic Versioning`_.
 
 
+Version 1.3.1 (2025-03-05)
+--------------------------
+
+* Added: support for Artifactory backend in Python 3.12
+* Changed: depend on ``audbackend>=2.2.2``
+
+
 Version 1.3.0 (2024-12-11)
 --------------------------
 
