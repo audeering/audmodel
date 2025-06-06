@@ -29,7 +29,7 @@ import audmodel.core.utils as utils
 def author(
     uid: str,
     *,
-    cache_root: str = None,
+    cache_root: str | None = None,
 ) -> str:
     r"""Author of model.
 
@@ -57,7 +57,7 @@ def author(
 def date(
     uid: str,
     *,
-    cache_root: str = None,
+    cache_root: str | None = None,
 ) -> str:
     r"""Publication date of model.
 
@@ -143,7 +143,7 @@ def exists(
 def header(
     uid: str,
     *,
-    cache_root: str = None,
+    cache_root: str | None = None,
     verbose: bool = False,
 ) -> dict[str, object]:
     r"""Load model header.
@@ -217,7 +217,7 @@ def legacy_uid(
     params: dict[str, object],
     version: str,
     *,
-    subgroup: str = None,
+    subgroup: str | None = None,
     private: bool = False,
 ) -> str:
     r"""Unique model ID in legacy format.
@@ -275,7 +275,7 @@ def legacy_uid(
 def load(
     uid: str,
     *,
-    cache_root: str = None,
+    cache_root: str | None = None,
     verbose: bool = False,
 ) -> str:
     r"""Download a model by its unique ID.
@@ -314,7 +314,7 @@ def load(
 def meta(
     uid: str,
     *,
-    cache_root: str = None,
+    cache_root: str | None = None,
     verbose: bool = False,
 ) -> dict[str, object]:
     r"""Meta information of model.
@@ -360,7 +360,7 @@ def meta(
 def name(
     uid: str,
     *,
-    cache_root: str = None,
+    cache_root: str | None = None,
     verbose: bool = False,
 ) -> str:
     r"""Name of model.
@@ -390,7 +390,7 @@ def name(
 def parameters(
     uid: str,
     *,
-    cache_root: str = None,
+    cache_root: str | None = None,
     verbose: bool = False,
 ) -> dict:
     r"""Parameters of model.
@@ -427,11 +427,11 @@ def publish(
     params: dict[str, object],
     version: str,
     *,
-    author: str = None,
-    date: datetime.date = None,
-    meta: dict[str, object] = None,
+    author: str | None = None,
+    date: datetime.date | None = None,
+    meta: dict[str, object] | None = None,
     repository: Repository = config.REPOSITORIES[0],
-    subgroup: str = None,
+    subgroup: str | None = None,
     verbose: bool = False,
 ) -> str:
     r"""Zip model and publish as a new artifact.
@@ -665,7 +665,7 @@ def publish(
 def subgroup(
     uid: str,
     *,
-    cache_root: str = None,
+    cache_root: str | None = None,
     verbose: bool = False,
 ) -> str:
     r"""Subgroup of model.
@@ -695,9 +695,9 @@ def subgroup(
 def uid(
     name: str,
     params: dict[str, object],
-    version: str = None,
+    version: str | None = None,
     *,
-    subgroup: str = None,
+    subgroup: str | None = None,
 ) -> str:
     r"""Unique model ID.
 
@@ -755,7 +755,7 @@ def update_meta(
     meta: dict[str, object],
     *,
     replace: bool = False,
-    cache_root: str = None,
+    cache_root: str | None = None,
     verbose: bool = False,
 ) -> dict[str, object]:
     r"""Update metadata of model on backend and in cache.
@@ -854,7 +854,7 @@ def url(
     uid: str,
     *,
     type: str = "model",
-    cache_root: str = None,
+    cache_root: str | None = None,
     verbose: bool = False,
 ) -> str:
     r"""URL to model archive or header.
@@ -912,11 +912,7 @@ def url(
         )
     else:
         raise ValueError(
-            "'type' has to be one of "
-            "'model', "
-            "'header', "
-            "'meta', "
-            f"not '{type}'"
+            f"'type' has to be one of 'model', 'header', 'meta', not '{type}'"
         )
     path = backend_interface._path_with_version(path, version)
     # Check for underlying backend of backend interface
@@ -937,7 +933,7 @@ def url(
 def version(
     uid: str,
     *,
-    cache_root: str = None,
+    cache_root: str | None = None,
     verbose: bool = False,
 ) -> str:
     r"""Version of model.
@@ -967,7 +963,7 @@ def version(
 def versions(
     uid: str,
     *,
-    cache_root: str = None,
+    cache_root: str | None = None,
 ) -> list[str]:
     r"""Available model versions.
 

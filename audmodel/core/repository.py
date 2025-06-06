@@ -74,13 +74,7 @@ class Repository:
         return str(self) == str(other)
 
     def __repr__(self):  # noqa: D105
-        return (
-            f"Repository("
-            f"'{self.name}', "
-            f"'{self.host}', "
-            f"'{self.backend}'"
-            f")"
-        )
+        return f"Repository('{self.name}', '{self.host}', '{self.backend}')"
 
     def create_backend_interface(self) -> type[audbackend.interface.Base]:
         r"""Create backend interface to access repository.
