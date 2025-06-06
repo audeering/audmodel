@@ -43,6 +43,24 @@ repository = 'https://gitlab.audeering.com/tools/audmodel'
 documentation = 'http://tools.pp.audeering.com/audmodel/'
 
 
+# ===== Dependency groups =================================================
+[dependency-groups]
+dev = [
+    'audeer >=1.3.0',
+    'ipykernel',
+    'jupyter-sphinx >=0.3.1',
+    'parse',
+    'pytest',
+    'pytest-cov',
+    'pytest-doctestplus',
+    'sphinx',
+    'sphinx-audeering-theme >=1.2.1',
+    'sphinx-autodoc-typehints',
+    'sphinx-copybutton',
+    'toml',
+]
+
+
 # ===== BUILD-SYSTEM ======================================================
 #
 # Requirements for building the Python package

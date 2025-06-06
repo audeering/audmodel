@@ -10,3 +10,4 @@ coverage.xml
 docs/pics/*.svg
 docs/.ipynb_checkpoints
 docs/api/
+uv.lock
