@@ -1,4 +1,0 @@
-parse
-pytest
-pytest-cov
-pytest-doctestplus
