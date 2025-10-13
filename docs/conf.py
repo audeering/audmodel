@@ -45,6 +45,7 @@ intersphinx_mapping = {
     "python": ("https://docs.python.org/3/", None),
     "audbackend": ("https://audeering.github.io/audbackend/", None),
     "audfactory": ("https://audeering.github.io/audfactory/", None),
+    "filelock": ("https://py-filelock.readthedocs.io/en/latest/", None),
 }
 # Disable Gitlab as we need to sign in
 linkcheck_ignore = [

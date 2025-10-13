@@ -45,6 +45,7 @@ def author(
         audbackend.BackendError: if connection to repository on backend
             cannot be established
         RuntimeError: if model does not exist
+        filelock.Timeout: if cache lock could not be acquired
 
     Examples:
         >>> author("d4e9c65b-3.0.0")
@@ -73,6 +74,7 @@ def date(
         audbackend.BackendError: if connection to repository on backend
             cannot be established
         RuntimeError: if model does not exist
+        filelock.Timeout: if cache lock could not be acquired
 
     Examples:
         >>> date("d4e9c65b-3.0.0")
@@ -158,6 +160,7 @@ def header(
         audbackend.BackendError: if connection to repository on backend
             cannot be established
         RuntimeError: if model does not exist on backend
+        filelock.Timeout: if cache lock could not be acquired
 
     Returns:
         dictionary with header fields
@@ -293,6 +296,7 @@ def load(
         audbackend.BackendError: if connection to repository on backend
             cannot be established
         RuntimeError: if model does not exist
+        filelock.Timeout: if cache lock could not be acquired
 
     Examples:
         >>> root = load("d4e9c65b-3.0.0")
@@ -326,6 +330,7 @@ def meta(
         audbackend.BackendError: if connection to repository on backend
             cannot be established
         RuntimeError: if model does not exist
+        filelock.Timeout: if cache lock could not be acquired
 
     Examples:
         >>> d = meta("d4e9c65b-3.0.0")
@@ -372,6 +377,7 @@ def name(
         audbackend.BackendError: if connection to repository on backend
             cannot be established
         RuntimeError: if model does not exist
+        filelock.Timeout: if cache lock could not be acquired
 
     Examples:
         >>> name("d4e9c65b-3.0.0")
@@ -402,6 +408,7 @@ def parameters(
         audbackend.BackendError: if connection to repository on backend
             cannot be established
         RuntimeError: if model does not exist
+        filelock.Timeout: if cache lock could not be acquired
 
     Examples:
         >>> parameters("d4e9c65b-3.0.0")
@@ -673,6 +680,7 @@ def subgroup(
         audbackend.BackendError: if connection to repository on backend
             cannot be established
         RuntimeError: if model does not exist
+        filelock.Timeout: if cache lock could not be acquired
 
     Examples:
         >>> subgroup("d4e9c65b-3.0.0")
@@ -941,6 +949,7 @@ def version(
         audbackend.BackendError: if connection to repository on backend
             cannot be established
         RuntimeError: if model does not exist
+        filelock.Timeout: if cache lock could not be acquired
 
     Examples:
         >>> version("d4e9c65b-3.0.0")
