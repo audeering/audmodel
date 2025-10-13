@@ -10,8 +10,27 @@ import audeer
 
 
 @contextmanager
-def lock(paths, *, timeout=86400, warning_timeout=2):
-    # reuse your existing function
+def lock(
+    paths: list[str],
+    *,
+    timeout: float = 86400,
+    warning_timeout: float = 2,
+):
+    """Create lock for given paths.
+
+    Args:
+        paths: files or folders to acquire lock
+        timeout: maximum time in seconds
+            before giving up acquiring a lock.
+            If timeout is reached,
+            an exception is raised
+        warning_timeout: time in seconds
+            after which a warning is shown to the user
+            that the lock could not yet get acquired
+    Raises:
+        :class:`filelock.Timeout`: if a timeout is reached
+
+    """
     lock_files = _lock_files(paths)
     locks = [FileLock(f, timeout=timeout) for f in lock_files]
     with ExitStack() as stack:
