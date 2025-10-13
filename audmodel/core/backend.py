@@ -10,7 +10,7 @@ import audeer
 
 from audmodel.core.config import config
 import audmodel.core.define as define
-from audmodel.core.lock import Lock
+from audmodel.core.lock import lock
 import audmodel.core.utils as utils
 
 
@@ -85,7 +85,7 @@ def get_archive(
         version,
     )
 
-    with Lock(root):
+    with lock(root):
         if not os.path.exists(root) or len(os.listdir(root)) == 0:
             tmp_root = audeer.mkdir(root + "~")
             backend_interface, path = archive_path(
@@ -154,7 +154,7 @@ def get_header(
         f"{version}.{define.HEADER_EXT}",
     )
 
-    with Lock(local_path):
+    with lock(local_path):
         # header is not in cache download it
         if not os.path.exists(local_path):
             with backend_interface.backend:
@@ -213,7 +213,7 @@ def get_meta(
         f"{version}.{define.META_EXT}",
     )
 
-    with Lock(local_path):
+    with lock(local_path):
         with backend_interface.backend:
             # if metadata in cache,
             # figure out if it matches remote version
