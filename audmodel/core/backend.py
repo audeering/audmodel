@@ -87,7 +87,7 @@ def get_archive(
 
     with lock(root):
         if not os.path.exists(root) or len(os.listdir(root)) == 0:
-            tmp_root = audeer.mkdir(root + "~")
+            tmp_root = audeer.mkdir(f"{root}~")
             backend_interface, path = archive_path(
                 short_id,
                 version,
