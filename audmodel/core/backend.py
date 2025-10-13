@@ -10,6 +10,7 @@ import audeer
 
 from audmodel.core.config import config
 import audmodel.core.define as define
+from audmodel.core.lock import Lock
 import audmodel.core.utils as utils
 
 
@@ -84,38 +85,39 @@ def get_archive(
         version,
     )
 
-    if not os.path.exists(root) or len(os.listdir(root)) == 0:
-        tmp_root = audeer.mkdir(root + "~")
-        backend_interface, path = archive_path(
-            short_id,
-            version,
-            cache_root,
-            verbose,
-        )
-
-        with backend_interface.backend:
-            # get archive
-            src_path = path
-            dst_path = os.path.join(tmp_root, "model.zip")
-            backend_interface.get_file(
-                src_path,
-                dst_path,
+    with Lock(root):
+        if not os.path.exists(root) or len(os.listdir(root)) == 0:
+            tmp_root = audeer.mkdir(root + "~")
+            backend_interface, path = archive_path(
+                short_id,
                 version,
+                cache_root,
+                verbose,
+            )
+
+            with backend_interface.backend:
+                # get archive
+                src_path = path
+                dst_path = os.path.join(tmp_root, "model.zip")
+                backend_interface.get_file(
+                    src_path,
+                    dst_path,
+                    version,
+                    verbose=verbose,
+                )
+
+            # extract files
+            audeer.extract_archive(
+                dst_path,
+                tmp_root,
+                keep_archive=False,
                 verbose=verbose,
             )
 
-        # extract files
-        audeer.extract_archive(
-            dst_path,
-            tmp_root,
-            keep_archive=False,
-            verbose=verbose,
-        )
-
-        # move tmp folder to final destination
-        if os.path.exists(root):
-            os.rmdir(root)
-        os.rename(tmp_root, root)
+            # move tmp folder to final destination
+            if os.path.exists(root):
+                os.rmdir(root)
+            os.rename(tmp_root, root)
 
     return root
 
@@ -152,23 +154,24 @@ def get_header(
         f"{version}.{define.HEADER_EXT}",
     )
 
-    # header is not in cache download it
-    if not os.path.exists(local_path):
-        with backend_interface.backend:
-            audeer.mkdir(os.path.dirname(local_path))
-            with tempfile.TemporaryDirectory() as root:
-                tmp_path = os.path.join(root, "model.yaml")
-                backend_interface.get_file(
-                    remote_path,
-                    tmp_path,
-                    version,
-                    verbose=verbose,
-                )
-                shutil.move(tmp_path, local_path)
+    with Lock(local_path):
+        # header is not in cache download it
+        if not os.path.exists(local_path):
+            with backend_interface.backend:
+                audeer.mkdir(os.path.dirname(local_path))
+                with tempfile.TemporaryDirectory() as root:
+                    tmp_path = os.path.join(root, "model.yaml")
+                    backend_interface.get_file(
+                        remote_path,
+                        tmp_path,
+                        version,
+                        verbose=verbose,
+                    )
+                    shutil.move(tmp_path, local_path)
 
-    # read header from local file
-    with open(local_path) as fp:
-        header = yaml.load(fp, Loader=yaml.Loader)
+        # read header from local file
+        with open(local_path) as fp:
+            header = yaml.load(fp, Loader=yaml.Loader)
 
     return backend_interface, header
 
@@ -210,37 +213,38 @@ def get_meta(
         f"{version}.{define.META_EXT}",
     )
 
-    with backend_interface.backend:
-        # if metadata in cache,
-        # figure out if it matches remote version
-        # and delete it if this is not the case
-        if os.path.exists(local_path):
-            local_checksum = audeer.md5(local_path)
-            remote_checksum = backend_interface.checksum(
-                remote_path,
-                version,
-            )
-            if local_checksum != remote_checksum:
-                os.remove(local_path)
-
-        # download metadata if it is not in cache yet
-        if not os.path.exists(local_path):
-            audeer.mkdir(os.path.dirname(local_path))
-            with tempfile.TemporaryDirectory() as root:
-                tmp_path = os.path.join(root, "meta.yaml")
-                backend_interface.get_file(
+    with Lock(local_path):
+        with backend_interface.backend:
+            # if metadata in cache,
+            # figure out if it matches remote version
+            # and delete it if this is not the case
+            if os.path.exists(local_path):
+                local_checksum = audeer.md5(local_path)
+                remote_checksum = backend_interface.checksum(
                     remote_path,
-                    tmp_path,
                     version,
-                    verbose=verbose,
                 )
-                shutil.move(tmp_path, local_path)
+                if local_checksum != remote_checksum:
+                    os.remove(local_path)
 
-    # read metadata from local file
-    with open(local_path) as fp:
-        meta = yaml.load(fp, Loader=yaml.Loader)
-        if meta is None:
-            meta = {}
+            # download metadata if it is not in cache yet
+            if not os.path.exists(local_path):
+                audeer.mkdir(os.path.dirname(local_path))
+                with tempfile.TemporaryDirectory() as root:
+                    tmp_path = os.path.join(root, "meta.yaml")
+                    backend_interface.get_file(
+                        remote_path,
+                        tmp_path,
+                        version,
+                        verbose=verbose,
+                    )
+                    shutil.move(tmp_path, local_path)
+
+        # read metadata from local file
+        with open(local_path) as fp:
+            meta = yaml.load(fp, Loader=yaml.Loader)
+            if meta is None:
+                meta = {}
 
     return backend_interface, meta
 
