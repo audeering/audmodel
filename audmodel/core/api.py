@@ -266,12 +266,6 @@ def legacy_uid(
     return audeer.uid(from_string=unique_string)
 
 
-@audeer.deprecated_keyword_argument(
-    deprecated_argument="root",
-    new_argument="cache_root",
-    mapping=lambda value: value,
-    removal_version="1.2.0",
-)
 def load(
     uid: str,
     *,
@@ -417,10 +411,6 @@ def parameters(
     return header(uid, cache_root=cache_root, verbose=verbose)["parameters"]
 
 
-@audeer.deprecated_keyword_argument(
-    deprecated_argument="private",
-    removal_version="1.2.0",
-)
 def publish(
     root: str,
     name: str,
