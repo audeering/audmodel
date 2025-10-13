@@ -144,7 +144,7 @@ def test_lock(tmpdir):
         ],
         num_workers=3,
     )
-    assert set(result) == set([1, 0, 1])
+    assert set(result) == {0, 1}
 
 
 def test_lock_warning_and_failure(tmpdir):
