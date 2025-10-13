@@ -117,11 +117,7 @@ def test_bad_repository(non_existing_repository, function):
         ),
         (
             "00000000-0000-0000-0000-000000000000",
-            (
-                "A model with ID "
-                "'00000000-0000-0000-0000-000000000000' "
-                "does not exist."
-            ),
+            ("A model with ID '00000000-0000-0000-0000-000000000000' does not exist."),
         ),
     ],
 )
