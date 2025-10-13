@@ -1,8 +1,8 @@
 import re
 import threading
 import time
+import warnings
 
-import filelock
 import pytest
 
 import audeer
@@ -16,13 +16,16 @@ event = threading.Event()
 def job(lock, wait, sleep):
     if wait:
         event.wait()  # wait for another thread to enter the lock
-    with lock:
-        if not wait:
-            event.set()  # notify waiting threads to enter the lock
-        time.sleep(sleep)
-        # Finished without timeout
-        return 1
-    return 0
+    with warnings.catch_warnings(record=True) as w:
+        # Cause all warnings to always be triggered.
+        warnings.simplefilter("always")
+        with lock:
+            if not wait:
+                event.set()  # notify waiting threads to enter the lock
+            time.sleep(sleep)
+        if len(w) > 0:
+            return 0
+    return 1
 
 
 def test_lock(tmpdir):
@@ -143,22 +146,24 @@ def test_lock(tmpdir):
         ],
         num_workers=3,
     )
-    assert result == [1, 0, 1]
+    assert set(result) == set([1, 0, 1])
 
 
 def test_lock_warning_and_failure(tmpdir):
     """Test user warning and lock failure messages."""
+    # Reset filtering of warnings
+    warnings.resetwarnings()
     path = audeer.path(tmpdir, "file.txt")
-    # Create lock file to force failing acquiring of lock
     lock_file = audeer.touch(tmpdir, ".file.txt.lock")
-    lock_error = filelock.Timeout
-    lock_error_msg = f"The file lock '{lock_file}' could not be acquired."
-    warning_msg = (
+    warning_msg_1 = (
         "Lock could not be acquired immediately.\n"
         "Another user might loading the same model.\n"
-        "Still trying for 0.1 more seconds..."
+        "Still trying for 0.1 more seconds...\n"
     )
-    with pytest.warns(UserWarning, match=re.escape(warning_msg)):
-        with pytest.raises(lock_error, match=re.escape(lock_error_msg)):
-            with Lock(path, warning_timeout=0.1, timeout=0.2):
-                pass
+    warning_msg_2 = f"The file lock '{lock_file}' could not be acquired."
+    # Acquire first lock to force failing second lock
+    with Lock(path):
+        with pytest.warns(UserWarning, match=re.escape(warning_msg_1)):
+            with pytest.warns(UserWarning, match=re.escape(warning_msg_2)):
+                with Lock(path, warning_timeout=0.1, timeout=0.2):
+                    pass

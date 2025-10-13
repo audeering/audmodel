@@ -65,7 +65,7 @@ class Lock:
                     lock.acquire(timeout=remaining_time)
                 except filelock.Timeout:
                     warnings.warn(
-                        "Lock could not be acquired. Timeout exceeded.",
+                        f"The file lock '{lock_file}' could not be acquired.",
                         category=UserWarning,
                     )
 
