@@ -339,7 +339,7 @@ in ``audb``'s documentation.
 ``audmodel`` uses lock files to avoid race conditions
 when trying to access the same file.
 You can only use a shared cache on the same platform
-as the file lock mechanism is not cross platform compatible.
+as the file lock mechanism is not cross-platform compatible.
 
 
 .. jupyter-execute::
