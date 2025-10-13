@@ -12,3 +12,6 @@ r"""Private repository for legacy models."""
 
 LEGACY_REPOSITORY_PUBLIC = "models-public-local"
 r"""Public repository for legacy models."""
+
+LOCK_FILE = ".lock"
+r"""Name of lock file in cache."""
