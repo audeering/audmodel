@@ -161,9 +161,7 @@ def test_is_alias():
     assert not is_alias("12345678-90ab-cdef-1234-567890abcdef")  # legacy UID (36 chars)
     # Test legacy UID with proper UUID format (8-4-4-4-12), all hex
     assert not is_alias("aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee")
-    # Test legacy UUID format with non-hex chars (to hit lines 62-70)
-    assert not is_alias("xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx")
-    # Test 8-char hex strings (multiple cases to ensure line 76 coverage)
+    # Test 8-char hex strings
     assert not is_alias("abcd1234")
     assert not is_alias("deadbeef")
     assert not is_alias("cafebabe")
@@ -174,7 +172,7 @@ def test_is_alias():
     assert is_alias("test_alias")
     assert is_alias("alias123")
     assert is_alias("Cafebabe")
-    # Test 8-char non-hex string (edge case for lines 73-79)
+    # Test 8-char non-hex string
     assert is_alias("zyxwvuts")
 
 

@@ -8,6 +8,14 @@ import re
 import audeer
 
 
+UID_LEGACY_PATERN = re.compile(
+    r"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+)
+UID_SHORT_PATTERN = re.compile(r"^[0-9a-f]{8}$")
+UID_VERSION_PATTERN = re.compile(r"^[0-9a-f]{8}-[0-9][A-Za-z0-9.+-]*$")
+VALID_ALIAS_PATTERN = re.compile(r"^[A-Za-z0-9._-]+$")
+
+
 def create_header(
     uid: str,
     *,
@@ -39,10 +47,7 @@ def valid_alias(alias: str) -> bool:
         ``True`` if alias is valid name
 
     """
-    allowed_chars = re.compile("[A-Za-z0-9._-]+")
-    if is_alias(alias) and allowed_chars.fullmatch(alias):
-        return True
-    return False
+    return bool(VALID_ALIAS_PATTERN.fullmatch(alias)) and is_alias(alias)
 
 
 def is_alias(uid: str) -> bool:
@@ -64,48 +69,11 @@ def is_alias(uid: str) -> bool:
         ``True`` if the string is an alias, ``False`` if it's a UID
 
     """
-    # If it's all hex digits (with optional dashes for UUID format),
-    # treat it as a UID attempt, not an alias
-    uid_clean = uid.replace("-", "")
-
-    # Only lowercase letters are allowed in UID
-    if uid_clean != uid_clean.lower():
-        return True
-
-    try:
-        int(uid_clean, 16)
-        # It's all hex, so it's likely meant to be a UID
-        return False
-    except ValueError:
-        # Contains non-hex characters, continue checking
-        pass
-
-    # Legacy UID (36 chars in UUID format: 8-4-4-4-12)
-    if len(uid) == 36 and uid.count("-") == 4:
-        parts = uid.split("-")
-        if (
-            len(parts[0]) == 8
-            and len(parts[1]) == 4
-            and len(parts[2]) == 4
-            and len(parts[3]) == 4
-            and len(parts[4]) == 12
-        ):
-            return False
-
-    # UID with version (short-id-version format)
-    # e.g., "d4e9c65b-3.0.0" or "d4e9c65b-1.0.0-rc1"
-    if "-" in uid:
-        parts = uid.split("-", 1)
-        if len(parts[0]) == 8:
-            # Check if first part is hexadecimal
-            try:
-                int(parts[0], 16)
-                return False
-            except ValueError:
-                pass
-
-    # Everything else is an alias
-    return True
+    return not (
+        UID_SHORT_PATTERN.fullmatch(uid)
+        or UID_LEGACY_PATERN.fullmatch(uid)
+        or UID_VERSION_PATTERN.fullmatch(uid)
+    )
 
 
 def is_legacy_uid(uid: str) -> bool:
