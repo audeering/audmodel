@@ -586,7 +586,11 @@ def publish(
         )
 
     if alias and not utils.valid_alias(alias):
-        raise ValueError(f"'{alias}' is not an allowed alias name.")
+        raise ValueError(
+            f"'{alias}' is not an allowed alias name. "
+            "Alias names may only contain letters, numbers, underscores, hyphens, "
+            "and are not allowed to be confused with a model ID."
+        )
 
     if not os.path.isdir(root):
         raise FileNotFoundError(
@@ -748,7 +752,11 @@ def set_alias(
 
     """
     if not utils.valid_alias(alias):
-        raise ValueError(f"'{alias}' is not an allowed alias name.")
+        raise ValueError(
+            f"'{alias}' is not an allowed alias name."
+            "Alias names may only contain letters, numbers, underscores, hyphens, "
+            "and are not allowed to be confused with a model ID."
+        )
 
     cache_root = audeer.safe_path(cache_root or default_cache_root())
 
