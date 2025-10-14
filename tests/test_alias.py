@@ -17,7 +17,7 @@ SUBGROUP = f"{pytest.ID}.alias"
 @pytest.fixture(scope="module")
 def published_model():
     """Publish a model for testing alias functionality."""
-    uid = audmodel.publish(
+    return audmodel.publish(
         pytest.MODEL_ROOT,
         pytest.NAME,
         pytest.PARAMS,
@@ -28,7 +28,6 @@ def published_model():
         subgroup=SUBGROUP,
         repository=audmodel.config.REPOSITORIES[0],
     )
-    return uid
 
 
 def test_publish_with_alias():
