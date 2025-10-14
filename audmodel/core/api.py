@@ -670,7 +670,7 @@ def publish(
                     f"{alias}.{define.ALIAS_EXT}",
                 )
                 if backend_interface.exists(path, "1.0.0"):
-                    backend_interface.remove_file(path, "1.0.0")
+                    backend_interface.remove_file(path, "1.0.0")  # pragma: no cover
 
         # Reraise our custom error if params or meta cannot be serialized
         if isinstance(ex, RuntimeError) and ex.args[0].startswith(

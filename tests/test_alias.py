@@ -154,9 +154,60 @@ def test_is_alias():
     assert not is_alias("d4e9c65b")  # short UID (8 chars)
     assert not is_alias("d4e9c65b-1.0.0")  # UID with version
     assert not is_alias("12345678-90ab-cdef-1234-567890abcdef")  # legacy UID (36 chars)
+    # Test legacy UID with proper UUID format (8-4-4-4-12), all hex
+    assert not is_alias("aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee")
+    # Test legacy UUID format with non-hex chars (to hit lines 62-70)
+    assert not is_alias("xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx")
+    # Test 8-char hex strings (multiple cases to ensure line 76 coverage)
+    assert not is_alias("abcd1234")
+    assert not is_alias("deadbeef")
+    assert not is_alias("cafebabe")
 
     # Aliases should be detected
     assert is_alias("my-model")
     assert is_alias("production-model")
     assert is_alias("test_alias")
     assert is_alias("alias123")
+    # Test 8-char non-hex string (edge case for lines 73-79)
+    assert is_alias("zyxwvuts")
+
+
+def test_publish_with_invalid_subgroup_alias():
+    """Test that publishing with subgroup='_alias' raises ValueError."""
+    with pytest.raises(
+        ValueError, match="It is not allowed to set subgroup to '_alias'"
+    ):
+        audmodel.publish(
+            pytest.MODEL_ROOT,
+            pytest.NAME,
+            pytest.PARAMS,
+            "5.0.0",
+            subgroup="_alias",
+            repository=audmodel.config.REPOSITORIES[0],
+        )
+
+
+def test_publish_with_alias_cleanup_on_failure():
+    """Test that alias is cleaned up when publishing fails.
+
+    This test verifies that if publishing fails after the alias file
+    has been created, the alias file is properly removed during cleanup.
+    """
+    alias = "test-failed-alias"
+
+    # Try to publish with an alias but cause a failure with unpicklable meta
+    with pytest.raises(RuntimeError, match="Cannot serialize"):
+        audmodel.publish(
+            pytest.MODEL_ROOT,
+            pytest.NAME,
+            pytest.PARAMS,
+            "6.0.0",
+            alias=alias,
+            meta={"object": pytest.CANNOT_PICKLE},
+            subgroup=SUBGROUP,
+            repository=audmodel.config.REPOSITORIES[0],
+        )
+
+    # Verify the alias was cleaned up and doesn't exist
+    with pytest.raises(RuntimeError, match="does not exist"):
+        audmodel.resolve_alias(alias)

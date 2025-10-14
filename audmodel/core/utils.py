@@ -69,15 +69,6 @@ def is_alias(uid: str) -> bool:
         ):
             return False
 
-    # Short UID (8 chars, all hex)
-    if len(uid) == 8:
-        try:
-            int(uid, 16)
-            return False
-        except ValueError:
-            # 8 chars but not hex, could be an alias
-            pass
-
     # UID with version (short-id-version format)
     # e.g., "d4e9c65b-3.0.0" or "d4e9c65b-1.0.0-rc1"
     if "-" in uid:
