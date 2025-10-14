@@ -109,7 +109,7 @@ def test_all_api_functions_with_alias(published_model):
     # Test all API functions that accept uid parameter
     assert audmodel.author(alias) == pytest.AUTHOR
     assert audmodel.date(alias) == str(pytest.DATE)
-    assert audmodel.exists(published_model)  # exists doesn't support aliases currently
+    assert audmodel.exists(alias)
     assert audmodel.name(alias) == pytest.NAME
     assert audmodel.parameters(alias) == pytest.PARAMS
     assert audmodel.subgroup(alias) == SUBGROUP
