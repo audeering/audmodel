@@ -1,3 +1,5 @@
+import os
+
 import pytest
 
 import audmodel
@@ -47,7 +49,7 @@ def test_publish_with_alias(published_model):
 
     # Verify we can load model using alias
     model_path = audmodel.load(alias)
-    assert model_path.endswith(uid.replace("-", "/"))
+    assert model_path.endswith(uid.replace("-", os.sep))
 
 
 def test_set_alias(published_model):
