@@ -214,3 +214,79 @@ def test_publish_with_alias_cleanup_on_failure():
     # Verify the alias was cleaned up and doesn't exist
     with pytest.raises(RuntimeError, match="does not exist"):
         audmodel.resolve_alias(alias)
+
+
+def test_set_alias_with_uid_like_name(published_model):
+    """Test that setting an alias with a UID-like name raises ValueError.
+
+    This test covers lines 638-642 in backend.py where the alias name
+    is validated to ensure it's not a UID format.
+    """
+    # Try to set an alias that looks like a short UID (8 hex chars)
+    with pytest.raises(ValueError, match="is not an allowed alias name"):
+        audmodel.set_alias("abcd1234", published_model)
+
+    # Try to set an alias that looks like a UID with version
+    with pytest.raises(ValueError, match="is not an allowed alias name"):
+        audmodel.set_alias("d4e9c65b-1.0.0", published_model)
+
+    # Try to set an alias that looks like a legacy UUID
+    with pytest.raises(ValueError, match="is not an allowed alias name"):
+        audmodel.set_alias("aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee", published_model)
+
+
+def test_set_alias_with_invalid_characters(published_model):
+    """Test that setting an alias with invalid characters raises ValueError.
+
+    Only [A-Za-z0-9._-] characters are allowed.
+    """
+    # Try to set an alias with spaces
+    with pytest.raises(ValueError, match="is not an allowed alias name"):
+        audmodel.set_alias("my alias", published_model)
+
+    # Try to set an alias with special characters
+    with pytest.raises(ValueError, match="is not an allowed alias name"):
+        audmodel.set_alias("my@alias", published_model)
+
+    with pytest.raises(ValueError, match="is not an allowed alias name"):
+        audmodel.set_alias("my!alias", published_model)
+
+    with pytest.raises(ValueError, match="is not an allowed alias name"):
+        audmodel.set_alias("my#alias", published_model)
+
+    with pytest.raises(ValueError, match="is not an allowed alias name"):
+        audmodel.set_alias("my$alias", published_model)
+
+    with pytest.raises(ValueError, match="is not an allowed alias name"):
+        audmodel.set_alias("my/alias", published_model)
+
+    with pytest.raises(ValueError, match="is not an allowed alias name"):
+        audmodel.set_alias("my(alias)", published_model)
+
+
+def test_publish_with_invalid_alias_names():
+    """Test that publishing with invalid alias names raises an error."""
+    # Try to publish with UID-like alias
+    with pytest.raises(ValueError, match="is not an allowed alias name"):
+        audmodel.publish(
+            pytest.MODEL_ROOT,
+            pytest.NAME,
+            pytest.PARAMS,
+            "7.0.0",
+            alias="deadbeef",
+            subgroup=SUBGROUP,
+            repository=audmodel.config.REPOSITORIES[0],
+        )
+
+    # Try to publish with alias containing special characters
+    # This raises ValueError from backend path validation in cleanup code
+    with pytest.raises(ValueError, match="is not an allowed alias name"):
+        audmodel.publish(
+            pytest.MODEL_ROOT,
+            pytest.NAME,
+            pytest.PARAMS,
+            "8.0.0",
+            alias="my@alias",
+            subgroup=SUBGROUP,
+            repository=audmodel.config.REPOSITORIES[0],
+        )

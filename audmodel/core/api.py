@@ -517,6 +517,8 @@ def publish(
             cannot be serialized to a YAML file
         ValueError: if subgroup is set to ``'_uid'``
         FileNotFoundError: if ``root`` folder cannot be found
+        ValueError: if ``alias`` can be confused with an UID,
+            or it does contain chars other than ``[A-Za-z0-9._-]+``
 
     Examples:
         >>> # Assuming your model files are stored under `model_root`
@@ -582,6 +584,9 @@ def publish(
         raise ValueError(
             f"It is not allowed to set subgroup to '{define.ALIAS_FOLDER}'."
         )
+
+    if alias and not utils.valid_alias(alias):
+        raise ValueError(f"'{alias}' is not an allowed alias name.")
 
     if not os.path.isdir(root):
         raise FileNotFoundError(
@@ -735,11 +740,16 @@ def set_alias(
         audbackend.BackendError: if connection to repository on backend
             cannot be established
         RuntimeError: if model does not exist
+        ValueError: if ``alias`` can be confused with an UID,
+            or it does contain chars other than ``[A-Za-z0-9._-]+``
 
     Examples:
         >>> set_alias("my-model", "d4e9c65b-3.0.0")  # doctest: +SKIP
 
     """
+    if not utils.valid_alias(alias):
+        raise ValueError(f"'{alias}' is not an allowed alias name.")
+
     cache_root = audeer.safe_path(cache_root or default_cache_root())
 
     # Verify the model exists by trying to get its header

@@ -3,6 +3,7 @@ from collections.abc import Sequence
 import datetime
 import getpass
 import os
+import re
 
 import audeer
 
@@ -26,6 +27,22 @@ def create_header(
         "subgroup": subgroup,
         "version": version,
     }
+
+
+def valid_alias(alias: str) -> bool:
+    r"""Check if alias is valid name.
+
+    Args:
+        alias: alias name
+
+    Returns:
+        ``True`` if alias is valid name
+
+    """
+    allowed_chars = re.compile("[A-Za-z0-9._-]+")
+    if is_alias(alias) and allowed_chars.fullmatch(alias):
+        return True
+    return False
 
 
 def is_alias(uid: str) -> bool:
