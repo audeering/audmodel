@@ -1,0 +1,162 @@
+import pytest
+
+import audmodel
+
+
+audmodel.config.CACHE_ROOT = pytest.CACHE_ROOT
+audmodel.config.REPOSITORIES = pytest.REPOSITORIES
+
+SUBGROUP = f"{pytest.ID}.alias"
+
+
+@pytest.fixture(scope="module")
+def published_model():
+    """Publish a model for testing alias functionality."""
+    uid = audmodel.publish(
+        pytest.MODEL_ROOT,
+        pytest.NAME,
+        pytest.PARAMS,
+        "1.0.0",
+        author=pytest.AUTHOR,
+        date=pytest.DATE,
+        meta=pytest.META["1.0.0"],
+        subgroup=SUBGROUP,
+        repository=audmodel.config.REPOSITORIES[0],
+    )
+    return uid
+
+
+def test_publish_with_alias(published_model):
+    """Test publishing a model with an alias."""
+    alias = "test-publish-alias"
+    uid = audmodel.publish(
+        pytest.MODEL_ROOT,
+        pytest.NAME,
+        pytest.PARAMS,
+        "2.0.0",
+        alias=alias,
+        author=pytest.AUTHOR,
+        date=pytest.DATE,
+        meta=pytest.META["2.0.0"],
+        subgroup=SUBGROUP,
+        repository=audmodel.config.REPOSITORIES[0],
+    )
+
+    # Verify alias was created and resolves to correct UID
+    assert audmodel.resolve_alias(alias) == uid
+
+    # Verify we can load model using alias
+    model_path = audmodel.load(alias)
+    assert model_path.endswith(uid.replace("-", "/"))
+
+
+def test_set_alias(published_model):
+    """Test setting an alias for an existing model."""
+    alias = "test-set-alias"
+
+    # Set alias for existing model
+    audmodel.set_alias(alias, published_model)
+
+    # Verify alias resolves correctly
+    assert audmodel.resolve_alias(alias) == published_model
+
+    # Verify we can use alias to access model info
+    assert audmodel.name(alias) == pytest.NAME
+    assert audmodel.author(alias) == pytest.AUTHOR
+    assert audmodel.parameters(alias) == pytest.PARAMS
+    assert audmodel.version(alias) == "1.0.0"
+
+
+def test_resolve_alias_nonexistent():
+    """Test resolving a non-existent alias raises error."""
+    alias = "test-nonexistent-alias"
+    with pytest.raises(RuntimeError, match="does not exist"):
+        audmodel.resolve_alias(alias)
+
+
+def test_set_alias_nonexistent_model():
+    """Test setting alias for non-existent model raises error."""
+    alias = "test-invalid-alias"
+    with pytest.raises(RuntimeError, match="does not exist"):
+        audmodel.set_alias(alias, "nonexist-1.0.0")
+
+
+def test_load_with_alias(published_model):
+    """Test loading a model using an alias."""
+    alias = "test-load-alias"
+    audmodel.set_alias(alias, published_model)
+
+    # Load using UID
+    path_uid = audmodel.load(published_model)
+
+    # Load using alias
+    path_alias = audmodel.load(alias)
+
+    # Both should point to the same location
+    assert path_uid == path_alias
+
+
+def test_all_api_functions_with_alias(published_model):
+    """Test that all API functions work with aliases."""
+    alias = "test-api-alias"
+    audmodel.set_alias(alias, published_model)
+
+    # Test all API functions that accept uid parameter
+    assert audmodel.author(alias) == pytest.AUTHOR
+    assert audmodel.date(alias) == str(pytest.DATE)
+    assert audmodel.exists(published_model)  # exists doesn't support aliases currently
+    assert audmodel.name(alias) == pytest.NAME
+    assert audmodel.parameters(alias) == pytest.PARAMS
+    assert audmodel.subgroup(alias) == SUBGROUP
+    assert audmodel.version(alias) == "1.0.0"
+
+    # Test header and meta
+    header = audmodel.header(alias)
+    assert header["name"] == pytest.NAME
+    assert header["author"] == pytest.AUTHOR
+
+    meta = audmodel.meta(alias)
+    assert meta == pytest.META["1.0.0"]
+
+
+def test_update_alias(published_model):
+    """Test updating an existing alias to point to a different model."""
+    alias = "test-update-alias"
+
+    # Set alias to first model
+    audmodel.set_alias(alias, published_model)
+    assert audmodel.resolve_alias(alias) == published_model
+
+    # Publish a new version
+    new_uid = audmodel.publish(
+        pytest.MODEL_ROOT,
+        pytest.NAME,
+        pytest.PARAMS,
+        "3.0.0",
+        author=pytest.AUTHOR,
+        date=pytest.DATE,
+        meta=pytest.META["3.0.0"],
+        subgroup=SUBGROUP,
+        repository=audmodel.config.REPOSITORIES[0],
+    )
+
+    # Update alias to point to new version
+    audmodel.set_alias(alias, new_uid)
+    assert audmodel.resolve_alias(alias) == new_uid
+    assert audmodel.version(alias) == "3.0.0"
+
+
+def test_is_alias():
+    """Test the is_alias utility function."""
+    from audmodel.core.utils import is_alias
+
+    # UIDs should not be detected as aliases
+    assert not is_alias("d4e9c65b")  # short UID (8 chars)
+    assert not is_alias("d4e9c65b-1.0.0")  # UID with version
+    assert not is_alias("12345678-90ab-cdef-1234-567890abcdef")  # legacy UID (36 chars)
+
+    # Aliases should be detected
+    assert is_alias("my-model")
+    assert is_alias("production-model")
+    assert is_alias("test_alias")
+    assert is_alias("alias123")

@@ -28,6 +28,72 @@ def create_header(
     }
 
 
+def is_alias(uid: str) -> bool:
+    r"""Check if uid is an alias name.
+
+    An alias is any string that doesn't match the UID formats:
+    - 8-character hexadecimal short ID
+    - 36-character legacy ID (UUID format with dashes)
+    - short-id-version format (e.g., "d4e9c65b-3.0.0")
+
+    Additionally, strings that look like they're intended to be UIDs
+    (e.g., all hex digits) are NOT treated as aliases, even if invalid.
+
+    Args:
+        uid: potential alias or UID
+
+    Returns:
+        ``True`` if the string is an alias, ``False`` if it's a UID
+
+    """
+    # If it's all hex digits (with optional dashes for UUID format),
+    # treat it as a UID attempt, not an alias
+    uid_clean = uid.replace("-", "")
+    try:
+        int(uid_clean, 16)
+        # It's all hex, so it's likely meant to be a UID
+        return False
+    except ValueError:
+        # Contains non-hex characters, continue checking
+        pass
+
+    # Legacy UID (36 chars in UUID format: 8-4-4-4-12)
+    if len(uid) == 36 and uid.count("-") == 4:
+        parts = uid.split("-")
+        if (
+            len(parts[0]) == 8
+            and len(parts[1]) == 4
+            and len(parts[2]) == 4
+            and len(parts[3]) == 4
+            and len(parts[4]) == 12
+        ):
+            return False
+
+    # Short UID (8 chars, all hex)
+    if len(uid) == 8:
+        try:
+            int(uid, 16)
+            return False
+        except ValueError:
+            # 8 chars but not hex, could be an alias
+            pass
+
+    # UID with version (short-id-version format)
+    # e.g., "d4e9c65b-3.0.0" or "d4e9c65b-1.0.0-rc1"
+    if "-" in uid:
+        parts = uid.split("-", 1)
+        if len(parts[0]) == 8:
+            # Check if first part is hexadecimal
+            try:
+                int(parts[0], 16)
+                return False
+            except ValueError:
+                pass
+
+    # Everything else is an alias
+    return True
+
+
 def is_legacy_uid(uid: str) -> bool:
     r"""Check if uid has old format."""
     return len(uid) == 36

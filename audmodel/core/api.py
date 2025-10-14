@@ -9,12 +9,14 @@ import audeer
 
 from audmodel.core.backend import SERIALIZE_ERROR_MESSAGE
 from audmodel.core.backend import archive_path
+from audmodel.core.backend import get_alias
 from audmodel.core.backend import get_archive
 from audmodel.core.backend import get_header
 from audmodel.core.backend import get_meta
 from audmodel.core.backend import header_path
 from audmodel.core.backend import header_versions
 from audmodel.core.backend import meta_path
+from audmodel.core.backend import put_alias
 from audmodel.core.backend import put_archive
 from audmodel.core.backend import put_header
 from audmodel.core.backend import put_meta
@@ -417,6 +419,7 @@ def publish(
     params: dict[str, object],
     version: str,
     *,
+    alias: str | None = None,
     author: str | None = None,
     date: datetime.date | None = None,
     meta: dict[str, object] | None = None,
@@ -488,6 +491,9 @@ def publish(
         name: model name
         params: dictionary with parameters
         version: version string
+        alias: optional alias name for the model.
+            If provided, the model can be accessed using this alias
+            in addition to its UID
         author: author name(s), defaults to user name
         date: date, defaults to current timestamp
         meta: dictionary with meta information
@@ -572,6 +578,11 @@ def publish(
     if subgroup == define.UID_FOLDER:
         raise ValueError(f"It is not allowed to set subgroup to '{define.UID_FOLDER}'.")
 
+    if subgroup == define.ALIAS_FOLDER:
+        raise ValueError(
+            f"It is not allowed to set subgroup to '{define.ALIAS_FOLDER}'."
+        )
+
     if not os.path.isdir(root):
         raise FileNotFoundError(
             errno.ENOENT,
@@ -620,6 +631,13 @@ def publish(
             backend_interface,
             verbose,
         )
+        if alias:
+            put_alias(
+                alias,
+                uid,
+                backend_interface,
+                verbose,
+            )
     except Exception as ex:
         # Otherwise remove already published files
         with backend_interface.backend:
@@ -645,6 +663,15 @@ def publish(
                 # so it's not likely we'll ever end up in this case
                 backend_interface.remove_file(path, version)
 
+            if alias:
+                path = backend_interface.join(
+                    "/",
+                    define.ALIAS_FOLDER,
+                    f"{alias}.{define.ALIAS_EXT}",
+                )
+                if backend_interface.exists(path, "1.0.0"):
+                    backend_interface.remove_file(path, "1.0.0")
+
         # Reraise our custom error if params or meta cannot be serialized
         if isinstance(ex, RuntimeError) and ex.args[0].startswith(
             SERIALIZE_ERROR_MESSAGE
@@ -654,6 +681,76 @@ def publish(
             raise RuntimeError("Could not publish model due to an unexpected error.")
 
     return uid
+
+
+def resolve_alias(
+    alias: str,
+    *,
+    cache_root: str | None = None,
+    verbose: bool = False,
+) -> str:
+    r"""Resolve an alias to its corresponding model UID.
+
+    Args:
+        alias: alias name
+        cache_root: cache folder where aliases are cached.
+            If not set :meth:`audmodel.default_cache_root` is used
+        verbose: show debug messages
+
+    Returns:
+        model UID
+
+    Raises:
+        audbackend.BackendError: if connection to repository on backend
+            cannot be established
+        RuntimeError: if alias does not exist
+
+    Examples:
+        >>> resolve_alias("my-model")  # doctest: +SKIP
+        'd4e9c65b-3.0.0'
+
+    """
+    cache_root = audeer.safe_path(cache_root or default_cache_root())
+    _, uid = get_alias(alias, cache_root, verbose)
+    return uid
+
+
+def set_alias(
+    alias: str,
+    uid: str,
+    *,
+    cache_root: str | None = None,
+    verbose: bool = False,
+):
+    r"""Set or update an alias for a model.
+
+    Args:
+        alias: alias name
+        uid: unique model ID or short ID for latest version
+        cache_root: cache folder where models and headers are stored.
+            If not set :meth:`audmodel.default_cache_root` is used
+        verbose: show debug messages
+
+    Raises:
+        audbackend.BackendError: if connection to repository on backend
+            cannot be established
+        RuntimeError: if model does not exist
+
+    Examples:
+        >>> set_alias("my-model", "d4e9c65b-3.0.0")  # doctest: +SKIP
+
+    """
+    cache_root = audeer.safe_path(cache_root or default_cache_root())
+
+    # Verify the model exists by trying to get its header
+    short_id, version = split_uid(uid, cache_root)
+    full_uid = f"{short_id}-{version}"
+
+    # Get the repository from the header
+    backend_interface, _ = get_header(short_id, version, cache_root, verbose)
+
+    # Create or update the alias
+    put_alias(alias, full_uid, backend_interface, verbose)
 
 
 def subgroup(

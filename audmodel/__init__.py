@@ -10,6 +10,8 @@ from audmodel.core.api import meta
 from audmodel.core.api import name
 from audmodel.core.api import parameters
 from audmodel.core.api import publish
+from audmodel.core.api import resolve_alias
+from audmodel.core.api import set_alias
 from audmodel.core.api import subgroup
 from audmodel.core.api import uid
 from audmodel.core.api import update_meta

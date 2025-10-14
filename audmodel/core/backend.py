@@ -510,6 +510,151 @@ def put_meta(
     return dst_path
 
 
+def alias_path(
+    alias: str,
+) -> tuple[audbackend.interface.Maven, str]:
+    r"""Return backend and alias path.
+
+    Args:
+        alias: alias name
+
+    Returns:
+        backend interface, path to alias on backend
+
+    Raises:
+        BackendError: if connection to backend
+            cannot be established
+        RuntimeError: if requested alias does not exist
+
+    """
+    for repository in config.REPOSITORIES:
+        backend_interface = repository.create_backend_interface()
+        path = backend_interface.join(
+            "/",
+            define.ALIAS_FOLDER,
+            f"{alias}.{define.ALIAS_EXT}",
+        )
+
+        # Look for the repository that contains the requested alias
+        with backend_interface.backend:
+            alias_exists = backend_interface.exists(
+                path,
+                "1.0.0",
+                suppress_backend_errors=True,
+            )
+        if alias_exists:
+            return backend_interface, path
+
+    # If no repository can be found, requested alias does not exist
+    raise RuntimeError(f"An alias with name '{alias}' does not exist.")
+
+
+def get_alias(
+    alias: str,
+    cache_root: str,
+    verbose: bool,
+) -> tuple[audbackend.interface.Maven, str]:
+    r"""Return backend and UID for alias.
+
+    Args:
+        alias: alias name
+        cache_root: path of cache root
+        verbose: if ``True`` show message
+            or progress bar
+            when downloading file
+
+    Returns:
+        backend interface, model UID
+
+    Raises:
+        BackendError: if connection to backend
+            cannot be established
+        RuntimeError: if requested alias does not exist
+
+    """
+    backend_interface, remote_path = alias_path(alias)
+    local_path = os.path.join(
+        cache_root,
+        define.ALIAS_FOLDER,
+        f"{alias}.{define.ALIAS_EXT}",
+    )
+
+    with backend_interface.backend:
+        # If alias in cache, check if it matches remote version
+        # and delete it if checksums don't match
+        if os.path.exists(local_path):
+            local_checksum = audeer.md5(local_path)
+            remote_checksum = backend_interface.checksum(
+                remote_path,
+                "1.0.0",
+            )
+            if local_checksum != remote_checksum:
+                os.remove(local_path)
+
+        # Download alias if not in cache
+        if not os.path.exists(local_path):
+            audeer.mkdir(os.path.dirname(local_path))
+            with tempfile.TemporaryDirectory() as root:
+                tmp_path = os.path.join(root, "alias.yaml")
+                backend_interface.get_file(
+                    remote_path,
+                    tmp_path,
+                    "1.0.0",
+                    verbose=verbose,
+                )
+                shutil.move(tmp_path, local_path)
+
+    # read alias from local file
+    with open(local_path) as fp:
+        alias_data = yaml.load(fp, Loader=yaml.Loader)
+
+    return backend_interface, alias_data["uid"]
+
+
+def put_alias(
+    alias: str,
+    uid: str,
+    backend_interface: audbackend.interface.Maven,
+    verbose: bool,
+) -> str:
+    r"""Put alias to backend.
+
+    Args:
+        alias: alias name
+        uid: model UID
+        backend_interface: backend interface instance
+        verbose: if ``True`` show message
+            when uploading file
+
+    Returns:
+        alias path on backend
+
+    Raises:
+        BackendError: if connection to backend
+            cannot be established
+
+    """
+    dst_path = backend_interface.join(
+        "/",
+        define.ALIAS_FOLDER,
+        f"{alias}.{define.ALIAS_EXT}",
+    )
+
+    with tempfile.TemporaryDirectory() as tmp_root:
+        src_path = os.path.join(tmp_root, "alias.yaml")
+        alias_data = {"uid": uid}
+        write_yaml(src_path, alias_data)
+        with backend_interface.backend:
+            backend_interface.put_file(
+                src_path,
+                dst_path,
+                "1.0.0",
+                verbose=verbose,
+            )
+
+    return dst_path
+
+
 def raise_model_not_found_error(
     short_id: str,
     version: str,
@@ -529,7 +674,7 @@ def split_uid(
     r"""Split uid into short id and version.
 
     Args:
-        uid: model ID, or model ID without version
+        uid: model ID, model ID without version, or alias name
         cache_root: path to cache root
 
     Returns:
@@ -541,8 +686,24 @@ def split_uid(
             cannot be established
         RuntimeError: if short or legacy model ID is provided,
             and requested model does not exists
+        RuntimeError: if an alias is provided and does not exist
 
     """
+    # Check if it's a potential alias (doesn't match UID patterns)
+    # If so, try to resolve it first
+    if utils.is_alias(uid):
+        try:
+            _, resolved_uid = get_alias(uid, cache_root, verbose=False)
+            uid = resolved_uid
+        except RuntimeError:
+            # Alias doesn't exist - this could be either:
+            # 1. A legitimate alias that doesn't exist
+            # 2. An invalid UID that was misidentified as an alias
+            #
+            # To maintain backward compatibility, we report it as a model ID error
+            # since there's no way to know the user's intent
+            raise_model_not_found_error(uid, None)
+
     if utils.is_legacy_uid(uid):
         short_id = uid
         version = None
