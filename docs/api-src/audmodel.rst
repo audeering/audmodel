@@ -21,6 +21,8 @@ audmodel
     parameters
     publish
     Repository
+    resolve_alias
+    set_alias
     subgroup
     uid
     update_meta
