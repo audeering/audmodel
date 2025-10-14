@@ -37,7 +37,8 @@ def is_alias(uid: str) -> bool:
     - short-id-version format (e.g., "d4e9c65b-3.0.0")
 
     Additionally, strings that look like they're intended to be UIDs
-    (e.g., all hex digits) are NOT treated as aliases, even if invalid.
+    (e.g., lower case and all hex digits)
+    are NOT treated as aliases, even if invalid.
 
     Args:
         uid: potential alias or UID
@@ -49,6 +50,11 @@ def is_alias(uid: str) -> bool:
     # If it's all hex digits (with optional dashes for UUID format),
     # treat it as a UID attempt, not an alias
     uid_clean = uid.replace("-", "")
+
+    # Only lowercase letters are allowed in UID
+    if uid_clean != uid_clean.lower():
+        return True
+
     try:
         int(uid_clean, 16)
         # It's all hex, so it's likely meant to be a UID

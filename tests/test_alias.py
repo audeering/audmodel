@@ -28,7 +28,7 @@ def published_model():
     return uid
 
 
-def test_publish_with_alias(published_model):
+def test_publish_with_alias():
     """Test publishing a model with an alias."""
     alias = "test-publish-alias"
     uid = audmodel.publish(
@@ -170,6 +170,7 @@ def test_is_alias():
     assert is_alias("production-model")
     assert is_alias("test_alias")
     assert is_alias("alias123")
+    assert is_alias("Cafebabe")
     # Test 8-char non-hex string (edge case for lines 73-79)
     assert is_alias("zyxwvuts")
 
