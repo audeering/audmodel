@@ -569,7 +569,8 @@ def get_alias(
     Raises:
         BackendError: if connection to backend
             cannot be established
-        RuntimeError: if requested alias does not exist
+        RuntimeError: if requested alias does not exist,
+            or alias file is corrupted
 
     """
     backend_interface, remote_path = alias_path(alias)
@@ -605,8 +606,11 @@ def get_alias(
                 shutil.move(tmp_path, local_path)
 
     # read alias from local file
-    with open(local_path) as fp:
-        alias_data = yaml.load(fp, Loader=yaml.Loader)
+    try:
+        with open(local_path) as fp:
+            alias_data = yaml.load(fp, Loader=yaml.Loader)
+    except yaml.YAMLError as yaml_ex:
+        raise RuntimeError(f"Failed to parse alias file '{local_path}': {yaml_ex}")
 
     return backend_interface, alias_data["uid"]
 

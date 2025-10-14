@@ -1,6 +1,9 @@
 import os
+from unittest.mock import patch
 
 import pytest
+
+import audeer
 
 import audmodel
 
@@ -290,3 +293,35 @@ def test_publish_with_invalid_alias_names():
             subgroup=SUBGROUP,
             repository=audmodel.config.REPOSITORIES[0],
         )
+
+
+def test_resolve_alias_with_corrupted_file(published_model):
+    """Test that resolving an alias with corrupted YAML file raises error."""
+    alias = "test-corrupted-alias"
+
+    # First, create a valid alias
+    audmodel.set_alias(alias, published_model)
+
+    # Get the cache path
+    cache_root = audmodel.config.CACHE_ROOT
+    alias_cache_path = os.path.join(
+        cache_root,
+        "_alias",
+        f"{alias}.alias.yaml",
+    )
+
+    # Corrupt the local alias file with invalid YAML
+    audeer.mkdir(os.path.dirname(alias_cache_path))
+    with open(alias_cache_path, "w") as f:
+        f.write("uid: [invalid yaml syntax without closing bracket")
+
+    # Get checksum of the corrupted file
+    corrupted_checksum = audeer.md5(alias_cache_path)
+
+    # Mock the backend checksum to match the corrupted file's checksum
+    # This prevents the file from being re-downloaded
+    # and forces reading of the corrupted file
+    with patch("audbackend.interface.Maven.checksum", return_value=corrupted_checksum):
+        # Try to resolve the alias - should raise RuntimeError about parsing failure
+        with pytest.raises(RuntimeError, match="Failed to parse alias file"):
+            audmodel.resolve_alias(alias)
