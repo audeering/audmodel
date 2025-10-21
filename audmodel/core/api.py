@@ -420,7 +420,7 @@ def publish(
     author: str | None = None,
     date: datetime.date | None = None,
     meta: dict[str, object] | None = None,
-    repository: Repository = config.REPOSITORIES[0],
+    repository: Repository | None = None,
     subgroup: str | None = None,
     verbose: bool = False,
 ) -> str:
@@ -491,7 +491,8 @@ def publish(
         author: author name(s), defaults to user name
         date: date, defaults to current timestamp
         meta: dictionary with meta information
-        repository: repository where the model will be published
+        repository: repository where the model will be published,
+            defaults to ``config.REPOSITORIES[0]``
         subgroup: subgroup under which
             the model is stored on backend.
             ``.`` are replaced by ``/``
@@ -564,6 +565,9 @@ def publish(
     """  # noqa: E501
     root = audeer.safe_path(root)
     subgroup = subgroup or ""
+
+    if repository is None:
+        repository = config.REPOSITORIES[0]
 
     if subgroup == define.UID_FOLDER:
         raise ValueError(f"It is not allowed to set subgroup to '{define.UID_FOLDER}'.")

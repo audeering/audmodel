@@ -25,7 +25,7 @@ SUBGROUP = f"{pytest.ID}.publish"
             pytest.DATE,
             pytest.META["1.0.0"],
             SUBGROUP,
-            audmodel.config.REPOSITORIES[0],
+            None,
         ),
         # different name
         pytest.param(
