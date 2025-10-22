@@ -1,3 +1,4 @@
+from audmodel.core.api import aliases
 from audmodel.core.api import author
 from audmodel.core.api import date
 from audmodel.core.api import default_cache_root
@@ -10,6 +11,8 @@ from audmodel.core.api import meta
 from audmodel.core.api import name
 from audmodel.core.api import parameters
 from audmodel.core.api import publish
+from audmodel.core.api import resolve_alias
+from audmodel.core.api import set_alias
 from audmodel.core.api import subgroup
 from audmodel.core.api import uid
 from audmodel.core.api import update_meta

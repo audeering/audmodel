@@ -3,8 +3,17 @@ from collections.abc import Sequence
 import datetime
 import getpass
 import os
+import re
 
 import audeer
+
+
+UID_LEGACY_PATERN = re.compile(
+    r"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+)
+UID_SHORT_PATTERN = re.compile(r"^[0-9a-f]{8}$")
+UID_VERSION_PATTERN = re.compile(r"^[0-9a-f]{8}-[0-9][A-Za-z0-9.+-]*$")
+VALID_ALIAS_PATTERN = re.compile(r"^[A-Za-z0-9._-]+$")
 
 
 def create_header(
@@ -26,6 +35,45 @@ def create_header(
         "subgroup": subgroup,
         "version": version,
     }
+
+
+def valid_alias(alias: str) -> bool:
+    r"""Check if alias is valid name.
+
+    Args:
+        alias: alias name
+
+    Returns:
+        ``True`` if alias is valid name
+
+    """
+    return bool(VALID_ALIAS_PATTERN.fullmatch(alias)) and is_alias(alias)
+
+
+def is_alias(uid: str) -> bool:
+    r"""Check if uid is an alias name.
+
+    An alias is any string that doesn't match the UID formats:
+    - 8-character hexadecimal short ID (e.g., "d4e9c65b")
+    - short ID with version (e.g., "d4e9c65b-3.0.0")
+    - 36-character legacy ID (UUID format with dashes)
+
+    Additionally, strings that look like they're intended to be UIDs
+    (e.g., lower case and all hex digits)
+    are NOT treated as aliases, even if invalid.
+
+    Args:
+        uid: potential alias or UID
+
+    Returns:
+        ``True`` if the string is an alias, ``False`` if it's a UID
+
+    """
+    return not (
+        UID_SHORT_PATTERN.fullmatch(uid)
+        or UID_LEGACY_PATERN.fullmatch(uid)
+        or UID_VERSION_PATTERN.fullmatch(uid)
+    )
 
 
 def is_legacy_uid(uid: str) -> bool:

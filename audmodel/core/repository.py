@@ -111,6 +111,7 @@ class Repository:
             extensions=[
                 define.HEADER_EXT,
                 define.META_EXT,
+                define.ALIAS_EXT,
             ],
         )
 

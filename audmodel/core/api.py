@@ -9,12 +9,16 @@ import audeer
 
 from audmodel.core.backend import SERIALIZE_ERROR_MESSAGE
 from audmodel.core.backend import archive_path
+from audmodel.core.backend import get_alias
+from audmodel.core.backend import get_aliases
 from audmodel.core.backend import get_archive
 from audmodel.core.backend import get_header
 from audmodel.core.backend import get_meta
 from audmodel.core.backend import header_path
 from audmodel.core.backend import header_versions
 from audmodel.core.backend import meta_path
+from audmodel.core.backend import put_alias
+from audmodel.core.backend import put_aliases
 from audmodel.core.backend import put_archive
 from audmodel.core.backend import put_header
 from audmodel.core.backend import put_meta
@@ -34,7 +38,7 @@ def author(
     r"""Author of model.
 
     Args:
-        uid: unique model ID or short ID for latest version
+        uid: unique model ID (omit version for latest version) or alias
         cache_root: cache folder where models and headers are stored.
             If not set :meth:`audmodel.default_cache_root` is used
 
@@ -62,7 +66,7 @@ def date(
     r"""Publication date of model.
 
     Args:
-        uid: unique model ID or short ID for latest version
+        uid: unique model ID (omit version for latest version) or alias
         cache_root: cache folder where models and headers are stored.
             If not set :meth:`audmodel.default_cache_root` is used
 
@@ -113,10 +117,10 @@ def default_cache_root() -> str:
 def exists(
     uid: str,
 ) -> bool:
-    r"""Check if a model with this ID exists.
+    r"""Check if a model exists.
 
     Args:
-        uid: unique model ID or short ID for latest version
+        uid: unique model ID (omit version for latest version) or alias
 
     Returns:
         ``True`` if a model with this ID is found
@@ -149,7 +153,7 @@ def header(
     r"""Load model header.
 
     Args:
-        uid: unique model ID or short ID for latest version
+        uid: unique model ID (omit version for latest version) or alias
         cache_root: cache folder where models and headers are stored.
             If not set :meth:`audmodel.default_cache_root` is used
         verbose: show debug messages
@@ -189,7 +193,7 @@ def latest_version(
     r"""Latest available version of model.
 
     Args:
-        uid: unique model ID or short ID
+        uid: unique model ID, alias, or short ID
 
     Returns:
         latest version of model
@@ -281,7 +285,7 @@ def load(
     the download is skipped.
 
     Args:
-        uid: unique model ID or short ID for latest version
+        uid: unique model ID (omit version for latest version) or alias
         cache_root: cache folder where models and headers are stored.
             If not set :meth:`audmodel.default_cache_root` is used
         verbose: show debug messages
@@ -314,7 +318,7 @@ def meta(
     r"""Meta information of model.
 
     Args:
-        uid: unique model ID or short ID for latest version
+        uid: unique model ID (omit version for latest version) or alias
         cache_root: cache folder where models and headers are stored.
             If not set :meth:`audmodel.default_cache_root` is used
         verbose: show debug messages
@@ -360,7 +364,7 @@ def name(
     r"""Name of model.
 
     Args:
-        uid: unique model ID or short ID for latest version
+        uid: unique model ID (omit version for latest version) or alias
         cache_root: cache folder where models and headers are stored.
             If not set :meth:`audmodel.default_cache_root` is used
         verbose: show debug messages
@@ -390,7 +394,7 @@ def parameters(
     r"""Parameters of model.
 
     Args:
-        uid: unique model ID or short ID for latest version
+        uid: unique model ID (omit version for latest version) or alias
         cache_root: cache folder where models and headers are stored.
             If not set :meth:`audmodel.default_cache_root` is used
         verbose: show debug messages
@@ -417,6 +421,7 @@ def publish(
     params: dict[str, object],
     version: str,
     *,
+    alias: str | None = None,
     author: str | None = None,
     date: datetime.date | None = None,
     meta: dict[str, object] | None = None,
@@ -488,6 +493,9 @@ def publish(
         name: model name
         params: dictionary with parameters
         version: version string
+        alias: optional alias name for the model.
+            If provided, the model can be accessed using this alias
+            in addition to its UID
         author: author name(s), defaults to user name
         date: date, defaults to current timestamp
         meta: dictionary with meta information
@@ -511,6 +519,8 @@ def publish(
             cannot be serialized to a YAML file
         ValueError: if subgroup is set to ``'_uid'``
         FileNotFoundError: if ``root`` folder cannot be found
+        ValueError: if ``alias`` can be confused with an UID,
+            or it does contain chars other than ``[A-Za-z0-9._-]+``
 
     Examples:
         >>> # Assuming your model files are stored under `model_root`
@@ -572,6 +582,18 @@ def publish(
     if subgroup == define.UID_FOLDER:
         raise ValueError(f"It is not allowed to set subgroup to '{define.UID_FOLDER}'.")
 
+    if subgroup == define.ALIAS_FOLDER:
+        raise ValueError(
+            f"It is not allowed to set subgroup to '{define.ALIAS_FOLDER}'."
+        )
+
+    if alias and not utils.valid_alias(alias):
+        raise ValueError(
+            f"'{alias}' is not an allowed alias name. "
+            "Alias names may only contain letters, numbers, underscores, hyphens, "
+            "and are not allowed to be confused with a model ID."
+        )
+
     if not os.path.isdir(root):
         raise FileNotFoundError(
             errno.ENOENT,
@@ -620,10 +642,26 @@ def publish(
             backend_interface,
             verbose,
         )
+        if alias:
+            # Store mapping (alias -> UID)
+            put_alias(
+                alias,
+                uid,
+                backend_interface,
+                verbose,
+            )
+            # Update reverse (UID -> aliases) mapping
+            put_aliases(
+                short_id,
+                version,
+                [alias],
+                backend_interface,
+                verbose,
+            )
     except Exception as ex:
         # Otherwise remove already published files
         with backend_interface.backend:
-            for ext in [define.HEADER_EXT, define.META_EXT]:
+            for ext in [define.HEADER_EXT, define.META_EXT, define.ALIASES_EXT]:
                 path = backend_interface.join(
                     "/",
                     define.UID_FOLDER,
@@ -645,6 +683,15 @@ def publish(
                 # so it's not likely we'll ever end up in this case
                 backend_interface.remove_file(path, version)
 
+            if alias:
+                path = backend_interface.join(
+                    "/",
+                    define.ALIAS_FOLDER,
+                    f"{alias}.{define.ALIAS_EXT}",
+                )
+                if backend_interface.exists(path, "1.0.0"):
+                    backend_interface.remove_file(path, "1.0.0")  # pragma: no cover
+
         # Reraise our custom error if params or meta cannot be serialized
         if isinstance(ex, RuntimeError) and ex.args[0].startswith(
             SERIALIZE_ERROR_MESSAGE
@@ -656,6 +703,131 @@ def publish(
     return uid
 
 
+def resolve_alias(
+    alias: str,
+    *,
+    cache_root: str | None = None,
+    verbose: bool = False,
+) -> str:
+    r"""Resolve an alias to its corresponding model UID.
+
+    Args:
+        alias: alias name
+        cache_root: cache folder where aliases are cached.
+            If not set :meth:`audmodel.default_cache_root` is used
+        verbose: show debug messages
+
+    Returns:
+        model UID
+
+    Raises:
+        audbackend.BackendError: if connection to repository on backend
+            cannot be established
+        RuntimeError: if alias does not exist
+
+    Examples:
+        >>> resolve_alias("my-model")  # doctest: +SKIP
+        'd4e9c65b-3.0.0'
+
+    """
+    cache_root = audeer.safe_path(cache_root or default_cache_root())
+    _, uid = get_alias(alias, cache_root, verbose)
+    return uid
+
+
+def aliases(
+    uid: str,
+    *,
+    cache_root: str | None = None,
+    verbose: bool = False,
+) -> list[str]:
+    r"""Get all aliases for a model.
+
+    Args:
+        uid: unique model ID (omit version for latest version) or alias
+        cache_root: cache folder where models and headers are stored.
+            If not set :meth:`audmodel.default_cache_root` is used
+        verbose: show debug messages
+
+    Returns:
+        list of alias names assigned to this model
+
+    Raises:
+        audbackend.BackendError: if connection to repository on backend
+            cannot be established
+        RuntimeError: if model does not exist
+
+    Examples:
+        >>> aliases("d4e9c65b-3.0.0")  # doctest: +SKIP
+        ['my-model', 'production-model']
+
+    """
+    cache_root = audeer.safe_path(cache_root or default_cache_root())
+    short_id, version = split_uid(uid, cache_root)
+    _, aliases_list = get_aliases(short_id, version, cache_root, verbose)
+    return aliases_list
+
+
+def set_alias(
+    alias: str,
+    uid: str,
+    *,
+    cache_root: str | None = None,
+    verbose: bool = False,
+):
+    r"""Set or update an alias for a model.
+
+    Args:
+        alias: alias name
+        uid: unique model ID (omit version for latest version)
+        cache_root: cache folder where models and headers are stored.
+            If not set :meth:`audmodel.default_cache_root` is used
+        verbose: show debug messages
+
+    Raises:
+        audbackend.BackendError: if connection to repository on backend
+            cannot be established
+        RuntimeError: if model does not exist
+        ValueError: if ``alias`` can be confused with an UID,
+            or it does contain chars other than ``[A-Za-z0-9._-]+``
+
+    Examples:
+        >>> set_alias("my-model", "d4e9c65b-3.0.0")  # doctest: +SKIP
+
+    """
+    if not utils.valid_alias(alias):
+        raise ValueError(
+            f"'{alias}' is not an allowed alias name."
+            "Alias names may only contain letters, numbers, underscores, hyphens, "
+            "and are not allowed to be confused with a model ID."
+        )
+
+    cache_root = audeer.safe_path(cache_root or default_cache_root())
+
+    # Verify the model exists by trying to get its header
+    short_id, version = split_uid(uid, cache_root)
+    full_uid = f"{short_id}-{version}"
+
+    # Get the repository from the header
+    backend_interface, _ = get_header(short_id, version, cache_root, verbose)
+
+    # Create or update the alias
+    put_alias(alias, full_uid, backend_interface, verbose)
+
+    # Update reverse mapping (UID -> aliases)
+    # Get current aliases list
+    _, current_aliases = get_aliases(short_id, version, cache_root, verbose)
+
+    # Add new alias if not already present
+    if alias not in current_aliases:
+        current_aliases.append(alias)
+        # Sort for consistent ordering
+        current_aliases.sort()
+
+    # Update the aliases file
+    put_aliases(short_id, version, current_aliases, backend_interface, verbose)
+
+
 def subgroup(
     uid: str,
     *,
@@ -665,7 +837,7 @@ def subgroup(
     r"""Subgroup of model.
 
     Args:
-        uid: unique model ID or short ID for latest version
+        uid: unique model ID (omit version for latest version) or alias
         cache_root: cache folder where models and headers are stored.
             If not set :meth:`audmodel.default_cache_root` is used
         verbose: show debug messages
@@ -761,7 +933,7 @@ def update_meta(
     but keeps all existing fields.
 
     Args:
-        uid: unique model ID or short ID for latest version
+        uid: unique model ID (omit version for latest version) or alias
         meta: dictionary with meta information
         replace: replace existing dictionary
         cache_root: cache folder where models and headers are stored.
@@ -854,7 +1026,7 @@ def url(
     r"""URL to model archive or header.
 
     Args:
-        uid: unique model ID or short ID for latest version
+        uid: unique model ID (omit version for latest version) or alias
         type: return URL to specified type.
             ``'model'`` corresponds to the archive file
             storing the model,
@@ -933,7 +1105,7 @@ def version(
     r"""Version of model.
 
     Args:
-        uid: unique model ID or short ID for latest version
+        uid: unique model ID (omit version for latest version) or alias
         cache_root: cache folder where models and headers are stored.
             If not set :meth:`audmodel.default_cache_root` is used
         verbose: show debug messages
@@ -962,7 +1134,7 @@ def versions(
     r"""Available model versions.
 
     Args:
-        uid: unique model ID or short ID
+        uid: unique model ID (omit version for latest version) or alias
         cache_root: cache folder where models and headers are stored.
             If not set :meth:`audmodel.default_cache_root` is used
 
@@ -982,14 +1154,15 @@ def versions(
 
     """
     cache_root = audeer.safe_path(cache_root or default_cache_root())
-    if utils.is_legacy_uid(uid):
-        try:
+    try:
+        if utils.is_legacy_uid(uid):
             # legacy IDs can only have one version
             _, version = split_uid(uid, cache_root)
             return [version]
-        except RuntimeError:
-            return []
-    else:
-        short_id = uid.split("-")[0]
-        matches = header_versions(short_id)
-        return [match[2] for match in matches]
+        else:
+            short_id, _ = split_uid(uid, cache_root)
+            matches = header_versions(short_id)
+            return [match[2] for match in matches]
+    except RuntimeError:
+        # no model found
+        return []
