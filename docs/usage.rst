@@ -203,6 +203,45 @@ we will then have the following structure.
     show_model(model_root)
 
 
+Model alias
+-----------
+
+In addition to the model ID,
+a user can create different model aliases
+to refer to a model.
+An alias can already be selected during publication,
+or it can be set afterwards with
+
+.. jupyter-execute::
+
+    audmodel.set_alias("emotion-small", uid)
+
+One can inspect the corresponding model ID with
+
+.. jupyter-execute::
+
+    audmodel.resolve_alias("emotion-small")
+
+and use the alias instead of the model ID
+to access the model, e.g.
+
+.. jupyter-execute::
+
+    model_root = audmodel.load("emotion-small")
+
+One can add more than one alias for a model
+
+.. jupyter-execute::
+
+    audmodel.set_alias("emotion-production", uid)
+
+and can inspect existing aliases for a model ID with
+
+.. jupyter-execute::
+
+    audmodel.aliases(uid)
+
+
 Publish a new version
 ---------------------
 
