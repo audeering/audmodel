@@ -779,7 +779,7 @@ def set_alias(
 
     Args:
         alias: alias name
-        uid: unique model ID or short ID for latest version
+        uid: unique model ID (omit version for latest version)
         cache_root: cache folder where models and headers are stored.
             If not set :meth:`audmodel.default_cache_root` is used
         verbose: show debug messages
