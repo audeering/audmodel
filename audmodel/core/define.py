@@ -7,6 +7,9 @@ r"""Extension of meta file."""
 ALIAS_EXT = "alias.yaml"
 r"""Extension of alias file."""
 
+ALIASES_EXT = "aliases.yaml"
+r"""Extension of aliases list file."""
+
 UID_FOLDER = "_uid"
 r"""Name of folder where header and metadata is stored on backend."""
 

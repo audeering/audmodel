@@ -659,6 +659,158 @@ def put_alias(
     return dst_path
 
 
+def aliases_path(
+    short_id: str,
+    version: str,
+) -> tuple[audbackend.interface.Maven, str]:
+    r"""Return backend and aliases list path.
+
+    Args:
+        short_id: model ID without version
+        version: model version
+
+    Returns:
+        backend interface, path to aliases list on backend
+
+    Raises:
+        BackendError: if connection to backend
+            cannot be established
+        RuntimeError: if requested model does not exist
+
+    """
+    backend_interface, path = header_path(short_id, version)
+    aliases_path = backend_interface.join(
+        "/",
+        define.UID_FOLDER,
+        f"{short_id}.{define.ALIASES_EXT}",
+    )
+
+    return backend_interface, aliases_path
+
+
+def get_aliases(
+    short_id: str,
+    version: str,
+    cache_root: str,
+    verbose: bool,
+) -> tuple[audbackend.interface.Maven, list[str]]:
+    r"""Return backend and aliases list.
+
+    Args:
+        short_id: model ID without version
+        version: model version
+        cache_root: path of cache root
+        verbose: if ``True`` show message
+            or progress bar
+            when downloading file
+
+    Returns:
+        backend interface, list of aliases
+
+    Raises:
+        BackendError: if connection to backend
+            cannot be established
+
+    """
+    backend_interface, remote_path = aliases_path(short_id, version)
+
+    local_path = os.path.join(
+        cache_root,
+        short_id,
+        f"{version}.{define.ALIASES_EXT}",
+    )
+
+    with backend_interface.backend:
+        # Check if aliases file exists on backend
+        aliases_exists = backend_interface.exists(
+            remote_path,
+            version,
+            suppress_backend_errors=True,
+        )
+
+        if not aliases_exists:
+            # No aliases file means no aliases for this model
+            return backend_interface, []
+
+        # If aliases in cache, check if it matches remote version
+        # and delete it if checksums don't match
+        if os.path.exists(local_path):
+            local_checksum = audeer.md5(local_path)
+            remote_checksum = backend_interface.checksum(
+                remote_path,
+                version,
+            )
+            if local_checksum != remote_checksum:
+                os.remove(local_path)
+
+        # Download aliases if not in cache
+        if not os.path.exists(local_path):
+            audeer.mkdir(os.path.dirname(local_path))
+            with tempfile.TemporaryDirectory() as root:
+                tmp_path = os.path.join(root, "aliases.yaml")
+                backend_interface.get_file(
+                    remote_path,
+                    tmp_path,
+                    version,
+                    verbose=verbose,
+                )
+                shutil.move(tmp_path, local_path)
+
+    # read aliases from local file
+    with open(local_path) as fp:
+        aliases_data = yaml.load(fp, Loader=yaml.Loader)
+        if aliases_data is None or "aliases" not in aliases_data:
+            return backend_interface, []
+
+    return backend_interface, aliases_data["aliases"]
+
+
+def put_aliases(
+    short_id: str,
+    version: str,
+    aliases: list[str],
+    backend_interface: audbackend.interface.Maven,
+    verbose: bool,
+) -> str:
+    r"""Put aliases list to UID folder on backend.
+
+    Args:
+        short_id: model ID without version
+        version: model version
+        aliases: list of alias names
+        backend_interface: backend interface instance
+        verbose: if ``True`` show message
+            when uploading file
+
+    Returns:
+        aliases path on backend
+
+    Raises:
+        BackendError: if connection to backend
+            cannot be established
+
+    """
+    dst_path = backend_interface.join(
+        "/",
+        define.UID_FOLDER,
+        f"{short_id}.{define.ALIASES_EXT}",
+    )
+
+    with tempfile.TemporaryDirectory() as tmp_root:
+        src_path = os.path.join(tmp_root, "aliases.yaml")
+        aliases_data = {"aliases": aliases}
+        write_yaml(src_path, aliases_data)
+        with backend_interface.backend:
+            backend_interface.put_file(
+                src_path,
+                dst_path,
+                version,
+                verbose=verbose,
+            )
+
+    return dst_path
+
+
 def raise_model_not_found_error(
     short_id: str,
     version: str,

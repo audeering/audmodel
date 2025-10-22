@@ -10,6 +10,7 @@ import audeer
 from audmodel.core.backend import SERIALIZE_ERROR_MESSAGE
 from audmodel.core.backend import archive_path
 from audmodel.core.backend import get_alias
+from audmodel.core.backend import get_aliases
 from audmodel.core.backend import get_archive
 from audmodel.core.backend import get_header
 from audmodel.core.backend import get_meta
@@ -17,6 +18,7 @@ from audmodel.core.backend import header_path
 from audmodel.core.backend import header_versions
 from audmodel.core.backend import meta_path
 from audmodel.core.backend import put_alias
+from audmodel.core.backend import put_aliases
 from audmodel.core.backend import put_archive
 from audmodel.core.backend import put_header
 from audmodel.core.backend import put_meta
@@ -641,16 +643,25 @@ def publish(
             verbose,
         )
         if alias:
+            # Store mapping (alias -> UID)
             put_alias(
                 alias,
                 uid,
                 backend_interface,
                 verbose,
             )
+            # Update reverse (UID -> aliases) mapping
+            put_aliases(
+                short_id,
+                version,
+                [alias],
+                backend_interface,
+                verbose,
+            )
     except Exception as ex:
         # Otherwise remove already published files
         with backend_interface.backend:
-            for ext in [define.HEADER_EXT, define.META_EXT]:
+            for ext in [define.HEADER_EXT, define.META_EXT, define.ALIASES_EXT]:
                 path = backend_interface.join(
                     "/",
                     define.UID_FOLDER,
@@ -724,6 +735,39 @@ def resolve_alias(
     return uid
 
 
+def aliases(
+    uid: str,
+    *,
+    cache_root: str | None = None,
+    verbose: bool = False,
+) -> list[str]:
+    r"""Get all aliases for a model.
+
+    Args:
+        uid: unique model ID, alias, or short ID for latest version
+        cache_root: cache folder where models and headers are stored.
+            If not set :meth:`audmodel.default_cache_root` is used
+        verbose: show debug messages
+
+    Returns:
+        list of alias names assigned to this model
+
+    Raises:
+        audbackend.BackendError: if connection to repository on backend
+            cannot be established
+        RuntimeError: if model does not exist
+
+    Examples:
+        >>> aliases("d4e9c65b-3.0.0")  # doctest: +SKIP
+        ['my-model', 'production-model']
+
+    """
+    cache_root = audeer.safe_path(cache_root or default_cache_root())
+    short_id, version = split_uid(uid, cache_root)
+    _, aliases_list = get_aliases(short_id, version, cache_root, verbose)
+    return aliases_list
+
+
 def set_alias(
     alias: str,
     uid: str,
@@ -769,6 +813,19 @@ def set_alias(
 
     # Create or update the alias
     put_alias(alias, full_uid, backend_interface, verbose)
+
+    # Update reverse mapping (UID -> aliases)
+    # Get current aliases list
+    _, current_aliases = get_aliases(short_id, version, cache_root, verbose)
+
+    # Add new alias if not already present
+    if alias not in current_aliases:
+        current_aliases.append(alias)
+        # Sort for consistent ordering
+        current_aliases.sort()
+
+    # Update the aliases file
+    put_aliases(short_id, version, current_aliases, backend_interface, verbose)
 
 
 def subgroup(

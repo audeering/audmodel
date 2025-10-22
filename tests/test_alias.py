@@ -322,3 +322,262 @@ def test_resolve_alias_with_corrupted_file(published_model):
         # Try to resolve the alias - should raise RuntimeError about parsing failure
         with pytest.raises(RuntimeError, match="Failed to parse alias file"):
             audmodel.resolve_alias(alias)
+
+
+def test_aliases_no_aliases():
+    """Test aliases() returns empty list when no aliases are set."""
+    # Publish a fresh model without any aliases
+    uid = audmodel.publish(
+        pytest.MODEL_ROOT,
+        pytest.NAME,
+        pytest.PARAMS,
+        "13.0.0",
+        author=pytest.AUTHOR,
+        date=pytest.DATE,
+        meta=pytest.META["1.0.0"],
+        subgroup=SUBGROUP,
+        repository=audmodel.config.REPOSITORIES[0],
+    )
+
+    # Get aliases for a model without any aliases
+    alias_list = audmodel.aliases(uid)
+    assert alias_list == []
+
+
+def test_aliases_single_alias():
+    """Test aliases() returns a single alias correctly."""
+    # Publish a fresh model
+    uid = audmodel.publish(
+        pytest.MODEL_ROOT,
+        pytest.NAME,
+        pytest.PARAMS,
+        "14.0.0",
+        author=pytest.AUTHOR,
+        date=pytest.DATE,
+        meta=pytest.META["1.0.0"],
+        subgroup=SUBGROUP,
+        repository=audmodel.config.REPOSITORIES[0],
+    )
+
+    alias = "test-single-alias"
+    audmodel.set_alias(alias, uid)
+
+    # Get aliases for the model
+    alias_list = audmodel.aliases(uid)
+    assert alias_list == [alias]
+
+
+def test_aliases_multiple_aliases():
+    """Test aliases() returns multiple aliases correctly."""
+    # Publish a fresh model
+    uid = audmodel.publish(
+        pytest.MODEL_ROOT,
+        pytest.NAME,
+        pytest.PARAMS,
+        "15.0.0",
+        author=pytest.AUTHOR,
+        date=pytest.DATE,
+        meta=pytest.META["1.0.0"],
+        subgroup=SUBGROUP,
+        repository=audmodel.config.REPOSITORIES[0],
+    )
+
+    alias1 = "test-multi-alias-1"
+    alias2 = "test-multi-alias-2"
+    alias3 = "test-multi-alias-3"
+
+    # Set multiple aliases
+    audmodel.set_alias(alias1, uid)
+    audmodel.set_alias(alias2, uid)
+    audmodel.set_alias(alias3, uid)
+
+    # Get aliases for the model
+    alias_list = audmodel.aliases(uid)
+
+    # Should be sorted
+    assert alias_list == sorted([alias1, alias2, alias3])
+
+
+def test_aliases_publish_with_alias():
+    """Test that publish with alias creates the aliases file."""
+    alias = "test-publish-aliases"
+    uid = audmodel.publish(
+        pytest.MODEL_ROOT,
+        pytest.NAME,
+        pytest.PARAMS,
+        "9.0.0",
+        alias=alias,
+        author=pytest.AUTHOR,
+        date=pytest.DATE,
+        meta=pytest.META["1.0.0"],
+        subgroup=SUBGROUP,
+        repository=audmodel.config.REPOSITORIES[0],
+    )
+
+    # Verify the alias is in the aliases list
+    alias_list = audmodel.aliases(uid)
+    assert alias_list == [alias]
+
+
+def test_aliases_with_short_id():
+    """Test that aliases() works with short ID (gets latest version)."""
+    # Publish a fresh model with unique params to get unique short_id
+    unique_params = pytest.PARAMS.copy()
+    unique_params["test_param"] = "short_id_test"
+
+    uid = audmodel.publish(
+        pytest.MODEL_ROOT,
+        pytest.NAME,
+        unique_params,
+        "1.0.0",
+        author=pytest.AUTHOR,
+        date=pytest.DATE,
+        meta=pytest.META["1.0.0"],
+        subgroup=SUBGROUP,
+        repository=audmodel.config.REPOSITORIES[0],
+    )
+
+    alias = "test-short-id-alias"
+    audmodel.set_alias(alias, uid)
+
+    # Extract short ID from full UID
+    short_id = uid.split("-")[0]
+
+    # Get aliases using short ID (should get latest version's aliases)
+    alias_list = audmodel.aliases(short_id)
+    assert alias in alias_list
+
+
+def test_aliases_update_existing():
+    """Test that setting an alias twice doesn't duplicate it."""
+    alias = "test-duplicate-alias"
+    uid = audmodel.publish(
+        pytest.MODEL_ROOT,
+        pytest.NAME,
+        pytest.PARAMS,
+        "10.0.0",
+        author=pytest.AUTHOR,
+        date=pytest.DATE,
+        meta=pytest.META["1.0.0"],
+        subgroup=SUBGROUP,
+        repository=audmodel.config.REPOSITORIES[0],
+    )
+
+    # Set the same alias twice
+    audmodel.set_alias(alias, uid)
+    audmodel.set_alias(alias, uid)
+
+    # Should only appear once
+    alias_list = audmodel.aliases(uid)
+    assert alias_list.count(alias) == 1
+
+
+def test_aliases_different_versions():
+    """Test that different versions can have different aliases."""
+    alias1 = "test-version-1-alias"
+    alias2 = "test-version-2-alias"
+
+    uid1 = audmodel.publish(
+        pytest.MODEL_ROOT,
+        pytest.NAME,
+        pytest.PARAMS,
+        "11.0.0",
+        alias=alias1,
+        author=pytest.AUTHOR,
+        date=pytest.DATE,
+        meta=pytest.META["1.0.0"],
+        subgroup=SUBGROUP,
+        repository=audmodel.config.REPOSITORIES[0],
+    )
+
+    uid2 = audmodel.publish(
+        pytest.MODEL_ROOT,
+        pytest.NAME,
+        pytest.PARAMS,
+        "12.0.0",
+        alias=alias2,
+        author=pytest.AUTHOR,
+        date=pytest.DATE,
+        meta=pytest.META["2.0.0"],
+        subgroup=SUBGROUP,
+        repository=audmodel.config.REPOSITORIES[0],
+    )
+
+    # Each version should have its own alias
+    assert audmodel.aliases(uid1) == [alias1]
+    assert audmodel.aliases(uid2) == [alias2]
+
+
+def test_aliases_nonexistent_model():
+    """Test that aliases() raises error for non-existent model."""
+    with pytest.raises(RuntimeError, match="does not exist"):
+        audmodel.aliases("nonexist-1.0.0")
+
+
+def test_aliases_with_alias_as_input():
+    """Test that aliases() works when given an alias as input."""
+    # Publish a fresh model
+    uid = audmodel.publish(
+        pytest.MODEL_ROOT,
+        pytest.NAME,
+        pytest.PARAMS,
+        "17.0.0",
+        author=pytest.AUTHOR,
+        date=pytest.DATE,
+        meta=pytest.META["1.0.0"],
+        subgroup=SUBGROUP,
+        repository=audmodel.config.REPOSITORIES[0],
+    )
+
+    alias1 = "test-input-alias-1"
+    alias2 = "test-input-alias-2"
+
+    # Set two aliases
+    audmodel.set_alias(alias1, uid)
+    audmodel.set_alias(alias2, uid)
+
+    # Get aliases using one of the aliases as input
+    alias_list = audmodel.aliases(alias1)
+    assert sorted(alias_list) == sorted([alias1, alias2])
+
+
+def test_aliases_with_corrupted_file():
+    """Test aliases() returns empty list when aliases file is corrupted."""
+    # Publish a fresh model with an alias
+    uid = audmodel.publish(
+        pytest.MODEL_ROOT,
+        pytest.NAME,
+        pytest.PARAMS,
+        "18.0.0",
+        alias="test-corrupted-aliases",
+        author=pytest.AUTHOR,
+        date=pytest.DATE,
+        meta=pytest.META["1.0.0"],
+        subgroup=SUBGROUP,
+        repository=audmodel.config.REPOSITORIES[0],
+    )
+
+    # Get the cache path
+    cache_root = audmodel.config.CACHE_ROOT
+    short_id = uid.split("-")[0]
+    version = uid.split("-")[1]
+    aliases_cache_path = os.path.join(
+        cache_root,
+        short_id,
+        f"{version}.aliases.yaml",
+    )
+
+    # Corrupt the local aliases file by writing empty content
+    audeer.mkdir(os.path.dirname(aliases_cache_path))
+    with open(aliases_cache_path, "w") as f:
+        f.write("")  # Empty file
+
+    # Get checksum of the corrupted file
+    corrupted_checksum = audeer.md5(aliases_cache_path)
+
+    # Mock the backend checksum to match the corrupted file's checksum
+    # This prevents the file from being re-downloaded
+    with patch("audbackend.interface.Maven.checksum", return_value=corrupted_checksum):
+        # Should return empty list for corrupted file
+        alias_list = audmodel.aliases(uid)
+        assert alias_list == []

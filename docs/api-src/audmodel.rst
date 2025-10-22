@@ -7,6 +7,7 @@ audmodel
     :toctree:
     :nosignatures:
 
+    aliases
     author
     config
     date

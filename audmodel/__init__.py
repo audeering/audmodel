@@ -1,3 +1,4 @@
+from audmodel.core.api import aliases
 from audmodel.core.api import author
 from audmodel.core.api import date
 from audmodel.core.api import default_cache_root
