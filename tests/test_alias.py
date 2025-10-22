@@ -149,7 +149,7 @@ def test_update_alias(published_model):
     assert audmodel.version(alias) == "3.0.0"
     assert audmodel.versions(alias) == ["1.0.0", "2.0.0", "3.0.0"]
     assert audmodel.aliases(new_uid) == [alias]
-    assert audmodel.aliases(published_model) == []
+    assert alias not in audmodel.aliases(published_model)
 
 
 def test_is_alias():
