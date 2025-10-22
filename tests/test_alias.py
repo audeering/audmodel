@@ -69,6 +69,7 @@ def test_set_alias(published_model):
     assert audmodel.author(alias) == pytest.AUTHOR
     assert audmodel.parameters(alias) == pytest.PARAMS
     assert audmodel.version(alias) == "1.0.0"
+    assert audmodel.versions(alias) == ["1.0.0", "2.0.0"]
 
 
 def test_resolve_alias_nonexistent():
@@ -113,6 +114,7 @@ def test_all_api_functions_with_alias(published_model):
     assert audmodel.parameters(alias) == pytest.PARAMS
     assert audmodel.subgroup(alias) == SUBGROUP
     assert audmodel.version(alias) == "1.0.0"
+    assert audmodel.versions(alias) == ["1.0.0", "2.0.0"]
 
     # Test header and meta
     header = audmodel.header(alias)
@@ -148,6 +150,7 @@ def test_update_alias(published_model):
     audmodel.set_alias(alias, new_uid)
     assert audmodel.resolve_alias(alias) == new_uid
     assert audmodel.version(alias) == "3.0.0"
+    assert audmodel.versions(alias) == ["1.0.0", "2.0.0", "3.0.0"]
 
 
 def test_is_alias():
