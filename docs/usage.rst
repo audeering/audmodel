@@ -244,6 +244,10 @@ and can inspect existing aliases for a model ID with
 
     audmodel.aliases(uid)
 
+You can update to which model ID an alias is pointing
+by running :func:`audmodel.set_alias` again,
+see next sub-section.
+
 
 Publish a new version
 ---------------------
@@ -276,6 +280,7 @@ and publish it with:
 
 .. jupyter-execute::
 
+    uid_v1 = uid
     uid = audmodel.publish(
         root_v2,
         name,
@@ -298,6 +303,24 @@ To find the latest version we can do:
 .. jupyter-execute::
 
     audmodel.latest_version(uid)
+
+We can now also update our existing model aliases
+to point to the newest version.
+
+.. jupyter-execute::
+
+    audmodel.set_alias("emotion-small", uid)
+    audmodel.set_alias("emotion-production", uid)
+
+Now, all model aliases are only pointing to the new version:
+
+.. jupyter-execute::
+
+    audmodel.aliases(uid_v1)
+
+.. jupyter-execute::
+
+    audmodel.aliases(uid)
 
 
 Update metadata
