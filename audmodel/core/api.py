@@ -1154,14 +1154,15 @@ def versions(
 
     """
     cache_root = audeer.safe_path(cache_root or default_cache_root())
-    if utils.is_legacy_uid(uid):
-        try:
+    try:
+        if utils.is_legacy_uid(uid):
             # legacy IDs can only have one version
             _, version = split_uid(uid, cache_root)
             return [version]
-        except RuntimeError:
-            return []
-    else:
-        short_id = uid.split("-")[0]
-        matches = header_versions(short_id)
-        return [match[2] for match in matches]
+        else:
+            short_id, _ = split_uid(uid, cache_root)
+            matches = header_versions(short_id)
+            return [match[2] for match in matches]
+    except RuntimeError:
+        # no model found
+        return []
