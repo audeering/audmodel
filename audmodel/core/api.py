@@ -832,12 +832,12 @@ def _remove_existing_alias(
     """Remove alias from UID -> alias mapping."""
     try:
         uid = resolve_alias(alias)
-        short_id, version = split_uid(uid, cache_root)
-        _, aliases = get_aliases(short_id, version, cache_root, verbose)
-        updated_aliases = [a for a in aliases if a != alias]
-        put_aliases(short_id, version, updated_aliases, backend_interface, verbose)
     except RuntimeError:
-        pass  # Alias doesn't exist yet
+        return  # Alias doesn't exist yet
+    short_id, version = split_uid(uid, cache_root)
+    _, aliases = get_aliases(short_id, version, cache_root, verbose)
+    updated_aliases = [a for a in aliases if a != alias]
+    put_aliases(short_id, version, updated_aliases, backend_interface, verbose)
 
 
 def _add_alias_to_model(
