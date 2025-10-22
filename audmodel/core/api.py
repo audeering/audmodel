@@ -853,7 +853,6 @@ def _add_alias_to_model(
 
     if alias not in current_aliases:
         current_aliases.append(alias)
-        current_aliases.sort()
         put_aliases(short_id, version, current_aliases, backend_interface, verbose)
 
 

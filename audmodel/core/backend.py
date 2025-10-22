@@ -755,7 +755,7 @@ def put_aliases(
 
     with tempfile.TemporaryDirectory() as tmp_root:
         src_path = os.path.join(tmp_root, "aliases.yaml")
-        aliases_data = {"aliases": aliases}
+        aliases_data = {"aliases": sorted(aliases)}
         write_yaml(src_path, aliases_data)
         with backend_interface.backend:
             backend_interface.put_file(
