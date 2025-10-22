@@ -1134,7 +1134,7 @@ def versions(
     r"""Available model versions.
 
     Args:
-        uid: unique model ID, alias, or short ID
+        uid: unique model ID (omit version for latest version) or alias
         cache_root: cache folder where models and headers are stored.
             If not set :meth:`audmodel.default_cache_root` is used
 
