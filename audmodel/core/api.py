@@ -38,7 +38,7 @@ def author(
     r"""Author of model.
 
     Args:
-        uid: unique model ID, alias, or short ID for latest version
+        uid: unique model ID (omit version for latest version) or alias
         cache_root: cache folder where models and headers are stored.
             If not set :meth:`audmodel.default_cache_root` is used
 
@@ -66,7 +66,7 @@ def date(
     r"""Publication date of model.
 
     Args:
-        uid: unique model ID, alias, or short ID for latest version
+        uid: unique model ID (omit version for latest version) or alias
         cache_root: cache folder where models and headers are stored.
             If not set :meth:`audmodel.default_cache_root` is used
 
@@ -120,7 +120,7 @@ def exists(
     r"""Check if a model exists.
 
     Args:
-        uid: unique model ID, alias, or short ID for latest version
+        uid: unique model ID (omit version for latest version) or alias
 
     Returns:
         ``True`` if a model with this ID is found
@@ -153,7 +153,7 @@ def header(
     r"""Load model header.
 
     Args:
-        uid: unique model ID, alias, or short ID for latest version
+        uid: unique model ID (omit version for latest version) or alias
         cache_root: cache folder where models and headers are stored.
             If not set :meth:`audmodel.default_cache_root` is used
         verbose: show debug messages
@@ -285,7 +285,7 @@ def load(
     the download is skipped.
 
     Args:
-        uid: unique model ID, alias, or short ID for latest version
+        uid: unique model ID (omit version for latest version) or alias
         cache_root: cache folder where models and headers are stored.
             If not set :meth:`audmodel.default_cache_root` is used
         verbose: show debug messages
@@ -364,7 +364,7 @@ def name(
     r"""Name of model.
 
     Args:
-        uid: unique model ID, alias, or short ID for latest version
+        uid: unique model ID (omit version for latest version) or alias
         cache_root: cache folder where models and headers are stored.
             If not set :meth:`audmodel.default_cache_root` is used
         verbose: show debug messages
@@ -394,7 +394,7 @@ def parameters(
     r"""Parameters of model.
 
     Args:
-        uid: unique model ID, alias, or short ID for latest version
+        uid: unique model ID (omit version for latest version) or alias
         cache_root: cache folder where models and headers are stored.
             If not set :meth:`audmodel.default_cache_root` is used
         verbose: show debug messages
@@ -744,7 +744,7 @@ def aliases(
     r"""Get all aliases for a model.
 
     Args:
-        uid: unique model ID, alias, or short ID for latest version
+        uid: unique model ID (omit version for latest version) or alias
         cache_root: cache folder where models and headers are stored.
             If not set :meth:`audmodel.default_cache_root` is used
         verbose: show debug messages
@@ -837,7 +837,7 @@ def subgroup(
     r"""Subgroup of model.
 
     Args:
-        uid: unique model ID, alias, or short ID for latest version
+        uid: unique model ID (omit version for latest version) or alias
         cache_root: cache folder where models and headers are stored.
             If not set :meth:`audmodel.default_cache_root` is used
         verbose: show debug messages
@@ -933,7 +933,7 @@ def update_meta(
     but keeps all existing fields.
 
     Args:
-        uid: unique model ID, alias, or short ID for latest version
+        uid: unique model ID (omit version for latest version) or alias
         meta: dictionary with meta information
         replace: replace existing dictionary
         cache_root: cache folder where models and headers are stored.
@@ -1026,7 +1026,7 @@ def url(
     r"""URL to model archive or header.
 
     Args:
-        uid: unique model ID, alias, or short ID for latest version
+        uid: unique model ID (omit version for latest version) or alias
         type: return URL to specified type.
             ``'model'`` corresponds to the archive file
             storing the model,
@@ -1105,7 +1105,7 @@ def version(
     r"""Version of model.
 
     Args:
-        uid: unique model ID, alias, or short ID for latest version
+        uid: unique model ID (omit version for latest version) or alias
         cache_root: cache folder where models and headers are stored.
             If not set :meth:`audmodel.default_cache_root` is used
         verbose: show debug messages
