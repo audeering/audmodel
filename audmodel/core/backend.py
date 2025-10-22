@@ -830,7 +830,7 @@ def split_uid(
     r"""Split uid into short id and version.
 
     Args:
-        unique model ID (omit version for latest version) or alias
+        uid: unique model ID (omit version for latest version) or alias
         cache_root: path to cache root
 
     Returns:
