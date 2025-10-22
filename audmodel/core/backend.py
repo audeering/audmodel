@@ -574,43 +574,22 @@ def get_alias(
 
     """
     backend_interface, remote_path = alias_path(alias)
-    local_path = os.path.join(
-        cache_root,
-        define.ALIAS_FOLDER,
-        f"{alias}.{define.ALIAS_EXT}",
-    )
 
     with backend_interface.backend:
-        # If alias in cache, check if it matches remote version
-        # and delete it if checksums don't match
-        if os.path.exists(local_path):
-            local_checksum = audeer.md5(local_path)
-            remote_checksum = backend_interface.checksum(
+        # Download and read alias
+        with tempfile.TemporaryDirectory() as root:
+            tmp_path = os.path.join(root, "alias.yaml")
+            backend_interface.get_file(
                 remote_path,
+                tmp_path,
                 "1.0.0",
+                verbose=verbose,
             )
-            if local_checksum != remote_checksum:
-                os.remove(local_path)
-
-        # Download alias if not in cache
-        if not os.path.exists(local_path):
-            audeer.mkdir(os.path.dirname(local_path))
-            with tempfile.TemporaryDirectory() as root:
-                tmp_path = os.path.join(root, "alias.yaml")
-                backend_interface.get_file(
-                    remote_path,
-                    tmp_path,
-                    "1.0.0",
-                    verbose=verbose,
-                )
-                shutil.move(tmp_path, local_path)
-
-    # read alias from local file
-    try:
-        with open(local_path) as fp:
-            alias_data = yaml.load(fp, Loader=yaml.Loader)
-    except yaml.YAMLError as yaml_ex:
-        raise RuntimeError(f"Failed to parse alias file '{local_path}': {yaml_ex}")
+            try:
+                with open(tmp_path) as fp:
+                    alias_data = yaml.load(fp, Loader=yaml.Loader)
+            except yaml.YAMLError as yaml_ex:
+                raise RuntimeError(f"Failed to parse alias file: {yaml_ex}")
 
     return backend_interface, alias_data["uid"]
 
@@ -714,12 +693,6 @@ def get_aliases(
     """
     backend_interface, remote_path = aliases_path(short_id, version)
 
-    local_path = os.path.join(
-        cache_root,
-        short_id,
-        f"{version}.{define.ALIASES_EXT}",
-    )
-
     with backend_interface.backend:
         # Check if aliases file exists on backend
         aliases_exists = backend_interface.exists(
@@ -732,35 +705,19 @@ def get_aliases(
             # No aliases file means no aliases for this model
             return backend_interface, []
 
-        # If aliases in cache, check if it matches remote version
-        # and delete it if checksums don't match
-        if os.path.exists(local_path):
-            local_checksum = audeer.md5(local_path)
-            remote_checksum = backend_interface.checksum(
+        # Download and read aliases
+        with tempfile.TemporaryDirectory() as root:
+            tmp_path = os.path.join(root, "aliases.yaml")
+            backend_interface.get_file(
                 remote_path,
+                tmp_path,
                 version,
+                verbose=verbose,
             )
-            if local_checksum != remote_checksum:
-                os.remove(local_path)
-
-        # Download aliases if not in cache
-        if not os.path.exists(local_path):
-            audeer.mkdir(os.path.dirname(local_path))
-            with tempfile.TemporaryDirectory() as root:
-                tmp_path = os.path.join(root, "aliases.yaml")
-                backend_interface.get_file(
-                    remote_path,
-                    tmp_path,
-                    version,
-                    verbose=verbose,
-                )
-                shutil.move(tmp_path, local_path)
-
-    # read aliases from local file
-    with open(local_path) as fp:
-        aliases_data = yaml.load(fp, Loader=yaml.Loader)
-        if aliases_data is None or "aliases" not in aliases_data:
-            return backend_interface, []
+            with open(tmp_path) as fp:
+                aliases_data = yaml.load(fp, Loader=yaml.Loader)
+                if aliases_data is None or "aliases" not in aliases_data:
+                    return backend_interface, []
 
     return backend_interface, aliases_data["aliases"]
 

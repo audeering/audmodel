@@ -1,9 +1,6 @@
 import os
-from unittest.mock import patch
 
 import pytest
-
-import audeer
 
 import audmodel
 
@@ -295,38 +292,6 @@ def test_publish_with_invalid_alias_names():
         )
 
 
-def test_resolve_alias_with_corrupted_file(published_model):
-    """Test that resolving an alias with corrupted YAML file raises error."""
-    alias = "test-corrupted-alias"
-
-    # First, create a valid alias
-    audmodel.set_alias(alias, published_model)
-
-    # Get the cache path
-    cache_root = audmodel.config.CACHE_ROOT
-    alias_cache_path = os.path.join(
-        cache_root,
-        "_alias",
-        f"{alias}.alias.yaml",
-    )
-
-    # Corrupt the local alias file with invalid YAML
-    audeer.mkdir(os.path.dirname(alias_cache_path))
-    with open(alias_cache_path, "w") as f:
-        f.write("uid: [invalid yaml syntax without closing bracket")
-
-    # Get checksum of the corrupted file
-    corrupted_checksum = audeer.md5(alias_cache_path)
-
-    # Mock the backend checksum to match the corrupted file's checksum
-    # This prevents the file from being re-downloaded
-    # and forces reading of the corrupted file
-    with patch("audbackend.interface.Maven.checksum", return_value=corrupted_checksum):
-        # Try to resolve the alias - should raise RuntimeError about parsing failure
-        with pytest.raises(RuntimeError, match="Failed to parse alias file"):
-            audmodel.resolve_alias(alias)
-
-
 def test_aliases_no_aliases():
     """Test aliases() returns empty list when no aliases are set."""
     # Publish a fresh model without any aliases
@@ -544,15 +509,19 @@ def test_aliases_with_alias_as_input():
     assert sorted(alias_list) == sorted([alias1, alias2])
 
 
-def test_aliases_with_corrupted_file():
-    """Test aliases() returns empty list when aliases file is corrupted."""
-    # Publish a fresh model with an alias
+def test_resolve_alias_with_corrupted_yaml():
+    """Test that resolving an alias with corrupted YAML raises RuntimeError.
+
+    This test covers lines 591-592 in backend.py where YAML parsing errors
+    are caught and re-raised as RuntimeError.
+    """
+    alias = "test-corrupted-yaml-alias"
     uid = audmodel.publish(
         pytest.MODEL_ROOT,
         pytest.NAME,
         pytest.PARAMS,
         "18.0.0",
-        alias="test-corrupted-aliases",
+        alias=alias,
         author=pytest.AUTHOR,
         date=pytest.DATE,
         meta=pytest.META["1.0.0"],
@@ -560,27 +529,126 @@ def test_aliases_with_corrupted_file():
         repository=audmodel.config.REPOSITORIES[0],
     )
 
-    # Get the cache path
-    cache_root = audmodel.config.CACHE_ROOT
-    short_id = uid.split("-")[0]
-    version = uid.split("-")[1]
-    aliases_cache_path = os.path.join(
-        cache_root,
-        short_id,
-        f"{version}.aliases.yaml",
+    # Verify alias works before corruption
+    assert audmodel.resolve_alias(alias) == uid
+
+    # Corrupt the alias file on the backend by writing invalid YAML
+    repository = audmodel.config.REPOSITORIES[0]
+    backend_interface = repository.create_backend_interface()
+    alias_path = backend_interface.join(
+        "/",
+        "_alias",
+        f"{alias}.alias.yaml",
     )
 
-    # Corrupt the local aliases file by writing empty content
-    audeer.mkdir(os.path.dirname(aliases_cache_path))
-    with open(aliases_cache_path, "w") as f:
-        f.write("")  # Empty file
+    # Write corrupted YAML directly to the backend
+    import tempfile
 
-    # Get checksum of the corrupted file
-    corrupted_checksum = audeer.md5(aliases_cache_path)
+    with tempfile.TemporaryDirectory() as tmp_root:
+        corrupt_file = os.path.join(tmp_root, "corrupt.yaml")
+        # Write invalid YAML (unbalanced brackets, invalid syntax)
+        with open(corrupt_file, "w") as f:
+            f.write("uid: {this is not valid yaml: [[[")
 
-    # Mock the backend checksum to match the corrupted file's checksum
-    # This prevents the file from being re-downloaded
-    with patch("audbackend.interface.Maven.checksum", return_value=corrupted_checksum):
-        # Should return empty list for corrupted file
-        alias_list = audmodel.aliases(uid)
-        assert alias_list == []
+        with backend_interface.backend:
+            backend_interface.put_file(
+                corrupt_file,
+                alias_path,
+                "1.0.0",
+                verbose=False,
+            )
+
+    # Clear the cache to force re-download
+    # (aliases are fetched from backend each time, not cached)
+
+    # Now resolving the alias should raise RuntimeError due to YAML parsing error
+    with pytest.raises(RuntimeError, match="Failed to parse alias file"):
+        audmodel.resolve_alias(alias)
+
+
+def test_aliases_with_malformed_aliases_file():
+    """Test that aliases() returns empty list when aliases file is malformed.
+
+    This test covers line 720 in backend.py where we return an empty list
+    when aliases_data is None or doesn't contain the 'aliases' key.
+    """
+    # Test case 1: aliases file exists but is empty (aliases_data is None)
+    uid1 = audmodel.publish(
+        pytest.MODEL_ROOT,
+        pytest.NAME,
+        pytest.PARAMS,
+        "19.0.0",
+        author=pytest.AUTHOR,
+        date=pytest.DATE,
+        meta=pytest.META["1.0.0"],
+        subgroup=SUBGROUP,
+        repository=audmodel.config.REPOSITORIES[0],
+    )
+
+    # Create an empty/malformed aliases file on the backend
+    repository = audmodel.config.REPOSITORIES[0]
+    backend_interface = repository.create_backend_interface()
+    short_id = uid1.split("-")[0]
+    version = "-".join(uid1.split("-")[1:])
+    aliases_path = backend_interface.join(
+        "/",
+        "_uid",
+        f"{short_id}.aliases.yaml",
+    )
+
+    # Write empty YAML file (will parse as None)
+    import tempfile
+
+    with tempfile.TemporaryDirectory() as tmp_root:
+        empty_file = os.path.join(tmp_root, "empty.yaml")
+        with open(empty_file, "w") as f:
+            f.write("")  # Empty file
+
+        with backend_interface.backend:
+            backend_interface.put_file(
+                empty_file,
+                aliases_path,
+                version,
+                verbose=False,
+            )
+
+    # Should return empty list when file is empty
+    assert audmodel.aliases(uid1) == []
+
+    # Test case 2: aliases file exists but doesn't have 'aliases' key
+    uid2 = audmodel.publish(
+        pytest.MODEL_ROOT,
+        pytest.NAME,
+        pytest.PARAMS,
+        "20.0.0",
+        author=pytest.AUTHOR,
+        date=pytest.DATE,
+        meta=pytest.META["2.0.0"],
+        subgroup=SUBGROUP,
+        repository=audmodel.config.REPOSITORIES[0],
+    )
+
+    short_id2 = uid2.split("-")[0]
+    version2 = "-".join(uid2.split("-")[1:])
+    aliases_path2 = backend_interface.join(
+        "/",
+        "_uid",
+        f"{short_id2}.aliases.yaml",
+    )
+
+    # Write YAML file with wrong structure (missing 'aliases' key)
+    with tempfile.TemporaryDirectory() as tmp_root:
+        wrong_structure_file = os.path.join(tmp_root, "wrong.yaml")
+        with open(wrong_structure_file, "w") as f:
+            f.write("wrong_key: some_value\n")
+
+        with backend_interface.backend:
+            backend_interface.put_file(
+                wrong_structure_file,
+                aliases_path2,
+                version2,
+                verbose=False,
+            )
+
+    # Should return empty list when 'aliases' key is missing
+    assert audmodel.aliases(uid2) == []
