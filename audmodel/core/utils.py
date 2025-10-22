@@ -54,9 +54,9 @@ def is_alias(uid: str) -> bool:
     r"""Check if uid is an alias name.
 
     An alias is any string that doesn't match the UID formats:
-    - 8-character hexadecimal short ID
+    - 8-character hexadecimal short ID (e.g., "d4e9c65b")
+    - short ID with version (e.g., "d4e9c65b-3.0.0")
     - 36-character legacy ID (UUID format with dashes)
-    - short-id-version format (e.g., "d4e9c65b-3.0.0")
 
     Additionally, strings that look like they're intended to be UIDs
     (e.g., lower case and all hex digits)
