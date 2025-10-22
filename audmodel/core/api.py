@@ -811,21 +811,49 @@ def set_alias(
     # Get the repository from the header
     backend_interface, _ = get_header(short_id, version, cache_root, verbose)
 
+    # --- Update reverse mapping (UID -> aliases)
+    # Remove alias from old model if it exists
+    _remove_existing_alias(alias, cache_root, backend_interface, verbose)
+    # Add alias to new model
+    _add_alias_to_model(
+        short_id, version, alias, cache_root, backend_interface, verbose
+    )
+
     # Create or update the alias
     put_alias(alias, full_uid, backend_interface, verbose)
 
-    # Update reverse mapping (UID -> aliases)
-    # Get current aliases list
+
+def _remove_existing_alias(
+    alias: str,
+    cache_root: str,
+    backend_interface: audbackend.interface.Maven,
+    verbose: bool,
+) -> None:
+    """Remove alias from UID -> alias mapping."""
+    try:
+        uid = resolve_alias(alias)
+    except RuntimeError:
+        return  # Alias doesn't exist yet
+    short_id, version = split_uid(uid, cache_root)
+    _, aliases = get_aliases(short_id, version, cache_root, verbose)
+    updated_aliases = [a for a in aliases if a != alias]
+    put_aliases(short_id, version, updated_aliases, backend_interface, verbose)
+
+
+def _add_alias_to_model(
+    short_id: str,
+    version: str,
+    alias: str,
+    cache_root: str,
+    backend_interface: audbackend.interface.Maven,
+    verbose: bool,
+) -> None:
+    """Add alias to UID -> alias mapping."""
     _, current_aliases = get_aliases(short_id, version, cache_root, verbose)
 
-    # Add new alias if not already present
     if alias not in current_aliases:
         current_aliases.append(alias)
-        # Sort for consistent ordering
-        current_aliases.sort()
-
-    # Update the aliases file
-    put_aliases(short_id, version, current_aliases, backend_interface, verbose)
+        put_aliases(short_id, version, current_aliases, backend_interface, verbose)
 
 
 def subgroup(
