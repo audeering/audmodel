@@ -229,6 +229,9 @@ to access the model, e.g.
 
     model_root = audmodel.load("emotion-small")
 
+Note, that resolving a model alias always
+requires access to the backend on which the model is stored.
+
 One can add more than one alias for a model
 
 .. jupyter-execute::
