@@ -273,6 +273,7 @@ def load(
     uid: str,
     *,
     cache_root: str | None = None,
+    timeout: float = 86400,  # 24 h
     verbose: bool = False,
 ) -> str:
     r"""Download a model by its unique ID.
@@ -287,6 +288,8 @@ def load(
         uid: unique model ID or short ID for latest version
         cache_root: cache folder where models and headers are stored.
             If not set :meth:`audmodel.default_cache_root` is used
+        timeout: maximum time in seconds
+            before giving up acquiring a lock
         verbose: show debug messages
 
     Returns:
@@ -306,7 +309,7 @@ def load(
     """
     cache_root = audeer.safe_path(cache_root or default_cache_root())
     short_id, version = split_uid(uid, cache_root)
-    return get_archive(short_id, version, cache_root, verbose)
+    return get_archive(short_id, version, cache_root, verbose, timeout)
 
 
 def meta(

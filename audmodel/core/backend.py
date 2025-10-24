@@ -60,6 +60,7 @@ def get_archive(
     version: str,
     cache_root: str,
     verbose: bool,
+    timeout: float = 10,
 ) -> str:
     r"""Return backend and local archive path.
 
@@ -67,6 +68,8 @@ def get_archive(
         short_id: model ID without version
         version: model version
         cache_root: path of cache root
+        timeout: maximum time in seconds
+            before giving up acquiring a lock
         verbose: if ``True`` show message
             or progress bar
             when downloading file
@@ -85,7 +88,7 @@ def get_archive(
         version,
     )
 
-    with lock(root):
+    with lock(root, timeout=timeout):
         if not os.path.exists(root) or len(os.listdir(root)) == 0:
             tmp_root = audeer.mkdir(f"{root}~")
             backend_interface, path = archive_path(
