@@ -273,7 +273,7 @@ def load(
     uid: str,
     *,
     cache_root: str | None = None,
-    timeout: float = 86400,  # 24 h
+    timeout: float = 14400,  # 4 h
     verbose: bool = False,
 ) -> str:
     r"""Download a model by its unique ID.
