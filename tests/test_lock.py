@@ -27,14 +27,17 @@ def job(lock, wait, sleep):
 
 
 def test_lock(tmpdir):
+    # avoid displaying a warning
+    warning_timeout = 2
+
     # create two lock folders
 
     lock_folders = [audeer.mkdir(tmpdir, str(idx)) for idx in range(2)]
 
     # lock 1 and 2
 
-    lock_1 = lock(lock_folders[0])
-    lock_2 = lock(lock_folders[1])
+    lock_1 = lock(lock_folders[0], warning_timeout=warning_timeout)
+    lock_2 = lock(lock_folders[1], warning_timeout=warning_timeout)
 
     event.clear()
     result = audeer.run_tasks(
@@ -49,9 +52,9 @@ def test_lock(tmpdir):
 
     # lock 1, 2 and 1+2
 
-    lock_1 = lock(lock_folders[0])
-    lock_2 = lock(lock_folders[1])
-    lock_12 = lock(lock_folders)
+    lock_1 = lock(lock_folders[0], warning_timeout=warning_timeout)
+    lock_2 = lock(lock_folders[1], warning_timeout=warning_timeout)
+    lock_12 = lock(lock_folders, warning_timeout=warning_timeout)
 
     result = audeer.run_tasks(
         job,
@@ -66,8 +69,8 @@ def test_lock(tmpdir):
 
     # lock 1, then 1+2 + wait
 
-    lock_1 = lock(lock_folders[0])
-    lock_12 = lock(lock_folders)
+    lock_1 = lock(lock_folders[0], warning_timeout=warning_timeout)
+    lock_12 = lock(lock_folders, warning_timeout=warning_timeout)
 
     event.clear()
     result = audeer.run_tasks(
@@ -82,8 +85,8 @@ def test_lock(tmpdir):
 
     # lock 1, then 1+2 + timeout
 
-    lock_1 = lock(lock_folders[0])
-    lock_12 = lock(lock_folders, timeout=0)
+    lock_1 = lock(lock_folders[0], warning_timeout=warning_timeout)
+    lock_12 = lock(lock_folders, warning_timeout=warning_timeout, timeout=0)
 
     event.clear()
     result = audeer.run_tasks(
@@ -98,8 +101,8 @@ def test_lock(tmpdir):
 
     # lock 1+2, then 1 + wait
 
-    lock_1 = lock(lock_folders[0])
-    lock_12 = lock(lock_folders)
+    lock_1 = lock(lock_folders[0], warning_timeout=warning_timeout)
+    lock_12 = lock(lock_folders, warning_timeout=warning_timeout)
 
     event.clear()
     result = audeer.run_tasks(
@@ -114,8 +117,8 @@ def test_lock(tmpdir):
 
     # lock 1+2, then 1 + timeout
 
-    lock_1 = lock(lock_folders[0], timeout=0)
-    lock_12 = lock(lock_folders)
+    lock_1 = lock(lock_folders[0], warning_timeout=warning_timeout, timeout=0)
+    lock_12 = lock(lock_folders, warning_timeout=warning_timeout)
 
     event.clear()
     result = audeer.run_tasks(
@@ -130,8 +133,8 @@ def test_lock(tmpdir):
 
     # lock 1+2, then 1 + wait and 2 + timeout
 
-    lock_1 = lock(lock_folders[0])
-    lock_2 = lock(lock_folders[1], timeout=0)
+    lock_1 = lock(lock_folders[0], warning_timeout=warning_timeout)
+    lock_2 = lock(lock_folders[1], warning_timeout=warning_timeout, timeout=0)
     lock_12 = lock(lock_folders)
 
     event.clear()
