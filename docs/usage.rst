@@ -203,6 +203,52 @@ we will then have the following structure.
     show_model(model_root)
 
 
+Model alias
+-----------
+
+In addition to the model ID,
+we can create different model aliases
+to refer to a model.
+An alias can already be selected during publication,
+or it can be set afterwards with
+
+.. jupyter-execute::
+
+    audmodel.set_alias("emotion-small", uid)
+
+We can inspect the corresponding model ID with
+
+.. jupyter-execute::
+
+    audmodel.resolve_alias("emotion-small")
+
+and use the alias instead of the model ID
+to access the model, e.g.
+
+.. jupyter-execute::
+
+    model_root = audmodel.load("emotion-small")
+
+Note, that resolving a model alias always
+requires access to the backend on which the model is stored.
+
+We can add more than one alias for a model
+
+.. jupyter-execute::
+
+    audmodel.set_alias("emotion-production", uid)
+
+and can inspect existing aliases for a model ID with
+
+.. jupyter-execute::
+
+    audmodel.aliases(uid)
+
+We can update to which model ID an alias is pointing
+by running :func:`audmodel.set_alias` again,
+see next sub-section.
+
+
 Publish a new version
 ---------------------
 
@@ -234,6 +280,7 @@ and publish it with:
 
 .. jupyter-execute::
 
+    uid_v1 = uid
     uid = audmodel.publish(
         root_v2,
         name,
@@ -256,6 +303,24 @@ To find the latest version we can do:
 .. jupyter-execute::
 
     audmodel.latest_version(uid)
+
+We can update our existing model aliases
+to point to the newest version.
+
+.. jupyter-execute::
+
+    audmodel.set_alias("emotion-small", uid)
+    audmodel.set_alias("emotion-production", uid)
+
+Now, all model aliases are only pointing to the new version:
+
+.. jupyter-execute::
+
+    audmodel.aliases(uid_v1)
+
+.. jupyter-execute::
+
+    audmodel.aliases(uid)
 
 
 Update metadata
