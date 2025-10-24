@@ -13,7 +13,7 @@ import audeer
 def lock(
     paths: list[str],
     *,
-    timeout: float = 86400,
+    timeout: float = 10,
     warning_timeout: float = 0,
 ):
     """Create lock for given paths.
