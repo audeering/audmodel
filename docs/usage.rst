@@ -304,7 +304,7 @@ To find the latest version we can do:
 
     audmodel.latest_version(uid)
 
-We can now also update our existing model aliases
+We can update our existing model aliases
 to point to the newest version.
 
 .. jupyter-execute::
