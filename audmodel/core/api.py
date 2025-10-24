@@ -309,7 +309,7 @@ def load(
     """
     cache_root = audeer.safe_path(cache_root or default_cache_root())
     short_id, version = split_uid(uid, cache_root)
-    return get_archive(short_id, version, cache_root, verbose, timeout)
+    return get_archive(short_id, version, cache_root, timeout, verbose)
 
 
 def meta(

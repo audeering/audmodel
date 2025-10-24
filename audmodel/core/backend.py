@@ -59,8 +59,8 @@ def get_archive(
     short_id: str,
     version: str,
     cache_root: str,
+    timeout: float,
     verbose: bool,
-    timeout: float = 10,
 ) -> str:
     r"""Return backend and local archive path.
 
