@@ -207,7 +207,7 @@ Model alias
 -----------
 
 In addition to the model ID,
-a user can create different model aliases
+we can create different model aliases
 to refer to a model.
 An alias can already be selected during publication,
 or it can be set afterwards with
@@ -216,7 +216,7 @@ or it can be set afterwards with
 
     audmodel.set_alias("emotion-small", uid)
 
-One can inspect the corresponding model ID with
+We can inspect the corresponding model ID with
 
 .. jupyter-execute::
 
@@ -232,7 +232,7 @@ to access the model, e.g.
 Note, that resolving a model alias always
 requires access to the backend on which the model is stored.
 
-One can add more than one alias for a model
+We can add more than one alias for a model
 
 .. jupyter-execute::
 
@@ -244,7 +244,7 @@ and can inspect existing aliases for a model ID with
 
     audmodel.aliases(uid)
 
-You can update to which model ID an alias is pointing
+We can update to which model ID an alias is pointing
 by running :func:`audmodel.set_alias` again,
 see next sub-section.
 
