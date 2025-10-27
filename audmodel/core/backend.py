@@ -60,6 +60,7 @@ def get_archive(
     version: str,
     cache_root: str,
     timeout: float,
+    num_workers: int,
     verbose: bool,
 ) -> str:
     r"""Return backend and local archive path.
@@ -70,6 +71,7 @@ def get_archive(
         cache_root: path of cache root
         timeout: maximum time in seconds
             before giving up acquiring a lock
+        num_workers: number of parallel jobs
         verbose: if ``True`` show message
             or progress bar
             when downloading file
@@ -106,6 +108,7 @@ def get_archive(
                     src_path,
                     dst_path,
                     version,
+                    num_workers=num_workers,
                     verbose=verbose,
                 )
 
@@ -114,6 +117,7 @@ def get_archive(
                 dst_path,
                 tmp_root,
                 keep_archive=False,
+                num_workers=num_workers,
                 verbose=verbose,
             )
 

@@ -278,6 +278,7 @@ def load(
     *,
     cache_root: str | None = None,
     timeout: float = 14400,  # 4 h
+    num_workers: int = 1,
     verbose: bool = False,
 ) -> str:
     r"""Download a model by its unique ID.
@@ -294,6 +295,7 @@ def load(
             If not set :meth:`audmodel.default_cache_root` is used
         timeout: maximum time in seconds
             before giving up acquiring a lock
+        num_workers: number of parallel jobs
         verbose: show debug messages
 
     Returns:
@@ -313,7 +315,7 @@ def load(
     """
     cache_root = audeer.safe_path(cache_root or default_cache_root())
     short_id, version = split_uid(uid, cache_root)
-    return get_archive(short_id, version, cache_root, timeout, verbose)
+    return get_archive(short_id, version, cache_root, timeout, num_workers, verbose)
 
 
 def meta(
