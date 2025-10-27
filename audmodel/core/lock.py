@@ -14,7 +14,7 @@ def lock(
     paths: list[str],
     *,
     timeout: float = 10,
-    warning_timeout: float = 0,
+    warn: bool = True,
 ):
     """Create lock for given paths.
 
@@ -24,8 +24,8 @@ def lock(
             before giving up acquiring a lock.
             If timeout is reached,
             an exception is raised
-        warning_timeout: time in seconds
-            after which a warning is shown to the user
+        warn: if ``True``
+            a warning is shown to the user
             that the lock could not yet get acquired
     Raises:
         :class:`filelock.Timeout`: if a timeout is reached
@@ -35,19 +35,15 @@ def lock(
     locks = [FileLock(f, timeout=timeout) for f in lock_files]
     with ExitStack() as stack:
         for lock, f in zip(locks, lock_files):
-            remaining_time = timeout
             acquired = False
-            if warning_timeout < timeout:
+            if warn:
                 try:
-                    lock.acquire(timeout=warning_timeout)
+                    lock.acquire(timeout=0)
                     acquired = True
                 except Timeout:
-                    remaining_time = timeout - warning_timeout
-                    warnings.warn(
-                        f"Lock '{f}' delayed; retrying for {remaining_time}s."
-                    )
+                    warnings.warn(f"Lock '{f}' delayed; retrying for {timeout}s.")
             if not acquired:
-                lock.acquire(timeout=remaining_time)
+                lock.acquire(timeout=timeout)
             stack.enter_context(lock)
         yield
 
