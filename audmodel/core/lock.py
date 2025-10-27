@@ -41,7 +41,9 @@ def lock(
                     lock.acquire(timeout=0)
                     acquired = True
                 except Timeout:
-                    warnings.warn(f"Lock '{f}' delayed; retrying for {timeout}s.")
+                    warnings.warn(
+                        f"Could not acquire lock '{f}'; retrying for {timeout}s."
+                    )
             if not acquired:
                 lock.acquire(timeout=timeout)
             stack.enter_context(lock)

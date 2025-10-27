@@ -153,7 +153,7 @@ def test_lock_warning_and_failure(tmpdir):
     lock_file = audeer.touch(tmpdir, ".file.txt.lock")
     lock_error = filelock.Timeout
     lock_error_msg = f"The file lock '{lock_file}' could not be acquired."
-    warning_msg = f"Lock '{lock_file}' delayed; retrying for 0.2s."
+    warning_msg = f"Could not acquire lock '{lock_file}'; retrying for 0.2s."
     # Acquire first lock to force failing second lock
     with lock(path):
         with pytest.warns(UserWarning, match=re.escape(warning_msg)):
