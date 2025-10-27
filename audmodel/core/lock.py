@@ -26,7 +26,7 @@ def lock(
             an exception is raised
         warn: if ``True``
             a warning is shown to the user
-            that the lock could not yet get acquired
+            if the lock cannot be acquired
     Raises:
         :class:`filelock.Timeout`: if a timeout is reached
 
