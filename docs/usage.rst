@@ -393,6 +393,20 @@ the model is placed in a unique sub-folder, namely
 ``<uid>/<version>``.
 
 
+Shared cache folder
+-------------------
+
+You can use a shared cache folder.
+Ensure to set the correct access rights,
+compare the
+`shared cache section <https://audeering.github.io/audb/caching.html#shared-cache>`_
+in ``audb``'s documentation.
+``audmodel`` uses lock files to avoid race conditions
+when trying to access the same file.
+You can only use a shared cache on the same platform
+as the file lock mechanism is not cross-platform compatible.
+
+
 .. jupyter-execute::
     :hide-code:
 

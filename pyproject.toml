@@ -32,6 +32,7 @@ classifiers = [
 requires-python = '>=3.10'
 dependencies = [
     'audbackend[all] >=2.2.2',
+    'filelock',
     'oyaml',
 ]
 # Get version dynamically from git

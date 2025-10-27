@@ -49,6 +49,7 @@ def author(
         audbackend.BackendError: if connection to repository on backend
             cannot be established
         RuntimeError: if model does not exist
+        filelock.Timeout: if cache lock could not be acquired
 
     Examples:
         >>> author("d4e9c65b-3.0.0")
@@ -77,6 +78,7 @@ def date(
         audbackend.BackendError: if connection to repository on backend
             cannot be established
         RuntimeError: if model does not exist
+        filelock.Timeout: if cache lock could not be acquired
 
     Examples:
         >>> date("d4e9c65b-3.0.0")
@@ -162,6 +164,7 @@ def header(
         audbackend.BackendError: if connection to repository on backend
             cannot be established
         RuntimeError: if model does not exist on backend
+        filelock.Timeout: if cache lock could not be acquired
 
     Returns:
         dictionary with header fields
@@ -274,6 +277,7 @@ def load(
     uid: str,
     *,
     cache_root: str | None = None,
+    timeout: float = 14400,  # 4 h
     verbose: bool = False,
 ) -> str:
     r"""Download a model by its unique ID.
@@ -288,6 +292,8 @@ def load(
         uid: unique model ID (omit version for latest version) or alias
         cache_root: cache folder where models and headers are stored.
             If not set :meth:`audmodel.default_cache_root` is used
+        timeout: maximum time in seconds
+            before giving up acquiring a lock
         verbose: show debug messages
 
     Returns:
@@ -297,6 +303,7 @@ def load(
         audbackend.BackendError: if connection to repository on backend
             cannot be established
         RuntimeError: if model does not exist
+        filelock.Timeout: if cache lock could not be acquired
 
     Examples:
         >>> root = load("d4e9c65b-3.0.0")
@@ -306,7 +313,7 @@ def load(
     """
     cache_root = audeer.safe_path(cache_root or default_cache_root())
     short_id, version = split_uid(uid, cache_root)
-    return get_archive(short_id, version, cache_root, verbose)
+    return get_archive(short_id, version, cache_root, timeout, verbose)
 
 
 def meta(
@@ -330,6 +337,7 @@ def meta(
         audbackend.BackendError: if connection to repository on backend
             cannot be established
         RuntimeError: if model does not exist
+        filelock.Timeout: if cache lock could not be acquired
 
     Examples:
         >>> d = meta("d4e9c65b-3.0.0")
@@ -376,6 +384,7 @@ def name(
         audbackend.BackendError: if connection to repository on backend
             cannot be established
         RuntimeError: if model does not exist
+        filelock.Timeout: if cache lock could not be acquired
 
     Examples:
         >>> name("d4e9c65b-3.0.0")
@@ -406,6 +415,7 @@ def parameters(
         audbackend.BackendError: if connection to repository on backend
             cannot be established
         RuntimeError: if model does not exist
+        filelock.Timeout: if cache lock could not be acquired
 
     Examples:
         >>> parameters("d4e9c65b-3.0.0")
@@ -877,6 +887,7 @@ def subgroup(
         audbackend.BackendError: if connection to repository on backend
             cannot be established
         RuntimeError: if model does not exist
+        filelock.Timeout: if cache lock could not be acquired
 
     Examples:
         >>> subgroup("d4e9c65b-3.0.0")
@@ -1145,6 +1156,7 @@ def version(
         audbackend.BackendError: if connection to repository on backend
             cannot be established
         RuntimeError: if model does not exist
+        filelock.Timeout: if cache lock could not be acquired
 
     Examples:
         >>> version("d4e9c65b-3.0.0")
