@@ -32,6 +32,7 @@ classifiers = [
 requires-python = '>=3.10'
 dependencies = [
     'audbackend[all] @ git+https://github.com/audeering/audbackend.git@workers-download',
+    'audeer @ git+https://https://github.com/audeering/audeer.git@archive-num-workers-2',
     'filelock',
     'oyaml',
 ]
