@@ -68,7 +68,7 @@
             
             
               <div class="version">
-                v1.3.1
+                v1.4.0
               </div>
             
           
@@ -101,6 +101,7 @@
 <p class="caption" role="heading"><span class="caption-text">API Documentation</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="reference internal" href="audmodel.html">audmodel</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="audmodel.aliases.html">aliases()</a></li>
 <li class="toctree-l2"><a class="reference internal" href="audmodel.author.html">author()</a></li>
 <li class="toctree-l2"><a class="reference internal" href="audmodel.config.html">config</a></li>
 <li class="toctree-l2"><a class="reference internal" href="audmodel.date.html">date()</a></li>
@@ -115,6 +116,8 @@
 <li class="toctree-l2"><a class="reference internal" href="audmodel.parameters.html">parameters()</a></li>
 <li class="toctree-l2"><a class="reference internal" href="audmodel.publish.html">publish()</a></li>
 <li class="toctree-l2"><a class="reference internal" href="audmodel.Repository.html">Repository</a></li>
+<li class="toctree-l2"><a class="reference internal" href="audmodel.resolve_alias.html">resolve_alias()</a></li>
+<li class="toctree-l2"><a class="reference internal" href="audmodel.set_alias.html">set_alias()</a></li>
 <li class="toctree-l2"><a class="reference internal" href="audmodel.subgroup.html">subgroup()</a></li>
 <li class="toctree-l2"><a class="reference internal" href="audmodel.uid.html">uid()</a></li>
 <li class="toctree-l2"><a class="reference internal" href="audmodel.update_meta.html">update_meta()</a></li>
@@ -175,10 +178,10 @@
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – model name</p></li>
-<li><p><strong>params</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a>]) – dictionary with parameters</p></li>
-<li><p><strong>version</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – version string</p></li>
-<li><p><strong>subgroup</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]) – extend group ID to
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – model name</p></li>
+<li><p><strong>params</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a>]) – dictionary with parameters</p></li>
+<li><p><strong>version</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – version string</p></li>
+<li><p><strong>subgroup</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]) – extend group ID to
 <code class="docutils literal notranslate"><span class="pre">com.audeering.models.&lt;subgroup&gt;</span></code>.
 You can increase the depth
 by using dot-notation,
@@ -186,11 +189,11 @@ e.g. setting
 <code class="docutils literal notranslate"><span class="pre">subgroup=foo.bar</span></code>
 will result in
 <code class="docutils literal notranslate"><span class="pre">com.audeering.models.foo.bar</span></code></p></li>
-<li><p><strong>private</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>) – repository is private</p></li>
+<li><p><strong>private</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>) – repository is private</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></p>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></p>
 </dd>
 <dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p>unique model ID</p>
@@ -255,7 +258,7 @@ will result in
         
         
         
-          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2025/03/05 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2025/12/08 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>

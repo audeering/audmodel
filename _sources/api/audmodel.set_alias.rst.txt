@@ -1,0 +1,6 @@
+﻿set\_alias\(\)
+==============
+
+.. currentmodule:: audmodel
+
+.. autofunction:: audmodel.set_alias

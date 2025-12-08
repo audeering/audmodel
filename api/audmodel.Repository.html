@@ -34,7 +34,7 @@
   <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="subgroup()" href="audmodel.subgroup.html" />
+    <link rel="next" title="resolve_alias()" href="audmodel.resolve_alias.html" />
     <link rel="prev" title="publish()" href="audmodel.publish.html" />
     
   
@@ -68,7 +68,7 @@
             
             
               <div class="version">
-                v1.3.1
+                v1.4.0
               </div>
             
           
@@ -101,6 +101,7 @@
 <p class="caption" role="heading"><span class="caption-text">API Documentation</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="reference internal" href="audmodel.html">audmodel</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="audmodel.aliases.html">aliases()</a></li>
 <li class="toctree-l2"><a class="reference internal" href="audmodel.author.html">author()</a></li>
 <li class="toctree-l2"><a class="reference internal" href="audmodel.config.html">config</a></li>
 <li class="toctree-l2"><a class="reference internal" href="audmodel.date.html">date()</a></li>
@@ -123,6 +124,8 @@
 <li class="toctree-l3"><a class="reference internal" href="#register">register()</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="audmodel.resolve_alias.html">resolve_alias()</a></li>
+<li class="toctree-l2"><a class="reference internal" href="audmodel.set_alias.html">set_alias()</a></li>
 <li class="toctree-l2"><a class="reference internal" href="audmodel.subgroup.html">subgroup()</a></li>
 <li class="toctree-l2"><a class="reference internal" href="audmodel.uid.html">uid()</a></li>
 <li class="toctree-l2"><a class="reference internal" href="audmodel.update_meta.html">update_meta()</a></li>
@@ -192,9 +195,9 @@ to access the repository.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – repository name</p></li>
-<li><p><strong>host</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – repository host</p></li>
-<li><p><strong>backend</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – repository backend</p></li>
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – repository name</p></li>
+<li><p><strong>host</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – repository host</p></li>
+<li><p><strong>backend</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – repository backend</p></li>
 </ul>
 </dd>
 </dl>
@@ -233,7 +236,7 @@ under Python &gt;=3.13.</p>
 <dt class="sig sig-object py" id="audmodel.Repository.create_backend_interface">
 <span class="sig-prename descclassname"><span class="pre">Repository.</span></span><span class="sig-name descname"><span class="pre">create_backend_interface</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/audmodel/core/repository.html#Repository.create_backend_interface"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audmodel.Repository.create_backend_interface" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create backend interface to access repository.</p>
-<p>It wraps an <a class="reference external" href="https://audeering.github.io/audbackend/api/audbackend.interface.Maven.html#audbackend.interface.Maven" title="(in audbackend v2.2.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">audbackend.interface.Maven</span></code></a> interface
+<p>It wraps an <a class="reference external" href="https://audeering.github.io/audbackend/api/audbackend.interface.Maven.html#audbackend.interface.Maven" title="(in audbackend v2.2.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">audbackend.interface.Maven</span></code></a> interface
 around the backend.</p>
 <p>The returned backend instance
 has not yet established a connection to the backend.
@@ -244,15 +247,15 @@ The backend is stored as the inside the <code class="docutils literal notranslat
 of the returned backend interface.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#type" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">type</span></code></a>[<a class="reference external" href="https://audeering.github.io/audbackend/api/audbackend.interface.Base.html#audbackend.interface.Base" title="(in audbackend v2.2.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Base</span></code></a>]</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#type" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">type</span></code></a>[<a class="reference external" href="https://audeering.github.io/audbackend/api/audbackend.interface.Base.html#audbackend.interface.Base" title="(in audbackend v2.2.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Base</span></code></a>]</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>interface to repository</p>
 </dd>
 <dt class="field-odd">Raises</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.13)"><strong>ValueError</strong></a> – if an artifactory backend is requested in Python&gt;=3.13</p></li>
-<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.13)"><strong>ValueError</strong></a> – if a non-supported backend is requested</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.14)"><strong>ValueError</strong></a> – if an artifactory backend is requested in Python&gt;=3.13</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.14)"><strong>ValueError</strong></a> – if a non-supported backend is requested</p></li>
 </ul>
 </dd>
 </dl>
@@ -290,9 +293,9 @@ to an actual backend class.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>backend_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – name of the backend,
+<li><p><strong>backend_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – name of the backend,
 e.g. <code class="docutils literal notranslate"><span class="pre">&quot;file-system&quot;</span></code></p></li>
-<li><p><strong>backend_class</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#type" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">type</span></code></a>[<a class="reference external" href="https://audeering.github.io/audbackend/api/audbackend.backend.Base.html#audbackend.backend.Base" title="(in audbackend v2.2.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Base</span></code></a>]) – class of the backend,
+<li><p><strong>backend_class</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#type" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">type</span></code></a>[<a class="reference external" href="https://audeering.github.io/audbackend/api/audbackend.backend.Base.html#audbackend.backend.Base" title="(in audbackend v2.2.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Base</span></code></a>]) – class of the backend,
 that should be associated with <code class="docutils literal notranslate"><span class="pre">backend_name</span></code>,
 e.g. <code class="docutils literal notranslate"><span class="pre">&quot;audbackend.backend.Filesystem&quot;</span></code></p></li>
 </ul>
@@ -316,7 +319,7 @@ e.g. <code class="docutils literal notranslate"><span class="pre">&quot;audbacke
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="audmodel.subgroup.html" class="btn btn-neutral float-right" title="subgroup()" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="audmodel.resolve_alias.html" class="btn btn-neutral float-right" title="resolve_alias()" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="audmodel.publish.html" class="btn btn-neutral float-left" title="publish()" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
@@ -348,7 +351,7 @@ e.g. <code class="docutils literal notranslate"><span class="pre">&quot;audbacke
         
         
         
-          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2025/03/05 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2025/12/08 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>

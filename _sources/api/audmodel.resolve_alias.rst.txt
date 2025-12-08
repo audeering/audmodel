@@ -1,0 +1,6 @@
+﻿resolve\_alias\(\)
+==================
+
+.. currentmodule:: audmodel
+
+.. autofunction:: audmodel.resolve_alias

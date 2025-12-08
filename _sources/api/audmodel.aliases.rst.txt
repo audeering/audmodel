@@ -1,0 +1,6 @@
+﻿aliases\(\)
+===========
+
+.. currentmodule:: audmodel
+
+.. autofunction:: audmodel.aliases

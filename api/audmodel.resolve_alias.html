@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>date() &mdash; Documentation</title>
+  <title>resolve_alias() &mdash; Documentation</title>
   
 
   
@@ -34,8 +34,8 @@
   <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="default_cache_root()" href="audmodel.default_cache_root.html" />
-    <link rel="prev" title="config" href="audmodel.config.html" />
+    <link rel="next" title="set_alias()" href="audmodel.set_alias.html" />
+    <link rel="prev" title="Repository" href="audmodel.Repository.html" />
     
   
 
@@ -104,7 +104,7 @@
 <li class="toctree-l2"><a class="reference internal" href="audmodel.aliases.html">aliases()</a></li>
 <li class="toctree-l2"><a class="reference internal" href="audmodel.author.html">author()</a></li>
 <li class="toctree-l2"><a class="reference internal" href="audmodel.config.html">config</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">date()</a></li>
+<li class="toctree-l2"><a class="reference internal" href="audmodel.date.html">date()</a></li>
 <li class="toctree-l2"><a class="reference internal" href="audmodel.default_cache_root.html">default_cache_root()</a></li>
 <li class="toctree-l2"><a class="reference internal" href="audmodel.exists.html">exists()</a></li>
 <li class="toctree-l2"><a class="reference internal" href="audmodel.header.html">header()</a></li>
@@ -116,7 +116,7 @@
 <li class="toctree-l2"><a class="reference internal" href="audmodel.parameters.html">parameters()</a></li>
 <li class="toctree-l2"><a class="reference internal" href="audmodel.publish.html">publish()</a></li>
 <li class="toctree-l2"><a class="reference internal" href="audmodel.Repository.html">Repository</a></li>
-<li class="toctree-l2"><a class="reference internal" href="audmodel.resolve_alias.html">resolve_alias()</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">resolve_alias()</a></li>
 <li class="toctree-l2"><a class="reference internal" href="audmodel.set_alias.html">set_alias()</a></li>
 <li class="toctree-l2"><a class="reference internal" href="audmodel.subgroup.html">subgroup()</a></li>
 <li class="toctree-l2"><a class="reference internal" href="audmodel.uid.html">uid()</a></li>
@@ -159,7 +159,7 @@
   <ul class="wy-breadcrumbs">
       <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
           <li><a href="audmodel.html">audmodel</a> &raquo;</li>
-      <li>date()</li>
+      <li>resolve_alias()</li>
       <li class="wy-breadcrumbs-aside">
               <a href="https://gitlab.audeering.com/audeering/audmodel/" class="fa fa-gitlab"> GitLab</a>
       </li>
@@ -169,38 +169,38 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="date">
-<h1>date()<a class="headerlink" href="#date" title="Permalink to this heading">¶</a></h1>
+  <div class="section" id="resolve-alias">
+<h1>resolve_alias()<a class="headerlink" href="#resolve-alias" title="Permalink to this heading">¶</a></h1>
 <dl class="py function">
-<dt class="sig sig-object py" id="audmodel.date">
-<span class="sig-prename descclassname"><span class="pre">audmodel.</span></span><span class="sig-name descname"><span class="pre">date</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">uid</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_root</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/audmodel/core/api.html#date"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audmodel.date" title="Permalink to this definition">¶</a></dt>
-<dd><p>Publication date of model.</p>
+<dt class="sig sig-object py" id="audmodel.resolve_alias">
+<span class="sig-prename descclassname"><span class="pre">audmodel.</span></span><span class="sig-name descname"><span class="pre">resolve_alias</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">alias</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_root</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/audmodel/core/api.html#resolve_alias"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audmodel.resolve_alias" title="Permalink to this definition">¶</a></dt>
+<dd><p>Resolve an alias to its corresponding model UID.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>uid</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – unique model ID (omit version for latest version) or alias</p></li>
-<li><p><strong>cache_root</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]) – cache folder where models and headers are stored.
+<li><p><strong>alias</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – alias name</p></li>
+<li><p><strong>cache_root</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]) – cache folder where aliases are cached.
 If not set <a class="reference internal" href="audmodel.default_cache_root.html#audmodel.default_cache_root" title="audmodel.default_cache_root"><code class="xref py py-meth docutils literal notranslate"><span class="pre">audmodel.default_cache_root()</span></code></a> is used</p></li>
+<li><p><strong>verbose</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>) – show debug messages</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type</dt>
 <dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></p>
 </dd>
 <dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>model publication date</p>
+<dd class="field-odd"><p>model UID</p>
 </dd>
 <dt class="field-even">Raises</dt>
 <dd class="field-even"><ul class="simple">
 <li><p><a class="reference external" href="https://audeering.github.io/audbackend/api/audbackend.BackendError.html#audbackend.BackendError" title="(in audbackend v2.2.3)"><strong>audbackend.BackendError</strong></a> – if connection to repository on backend
     cannot be established</p></li>
-<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#RuntimeError" title="(in Python v3.14)"><strong>RuntimeError</strong></a> – if model does not exist</p></li>
-<li><p><a class="reference external" href="https://py-filelock.readthedocs.io/en/latest/api.html#filelock.Timeout" title="(in Project name not set v3.20)"><strong>filelock.Timeout</strong></a> – if cache lock could not be acquired</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#RuntimeError" title="(in Python v3.14)"><strong>RuntimeError</strong></a> – if alias does not exist</p></li>
 </ul>
 </dd>
 </dl>
 <p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">date</span><span class="p">(</span><span class="s2">&quot;d4e9c65b-3.0.0&quot;</span><span class="p">)</span>
-<span class="go">&#39;1985-11-18&#39;</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">resolve_alias</span><span class="p">(</span><span class="s2">&quot;my-model&quot;</span><span class="p">)</span>  
+<span class="go">&#39;d4e9c65b-3.0.0&#39;</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -215,10 +215,10 @@ If not set <a class="reference internal" href="audmodel.default_cache_root.html#
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="audmodel.default_cache_root.html" class="btn btn-neutral float-right" title="default_cache_root()" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="audmodel.set_alias.html" class="btn btn-neutral float-right" title="set_alias()" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="audmodel.config.html" class="btn btn-neutral float-left" title="config" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="audmodel.Repository.html" class="btn btn-neutral float-left" title="Repository" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

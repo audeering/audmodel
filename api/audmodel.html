@@ -34,7 +34,7 @@
   <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="author()" href="audmodel.author.html" />
+    <link rel="next" title="aliases()" href="audmodel.aliases.html" />
     <link rel="prev" title="Usage" href="../usage.html" />
     
   
@@ -68,7 +68,7 @@
             
             
               <div class="version">
-                v1.3.1
+                v1.4.0
               </div>
             
           
@@ -101,6 +101,7 @@
 <p class="caption" role="heading"><span class="caption-text">API Documentation</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">audmodel</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="audmodel.aliases.html">aliases()</a></li>
 <li class="toctree-l2"><a class="reference internal" href="audmodel.author.html">author()</a></li>
 <li class="toctree-l2"><a class="reference internal" href="audmodel.config.html">config</a></li>
 <li class="toctree-l2"><a class="reference internal" href="audmodel.date.html">date()</a></li>
@@ -115,6 +116,8 @@
 <li class="toctree-l2"><a class="reference internal" href="audmodel.parameters.html">parameters()</a></li>
 <li class="toctree-l2"><a class="reference internal" href="audmodel.publish.html">publish()</a></li>
 <li class="toctree-l2"><a class="reference internal" href="audmodel.Repository.html">Repository</a></li>
+<li class="toctree-l2"><a class="reference internal" href="audmodel.resolve_alias.html">resolve_alias()</a></li>
+<li class="toctree-l2"><a class="reference internal" href="audmodel.set_alias.html">set_alias()</a></li>
 <li class="toctree-l2"><a class="reference internal" href="audmodel.subgroup.html">subgroup()</a></li>
 <li class="toctree-l2"><a class="reference internal" href="audmodel.uid.html">uid()</a></li>
 <li class="toctree-l2"><a class="reference internal" href="audmodel.update_meta.html">update_meta()</a></li>
@@ -173,64 +176,73 @@
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="audmodel.author.html#audmodel.author" title="audmodel.author"><code class="xref py py-obj docutils literal notranslate"><span class="pre">author</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="audmodel.aliases.html#audmodel.aliases" title="audmodel.aliases"><code class="xref py py-obj docutils literal notranslate"><span class="pre">aliases</span></code></a></p></td>
+<td><p>Get all aliases for a model.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="audmodel.author.html#audmodel.author" title="audmodel.author"><code class="xref py py-obj docutils literal notranslate"><span class="pre">author</span></code></a></p></td>
 <td><p>Author of model.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="audmodel.config.html#audmodel.config" title="audmodel.config"><code class="xref py py-obj docutils literal notranslate"><span class="pre">config</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="audmodel.config.html#audmodel.config" title="audmodel.config"><code class="xref py py-obj docutils literal notranslate"><span class="pre">config</span></code></a></p></td>
 <td><p>Get/set defaults for the <a class="reference internal" href="#module-audmodel" title="audmodel"><code class="xref py py-mod docutils literal notranslate"><span class="pre">audmodel</span></code></a> module.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="audmodel.date.html#audmodel.date" title="audmodel.date"><code class="xref py py-obj docutils literal notranslate"><span class="pre">date</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="audmodel.date.html#audmodel.date" title="audmodel.date"><code class="xref py py-obj docutils literal notranslate"><span class="pre">date</span></code></a></p></td>
 <td><p>Publication date of model.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="audmodel.default_cache_root.html#audmodel.default_cache_root" title="audmodel.default_cache_root"><code class="xref py py-obj docutils literal notranslate"><span class="pre">default_cache_root</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="audmodel.default_cache_root.html#audmodel.default_cache_root" title="audmodel.default_cache_root"><code class="xref py py-obj docutils literal notranslate"><span class="pre">default_cache_root</span></code></a></p></td>
 <td><p>Default path under which models are stored.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="audmodel.exists.html#audmodel.exists" title="audmodel.exists"><code class="xref py py-obj docutils literal notranslate"><span class="pre">exists</span></code></a></p></td>
-<td><p>Check if a model with this ID exists.</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="audmodel.exists.html#audmodel.exists" title="audmodel.exists"><code class="xref py py-obj docutils literal notranslate"><span class="pre">exists</span></code></a></p></td>
+<td><p>Check if a model exists.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="audmodel.header.html#audmodel.header" title="audmodel.header"><code class="xref py py-obj docutils literal notranslate"><span class="pre">header</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="audmodel.header.html#audmodel.header" title="audmodel.header"><code class="xref py py-obj docutils literal notranslate"><span class="pre">header</span></code></a></p></td>
 <td><p>Load model header.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="audmodel.latest_version.html#audmodel.latest_version" title="audmodel.latest_version"><code class="xref py py-obj docutils literal notranslate"><span class="pre">latest_version</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="audmodel.latest_version.html#audmodel.latest_version" title="audmodel.latest_version"><code class="xref py py-obj docutils literal notranslate"><span class="pre">latest_version</span></code></a></p></td>
 <td><p>Latest available version of model.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="audmodel.legacy_uid.html#audmodel.legacy_uid" title="audmodel.legacy_uid"><code class="xref py py-obj docutils literal notranslate"><span class="pre">legacy_uid</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="audmodel.legacy_uid.html#audmodel.legacy_uid" title="audmodel.legacy_uid"><code class="xref py py-obj docutils literal notranslate"><span class="pre">legacy_uid</span></code></a></p></td>
 <td><p>Unique model ID in legacy format.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="audmodel.load.html#audmodel.load" title="audmodel.load"><code class="xref py py-obj docutils literal notranslate"><span class="pre">load</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="audmodel.load.html#audmodel.load" title="audmodel.load"><code class="xref py py-obj docutils literal notranslate"><span class="pre">load</span></code></a></p></td>
 <td><p>Download a model by its unique ID.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="audmodel.meta.html#audmodel.meta" title="audmodel.meta"><code class="xref py py-obj docutils literal notranslate"><span class="pre">meta</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="audmodel.meta.html#audmodel.meta" title="audmodel.meta"><code class="xref py py-obj docutils literal notranslate"><span class="pre">meta</span></code></a></p></td>
 <td><p>Meta information of model.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="audmodel.name.html#audmodel.name" title="audmodel.name"><code class="xref py py-obj docutils literal notranslate"><span class="pre">name</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="audmodel.name.html#audmodel.name" title="audmodel.name"><code class="xref py py-obj docutils literal notranslate"><span class="pre">name</span></code></a></p></td>
 <td><p>Name of model.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="audmodel.parameters.html#audmodel.parameters" title="audmodel.parameters"><code class="xref py py-obj docutils literal notranslate"><span class="pre">parameters</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="audmodel.parameters.html#audmodel.parameters" title="audmodel.parameters"><code class="xref py py-obj docutils literal notranslate"><span class="pre">parameters</span></code></a></p></td>
 <td><p>Parameters of model.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="audmodel.publish.html#audmodel.publish" title="audmodel.publish"><code class="xref py py-obj docutils literal notranslate"><span class="pre">publish</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="audmodel.publish.html#audmodel.publish" title="audmodel.publish"><code class="xref py py-obj docutils literal notranslate"><span class="pre">publish</span></code></a></p></td>
 <td><p>Zip model and publish as a new artifact.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="audmodel.Repository.html#audmodel.Repository" title="audmodel.Repository"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Repository</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="audmodel.Repository.html#audmodel.Repository" title="audmodel.Repository"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Repository</span></code></a></p></td>
 <td><p>Repository object.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="audmodel.subgroup.html#audmodel.subgroup" title="audmodel.subgroup"><code class="xref py py-obj docutils literal notranslate"><span class="pre">subgroup</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="audmodel.resolve_alias.html#audmodel.resolve_alias" title="audmodel.resolve_alias"><code class="xref py py-obj docutils literal notranslate"><span class="pre">resolve_alias</span></code></a></p></td>
+<td><p>Resolve an alias to its corresponding model UID.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="audmodel.set_alias.html#audmodel.set_alias" title="audmodel.set_alias"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_alias</span></code></a></p></td>
+<td><p>Set or update an alias for a model.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="audmodel.subgroup.html#audmodel.subgroup" title="audmodel.subgroup"><code class="xref py py-obj docutils literal notranslate"><span class="pre">subgroup</span></code></a></p></td>
 <td><p>Subgroup of model.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="audmodel.uid.html#audmodel.uid" title="audmodel.uid"><code class="xref py py-obj docutils literal notranslate"><span class="pre">uid</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="audmodel.uid.html#audmodel.uid" title="audmodel.uid"><code class="xref py py-obj docutils literal notranslate"><span class="pre">uid</span></code></a></p></td>
 <td><p>Unique model ID.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="audmodel.update_meta.html#audmodel.update_meta" title="audmodel.update_meta"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update_meta</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="audmodel.update_meta.html#audmodel.update_meta" title="audmodel.update_meta"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update_meta</span></code></a></p></td>
 <td><p>Update metadata of model on backend and in cache.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="audmodel.url.html#audmodel.url" title="audmodel.url"><code class="xref py py-obj docutils literal notranslate"><span class="pre">url</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="audmodel.url.html#audmodel.url" title="audmodel.url"><code class="xref py py-obj docutils literal notranslate"><span class="pre">url</span></code></a></p></td>
 <td><p>URL to model archive or header.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="audmodel.version.html#audmodel.version" title="audmodel.version"><code class="xref py py-obj docutils literal notranslate"><span class="pre">version</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="audmodel.version.html#audmodel.version" title="audmodel.version"><code class="xref py py-obj docutils literal notranslate"><span class="pre">version</span></code></a></p></td>
 <td><p>Version of model.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="audmodel.versions.html#audmodel.versions" title="audmodel.versions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">versions</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="audmodel.versions.html#audmodel.versions" title="audmodel.versions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">versions</span></code></a></p></td>
 <td><p>Available model versions.</p></td>
 </tr>
 </tbody>
@@ -245,7 +257,7 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="audmodel.author.html" class="btn btn-neutral float-right" title="author()" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="audmodel.aliases.html" class="btn btn-neutral float-right" title="aliases()" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="../usage.html" class="btn btn-neutral float-left" title="Usage" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
@@ -277,7 +289,7 @@
         
         
         
-          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2025/03/05 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2025/12/08 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>
