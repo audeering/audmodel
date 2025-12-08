@@ -7,6 +7,36 @@ The format is based on `Keep a Changelog`_,
 and this project adheres to `Semantic Versioning`_.
 
 
+Version 1.4.0 (2025-12-08)
+--------------------------
+
+* Added: support for named model aliases.
+  Most functions that take a ``uid``,
+  accept alternatively the corresponding ``alias``
+* Added: possibility to create model aliases
+  by calling
+  ``audmodel.set_alias(alias, uid)``,
+  or setting the new ``alias`` argument
+  of ``audmodel.publish()``
+* Added: ``audmodel.resolve_alias(alias)``
+  to get the corresponding model ``uid``
+* Added: ``audmodel.aliases(uid)``
+  to list all aliases
+  pointing to the model ``uid``
+* Added: support for Python 3.14
+* Changed: set default value of the ``repository`` argument
+  of ``audmodel.publish()``
+  to ``None``.
+  If it is ``None``,
+  it will use ``audmodel.config.REPOSITORIES[0]``
+  which returns the same default value as before
+* Changed: depend on ``audbackend[all]>=2.2.3``
+* Fixed: lock cache to avoid failures
+  when two processes/users download the same model.
+  The lock does not support cross-platform access to the cache
+* Removed: support for Python 3.9
+
+
 Version 1.3.1 (2025-03-05)
 --------------------------
 
