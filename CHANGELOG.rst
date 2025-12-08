@@ -14,9 +14,10 @@ Version 1.4.0 (2025-12-08)
   Most functions that take a ``uid``,
   accept alternatively the corresponding ``alias``
 * Added: possibility to create model aliases
-  by adding
+  by calling
   ``audmodel.set_alias(alias, uid)``,
-  and ``alias`` argument to ``audmodel.publish()``
+  or setting the new ``alias`` argument
+  of ``audmodel.publish()``
 * Added: ``audmodel.resolve_alias(alias)``
   to get the corresponding model ``uid``
 * Added: ``audmodel.aliases(uid)``
