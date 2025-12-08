@@ -33,7 +33,7 @@ Version 1.4.0 (2025-12-08)
 * Changed: depend on ``audbackend[all]>=2.2.3``
 * Fixed: lock cache to avoid failures
   when two processes/users download the same model.
-  The lock does not support cross platform access to cache
+  The lock does not support cross-platform access to the cache
 * Removed: support for Python 3.9
 
 
