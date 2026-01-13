@@ -100,22 +100,12 @@ def get_archive(
 
             with backend_interface.backend:
                 # get archive
-                src_path = path
-                dst_path = os.path.join(tmp_root, "model.zip")
-                backend_interface.get_file(
-                    src_path,
-                    dst_path,
+                backend_interface.get_archive(
+                    path,
+                    tmp_root,
                     version,
                     verbose=verbose,
                 )
-
-            # extract files
-            audeer.extract_archive(
-                dst_path,
-                tmp_root,
-                keep_archive=False,
-                verbose=verbose,
-            )
 
             # move tmp folder to final destination
             if os.path.exists(root):
