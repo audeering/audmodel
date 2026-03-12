@@ -149,6 +149,7 @@ def test_lock(tmpdir):
     assert set(result) == {0, 1}
 
 
+@pytest.mark.skipif(os.name != "posix", reason="POSIX file permissions required")
 def test_lock_file_permissions(tmpdir):
     """Lock files are created with group-write permissions."""
     path = audeer.path(tmpdir, "file.txt")
