@@ -156,10 +156,8 @@ def test_lock_file_permissions(tmpdir):
     lock_file = audeer.path(tmpdir, ".file.txt.lock")
 
     with lock(path, warn=False):
-        pass
-
-    mode = os.stat(lock_file).st_mode
-    assert mode & stat.S_IWGRP
+        mode = os.stat(lock_file).st_mode
+        assert mode & stat.S_IWGRP
 
 
 def test_lock_warning_and_failure(tmpdir):
