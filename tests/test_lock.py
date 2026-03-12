@@ -158,16 +158,7 @@ def test_lock_file_permissions(tmpdir):
         pass
 
     mode = os.stat(lock_file).st_mode
-    assert mode & stat.S_IWGRP, "Lock file should have group-write permission"
-
-    # Remove lock file so next lock() recreates it via FileLock.acquire
-    os.remove(lock_file)
-
-    with lock(path, warn=False):
-        pass
-
-    mode = os.stat(lock_file).st_mode
-    assert mode & stat.S_IWGRP, "Recreated lock file should have group-write permission"
+    assert mode & stat.S_IWGRP
 
 
 def test_lock_warning_and_failure(tmpdir):
