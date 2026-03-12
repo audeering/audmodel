@@ -5,7 +5,8 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <title>Usage &mdash; Documentation</title>
@@ -68,7 +69,7 @@
             
             
               <div class="version">
-                v1.4.0
+                v1.4.1
               </div>
             
           
@@ -153,14 +154,14 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="usage">
-<h1>Usage<a class="headerlink" href="#usage" title="Permalink to this heading">¶</a></h1>
+  <section id="usage">
+<h1>Usage<a class="headerlink" href="#usage" title="Link to this heading">¶</a></h1>
 <div class="jupyter_cell docutils container">
 <div class="cell_output docutils container">
 </div>
 </div>
-<div class="section" id="introduction">
-<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this heading">¶</a></h2>
+<section id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Link to this heading">¶</a></h2>
 <p><a class="reference internal" href="api/audmodel.html#module-audmodel" title="audmodel"><code class="xref py py-mod docutils literal notranslate"><span class="pre">audmodel</span></code></a> is a versatile tool
 to <strong>publish</strong>,
 <strong>load</strong>,
@@ -170,17 +171,17 @@ with <strong>parameters</strong>,
 (e.g. data and sampling rate),
 and <strong>metadata</strong>
 (e.g. hyperparameter).</p>
-</div>
-<div class="section" id="publish-a-model">
-<h2>Publish a model<a class="headerlink" href="#publish-a-model" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="publish-a-model">
+<h2>Publish a model<a class="headerlink" href="#publish-a-model" title="Link to this heading">¶</a></h2>
 <p>Let’s assume we have a model folder <code class="docutils literal notranslate"><span class="pre">root_v1</span></code>,
 consisting of the following files:</p>
 <div class="jupyter_cell docutils container">
 <div class="cell_output docutils container">
 <div class="output stream highlight-none notranslate"><div class="highlight"><pre><span></span>root_v1/
-    model.yaml
     model.onnx
     readme.txt
+    model.yaml
     log/
         eval.yaml
 </pre></div>
@@ -286,9 +287,9 @@ in which the model is stored.</p>
 that can be used to access the model.
 The model ID is derived from
 <code class="docutils literal notranslate"><span class="pre">name</span></code>, <code class="docutils literal notranslate"><span class="pre">params</span></code>, <code class="docutils literal notranslate"><span class="pre">subgroup</span></code>, <code class="docutils literal notranslate"><span class="pre">version</span></code>.</p>
-</div>
-<div class="section" id="load-a-model">
-<h2>Load a model<a class="headerlink" href="#load-a-model" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="load-a-model">
+<h2>Load a model<a class="headerlink" href="#load-a-model" title="Link to this heading">¶</a></h2>
 <p>With the model ID we can check if a model exists:</p>
 <div class="jupyter_cell jupyter_container docutils container">
 <div class="cell_input code_cell docutils container">
@@ -363,18 +364,18 @@ we will then have the following structure.</p>
 <div class="jupyter_cell docutils container">
 <div class="cell_output docutils container">
 <div class="output stream highlight-none notranslate"><div class="highlight"><pre><span></span>1.0.0/
-    model.yaml
     model.onnx
     readme.txt
+    model.yaml
     log/
         eval.yaml
 </pre></div>
 </div>
 </div>
 </div>
-</div>
-<div class="section" id="model-alias">
-<h2>Model alias<a class="headerlink" href="#model-alias" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="model-alias">
+<h2>Model alias<a class="headerlink" href="#model-alias" title="Link to this heading">¶</a></h2>
 <p>In addition to the model ID,
 we can create different model aliases
 to refer to a model.
@@ -441,9 +442,9 @@ requires access to the backend on which the model is stored.</p>
 <p>We can update to which model ID an alias is pointing
 by running <a class="reference internal" href="api/audmodel.set_alias.html#audmodel.set_alias" title="audmodel.set_alias"><code class="xref py py-func docutils literal notranslate"><span class="pre">audmodel.set_alias()</span></code></a> again,
 see next sub-section.</p>
-</div>
-<div class="section" id="publish-a-new-version">
-<h2>Publish a new version<a class="headerlink" href="#publish-a-new-version" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="publish-a-new-version">
+<h2>Publish a new version<a class="headerlink" href="#publish-a-new-version" title="Link to this heading">¶</a></h2>
 <p>When making only minor changes to the model
 that does not affect any of its parameters,
 we can publish a new version of the model
@@ -465,9 +466,9 @@ this time called <code class="docutils literal notranslate"><span class="pre">ro
 <div class="jupyter_cell docutils container">
 <div class="cell_output docutils container">
 <div class="output stream highlight-none notranslate"><div class="highlight"><pre><span></span>root_v2/
-    model.yaml
     model.onnx
     readme.txt
+    model.yaml
     log/
         eval.yaml
 </pre></div>
@@ -563,9 +564,9 @@ to point to the newest version.</p>
 </div>
 </div>
 </div>
-</div>
-<div class="section" id="update-metadata">
-<h2>Update metadata<a class="headerlink" href="#update-metadata" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="update-metadata">
+<h2>Update metadata<a class="headerlink" href="#update-metadata" title="Link to this heading">¶</a></h2>
 <p>While the parameters of a model cannot be changed,
 it is possible to update its metadata.</p>
 <p>For instance,
@@ -614,9 +615,9 @@ we can replace the metadata.</p>
 </div>
 </div>
 </div>
-</div>
-<div class="section" id="cache-folder">
-<h2>Cache folder<a class="headerlink" href="#cache-folder" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="cache-folder">
+<h2>Cache folder<a class="headerlink" href="#cache-folder" title="Link to this heading">¶</a></h2>
 <p>Models are unpacked to the model cache folder,
 which can be checked by:</p>
 <div class="jupyter_cell jupyter_container docutils container">
@@ -659,9 +660,9 @@ with a non empty <code class="docutils literal notranslate"><span class="pre">ca
 <p>Within the model cache folder
 the model is placed in a unique sub-folder, namely
 <code class="docutils literal notranslate"><span class="pre">&lt;uid&gt;/&lt;version&gt;</span></code>.</p>
-</div>
-<div class="section" id="shared-cache-folder">
-<h2>Shared cache folder<a class="headerlink" href="#shared-cache-folder" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="shared-cache-folder">
+<h2>Shared cache folder<a class="headerlink" href="#shared-cache-folder" title="Link to this heading">¶</a></h2>
 <p>You can use a shared cache folder.
 Ensure to set the correct access rights,
 compare the
@@ -675,8 +676,8 @@ as the file lock mechanism is not cross-platform compatible.</p>
 <div class="cell_output docutils container">
 </div>
 </div>
-</div>
-</div>
+</section>
+</section>
 
 
            </div>
@@ -718,7 +719,7 @@ as the file lock mechanism is not cross-platform compatible.</p>
         
         
         
-          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2025/12/08 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2026/03/12 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>
@@ -726,7 +727,7 @@ as the file lock mechanism is not cross-platform compatible.</p>
   <div role="contentinfo">
     <p>
         
-      &copy; 2019-2025 audEERING GmbH
+      &copy; 2019-2026 audEERING GmbH
     </p>
   </div> 
 
@@ -750,21 +751,19 @@ as the file lock mechanism is not cross-platform compatible.</p>
     
     
       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-        <script src="_static/jquery.js"></script>
-        <script src="_static/underscore.js"></script>
-        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="_static/doctools.js"></script>
-        <script src="_static/sphinx_highlight.js"></script>
+        <script src="_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="_static/doctools.js?v=fd6eb6e6"></script>
+        <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
         <script src="_static/thebelab-helper.js"></script>
-        <script src="_static/clipboard.min.js"></script>
-        <script src="_static/copybutton.js"></script>
+        <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+        <script src="_static/copybutton.js?v=ccdb6887"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
     
 
   
 
+  <script type="text/javascript" src="_static/js/jquery.js"></script>
   <script type="text/javascript" src="_static/js/theme.js"></script>
 
   <script type="text/javascript">
