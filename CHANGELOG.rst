@@ -7,6 +7,13 @@ The format is based on `Keep a Changelog`_,
 and this project adheres to `Semantic Versioning`_.
 
 
+Version 1.4.1 (2026-03-12)
+--------------------------
+
+* Fixed: create lock file with group write permissions
+  to allow usage of shared cache
+
+
 Version 1.4.0 (2025-12-08)
 --------------------------
 
