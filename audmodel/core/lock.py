@@ -9,6 +9,13 @@ from filelock import Timeout
 import audeer
 
 
+# File permissions for lock files.
+# We use `0o664` (`-rw-rw-r--`)
+# to allow group-write access,
+# which is needed for shared caches.
+_LOCK_FILE_MODE = 0o664
+
+
 @contextmanager
 def lock(
     paths: list[str],
@@ -32,7 +39,7 @@ def lock(
 
     """
     lock_files = _lock_files(paths)
-    locks = [FileLock(f, timeout=timeout) for f in lock_files]
+    locks = [FileLock(f, timeout=timeout, mode=_LOCK_FILE_MODE) for f in lock_files]
     with ExitStack() as stack:
         for lock, f in zip(locks, lock_files):
             acquired = False
@@ -51,11 +58,14 @@ def lock(
 
 
 def _lock_files(paths: list[str]) -> list[str]:
-    """Create lock files if not existent.
+    """Return lock file paths for given paths.
 
-    The lock files are created outside the folder,
+    The lock files are placed outside the folder,
     to allow to delete/overwrite the folder
     by the process.
+
+    The lock files themselves are created
+    by :class:`filelock.FileLock` during acquisition.
 
     Args:
         paths: files or folders that should be locked
@@ -70,7 +80,5 @@ def _lock_files(paths: list[str]) -> list[str]:
         dirname = audeer.mkdir(os.path.dirname(path))
         basename = os.path.basename(path)
         lock_file = audeer.path(dirname, f".{basename}.lock")
-        if not os.path.exists(lock_file):
-            audeer.touch(lock_file)
         lock_files.append(lock_file)
     return lock_files

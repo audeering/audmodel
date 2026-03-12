@@ -1,4 +1,6 @@
+import os
 import re
+import stat
 import threading
 import time
 
@@ -145,6 +147,17 @@ def test_lock(tmpdir):
         num_workers=3,
     )
     assert set(result) == {0, 1}
+
+
+@pytest.mark.skipif(os.name != "posix", reason="POSIX file permissions required")
+def test_lock_file_permissions(tmpdir):
+    """Lock files are created with group-write permissions."""
+    path = audeer.path(tmpdir, "file.txt")
+    lock_file = audeer.path(tmpdir, ".file.txt.lock")
+
+    with lock(path, warn=False):
+        mode = os.stat(lock_file).st_mode
+        assert mode & stat.S_IWGRP
 
 
 def test_lock_warning_and_failure(tmpdir):
