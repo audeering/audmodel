@@ -9,6 +9,24 @@ from filelock import Timeout
 import audeer
 
 
+def _acquire_with_umask(lock, *, timeout):
+    """Acquire lock with group-write friendly umask.
+
+    ``filelock.FileLock`` may create the lock file
+    during acquisition.
+    We set umask to ``0o002``
+    to ensure the lock file is created
+    with group-write permissions,
+    which is needed in shared caches.
+
+    """
+    old_mask = os.umask(0o002)
+    try:
+        lock.acquire(timeout=timeout)
+    finally:
+        os.umask(old_mask)
+
+
 @contextmanager
 def lock(
     paths: list[str],
@@ -38,14 +56,14 @@ def lock(
             acquired = False
             if warn:
                 try:
-                    lock.acquire(timeout=0)
+                    _acquire_with_umask(lock, timeout=0)
                     acquired = True
                 except Timeout:
                     warnings.warn(
                         f"Could not acquire lock '{f}'; retrying for {timeout}s."
                     )
             if not acquired:
-                lock.acquire(timeout=timeout)
+                _acquire_with_umask(lock, timeout=timeout)
             stack.enter_context(lock)
         yield
 
@@ -71,6 +89,10 @@ def _lock_files(paths: list[str]) -> list[str]:
         basename = os.path.basename(path)
         lock_file = audeer.path(dirname, f".{basename}.lock")
         if not os.path.exists(lock_file):
-            audeer.touch(lock_file)
+            old_mask = os.umask(0o002)
+            try:
+                audeer.touch(lock_file)
+            finally:
+                os.umask(old_mask)
         lock_files.append(lock_file)
     return lock_files
