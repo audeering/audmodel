@@ -9,22 +9,11 @@ from filelock import Timeout
 import audeer
 
 
-def _acquire_with_umask(lock, *, timeout):
-    """Acquire lock with group-write friendly umask.
-
-    ``filelock.FileLock`` may create the lock file
-    during acquisition.
-    We set umask to ``0o002``
-    to ensure the lock file is created
-    with group-write permissions,
-    which is needed in shared caches.
-
-    """
-    old_mask = os.umask(0o002)
-    try:
-        lock.acquire(timeout=timeout)
-    finally:
-        os.umask(old_mask)
+#: File permissions for lock files.
+#: We use ``0o664`` (``-rw-rw-r--``)
+#: to allow group-write access,
+#: which is needed for shared caches.
+_LOCK_FILE_MODE = 0o664
 
 
 @contextmanager
@@ -50,20 +39,20 @@ def lock(
 
     """
     lock_files = _lock_files(paths)
-    locks = [FileLock(f, timeout=timeout) for f in lock_files]
+    locks = [FileLock(f, timeout=timeout, mode=_LOCK_FILE_MODE) for f in lock_files]
     with ExitStack() as stack:
         for lock, f in zip(locks, lock_files):
             acquired = False
             if warn:
                 try:
-                    _acquire_with_umask(lock, timeout=0)
+                    lock.acquire(timeout=0)
                     acquired = True
                 except Timeout:
                     warnings.warn(
                         f"Could not acquire lock '{f}'; retrying for {timeout}s."
                     )
             if not acquired:
-                _acquire_with_umask(lock, timeout=timeout)
+                lock.acquire(timeout=timeout)
             stack.enter_context(lock)
         yield
 
@@ -89,10 +78,7 @@ def _lock_files(paths: list[str]) -> list[str]:
         basename = os.path.basename(path)
         lock_file = audeer.path(dirname, f".{basename}.lock")
         if not os.path.exists(lock_file):
-            old_mask = os.umask(0o002)
-            try:
-                audeer.touch(lock_file)
-            finally:
-                os.umask(old_mask)
+            audeer.touch(lock_file)
+            os.chmod(lock_file, _LOCK_FILE_MODE)
         lock_files.append(lock_file)
     return lock_files
