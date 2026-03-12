@@ -9,18 +9,12 @@ from filelock import Timeout
 import audeer
 
 
-#: File permissions for lock files.
-#: We use ``0o664`` (``-rw-rw-r--``)
-#: to allow group-write access,
-#: which is needed for shared caches.
-_LOCK_FILE_MODE = 0o664
-
-
 @contextmanager
 def lock(
     paths: list[str],
     *,
     timeout: float = 10,
+    mode: int = 0o664,
     warn: bool = True,
 ):
     """Create lock for given paths.
@@ -31,6 +25,10 @@ def lock(
             before giving up acquiring a lock.
             If timeout is reached,
             an exception is raised
+        mode: file permissions for lock files.
+            We use ``0o664`` (``-rw-rw-r--``)
+            to allow group-write access,
+            which is needed for shared caches
         warn: if ``True``
             a warning is shown to the user
             if the lock cannot be acquired
@@ -39,7 +37,7 @@ def lock(
 
     """
     lock_files = _lock_files(paths)
-    locks = [FileLock(f, timeout=timeout, mode=_LOCK_FILE_MODE) for f in lock_files]
+    locks = [FileLock(f, timeout=timeout, mode=mode) for f in lock_files]
     with ExitStack() as stack:
         for lock, f in zip(locks, lock_files):
             acquired = False
