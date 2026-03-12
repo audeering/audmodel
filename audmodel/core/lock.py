@@ -9,10 +9,10 @@ from filelock import Timeout
 import audeer
 
 
-#: File permissions for lock files.
-#: We use ``0o664`` (``-rw-rw-r--``)
-#: to allow group-write access,
-#: which is needed for shared caches.
+# File permissions for lock files.
+# We use `0o664` (`-rw-rw-r--`)
+# to allow group-write access,
+# which is needed for shared caches.
 _LOCK_FILE_MODE = 0o664
 
 
