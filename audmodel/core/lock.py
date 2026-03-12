@@ -58,14 +58,16 @@ def lock(
 
 
 def _lock_files(paths: list[str]) -> list[str]:
-    """Return lock file paths for given paths.
+    """Create lock files if not existent.
 
-    The lock files are placed outside the folder,
+    The lock files are created outside the folder,
     to allow to delete/overwrite the folder
     by the process.
 
-    The lock files themselves are created
-    by :class:`filelock.FileLock` during acquisition.
+    Lock files are created with group-write permissions
+    (``-rw-rw-r--``)
+    to allow shared cache usage
+    across users of the same group.
 
     Args:
         paths: files or folders that should be locked
@@ -80,5 +82,8 @@ def _lock_files(paths: list[str]) -> list[str]:
         dirname = audeer.mkdir(os.path.dirname(path))
         basename = os.path.basename(path)
         lock_file = audeer.path(dirname, f".{basename}.lock")
+        if not os.path.exists(lock_file):
+            audeer.touch(lock_file)
+            os.chmod(lock_file, _LOCK_FILE_MODE)
         lock_files.append(lock_file)
     return lock_files
