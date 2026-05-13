@@ -7,6 +7,13 @@ The format is based on `Keep a Changelog`_,
 and this project adheres to `Semantic Versioning`_.
 
 
+Version 1.4.2 (2026-05-13)
+--------------------------
+
+* Added: ``tmp_root`` argument to ``audmodel.publish()``
+* Changed: exclude ``tests/`` and ``docs/`` folders from the Python package
+
+
 Version 1.4.1 (2026-03-12)
 --------------------------
 
