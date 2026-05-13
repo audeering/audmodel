@@ -3,6 +3,7 @@ import os
 import pytest
 
 import audbackend
+import audeer
 
 import audmodel
 
@@ -249,3 +250,33 @@ def test_publish_error(params, meta, repository, error, error_msg):
         version,
     )
     assert not audmodel.exists(uid)
+
+
+def test_publish_tmp_root(tmp_path):
+    r"""Test publishing with a custom ``tmp_root`` folder.
+
+    The archive should be staged inside ``tmp_root``
+    and the folder should be created
+    if it does not exist yet.
+
+    """
+    tmp_root = os.path.join(tmp_path, "does", "not", "exist")
+    assert not os.path.exists(tmp_root)
+
+    uid = audmodel.publish(
+        pytest.MODEL_ROOT,
+        pytest.NAME,
+        {"tmp_root": "custom"},
+        "1.0.0",
+        author=pytest.AUTHOR,
+        date=pytest.DATE,
+        subgroup=f"{SUBGROUP}.tmp_root",
+        tmp_root=tmp_root,
+    )
+
+    assert audmodel.exists(uid)
+    # ``tmp_root`` is created on demand,
+    # and ``TemporaryDirectory`` cleans up its content,
+    # but the folder we created stays around
+    assert os.path.isdir(tmp_root)
+    assert audeer.list_file_names(tmp_root) == []

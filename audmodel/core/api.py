@@ -437,6 +437,7 @@ def publish(
     meta: dict[str, object] | None = None,
     repository: Repository | None = None,
     subgroup: str | None = None,
+    tmp_root: str | None = None,
     verbose: bool = False,
 ) -> str:
     r"""Zip model and publish as a new artifact.
@@ -515,6 +516,14 @@ def publish(
             the model is stored on backend.
             ``.`` are replaced by ``/``
             on the backend
+        tmp_root: folder under which the temporary archive
+            of the model is created before uploading.
+            The folder is created if it does not exist,
+            and is kept afterwards;
+            only the temporary archive inside it
+            is removed when publishing finishes.
+            If ``None``,
+            the system default temporary folder is used
         verbose: show debug messages
 
     Returns:
@@ -651,6 +660,7 @@ def publish(
             root,
             backend_interface,
             verbose,
+            tmp_root=tmp_root,
         )
         if alias:
             # Store mapping (alias -> UID)
