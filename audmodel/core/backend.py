@@ -415,8 +415,8 @@ def put_archive(
     if tmp_root is not None:
         tmp_root = audeer.mkdir(tmp_root)
 
-    with tempfile.TemporaryDirectory(dir=tmp_root) as tmp_root:
-        src_path = os.path.join(tmp_root, "model.zip")
+    with tempfile.TemporaryDirectory(dir=tmp_root) as archive_root:
+        src_path = os.path.join(archive_root, "model.zip")
         files = utils.scan_files(root)
         audeer.create_archive(
             root,
