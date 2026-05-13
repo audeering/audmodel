@@ -518,7 +518,10 @@ def publish(
             on the backend
         tmp_root: folder under which the temporary archive
             of the model is created before uploading.
-            The folder is created if it does not exist.
+            The folder is created if it does not exist,
+            and is kept afterwards;
+            only the temporary archive inside it
+            is removed when publishing finishes.
             If ``None``,
             the system default temporary folder is used
         verbose: show debug messages
