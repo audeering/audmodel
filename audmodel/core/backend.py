@@ -379,6 +379,7 @@ def put_archive(
     root: str,
     backend_interface: audbackend.interface.Maven,
     verbose: bool,
+    tmp_root: str | None = None,
 ) -> str:
     r"""Put archive to backend.
 
@@ -391,6 +392,10 @@ def put_archive(
         backend_interface: backend interface instance
         verbose: if ``True`` show message
             when uploading file
+        tmp_root: folder under which the temporary archive
+            is created.
+            If ``None``,
+            the system default temporary folder is used
 
     Returns:
         archive path on backend
@@ -407,7 +412,10 @@ def put_archive(
         short_id + ".zip",
     )
 
-    with tempfile.TemporaryDirectory() as tmp_root:
+    if tmp_root is not None:
+        tmp_root = audeer.mkdir(tmp_root)
+
+    with tempfile.TemporaryDirectory(dir=tmp_root) as tmp_root:
         src_path = os.path.join(tmp_root, "model.zip")
         files = utils.scan_files(root)
         audeer.create_archive(
