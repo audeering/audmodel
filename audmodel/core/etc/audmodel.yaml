@@ -1,0 +1,8 @@
+cache_root: ~/audmodel
+repositories:
+  - name: models-local
+    backend: artifactory
+    host: https://artifactory.audeering.com/artifactory
+  - name: audmodel-internal
+    backend: s3
+    host: s3.dualstack.eu-north-1.amazonaws.com

@@ -220,6 +220,10 @@ convention = 'google'
 [tool.setuptools.packages.find]
 include = ['audmodel*']
 
+# Ship the default configuration file with the package
+[tool.setuptools.package-data]
+audmodel = ['core/etc/*']
+
 # ----- setuptools_scm ----------------------------------------------------
 #
 # Use setuptools_scm to get version from git
