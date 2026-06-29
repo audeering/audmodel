@@ -46,18 +46,11 @@ def load_configuration_file(config_file: str) -> dict:
                 f"in the configuration file '{USER_CONFIG_FILE}'."
             )
         for repo in config["repositories"]:
-            if "host" not in repo:
-                raise ValueError(
-                    f"Your repository is missing a 'host' entry: '{repo}'."
-                )
-            if "backend" not in repo:
-                raise ValueError(
-                    f"Your repository is missing a 'backend' entry: '{repo}'."
-                )
-            if "name" not in repo:
-                raise ValueError(
-                    f"Your repository is missing a 'name' entry: '{repo}'."
-                )
+            for key in ("host", "backend", "name"):
+                if key not in repo:
+                    raise ValueError(
+                        f"Your repository is missing a '{key}' entry: '{repo}'."
+                    )
 
     return config
 
