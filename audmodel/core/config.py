@@ -9,9 +9,9 @@ class config:
 
     REPOSITORIES = [
         Repository(
-            "models-local",
-            "https://artifactory.audeering.com/artifactory",
-            "artifactory",
+            "...",
+            "...",
+            "s3",
         ),
         Repository(
             "audmodel-internal",
