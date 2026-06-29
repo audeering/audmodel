@@ -86,7 +86,7 @@ class config:
     You can change the configuration values after import,
     by setting the attributes directly.
     The cache related configuration value :attr:`config.CACHE_ROOT`
-    can be overwritten by the ``AUDMODEL_CACHE_ROOT`` environment variable.
+    can be overridden by the ``AUDMODEL_CACHE_ROOT`` environment variable.
 
     Examples:
         >>> config.CACHE_ROOT = "~/caches/audmodel"

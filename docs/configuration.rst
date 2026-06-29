@@ -5,7 +5,7 @@ Configuration
 
 :mod:`audmodel` can be configured with a :file:`~/.config/audmodel.yaml` file.
 The configuration file is read during import
-and will overwrite the default settings.
+and will override the default settings.
 The default settings are:
 
 .. literalinclude:: ../audmodel/core/etc/audmodel.yaml
@@ -27,5 +27,5 @@ using :class:`audmodel.config`.
 '/user/cache'
 
 The cache folder
-can also be overwritten
+can also be overridden
 with the ``AUDMODEL_CACHE_ROOT`` environment variable.
