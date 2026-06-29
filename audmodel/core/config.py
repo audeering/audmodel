@@ -43,7 +43,7 @@ def load_configuration_file(config_file: str) -> dict:
         if len(config["repositories"]) == 0:
             raise ValueError(
                 "You cannot specify an empty 'repositories:' section "
-                f"in the configuration file '{USER_CONFIG_FILE}'."
+                f"in the configuration file '{config_file}'."
             )
         for repo in config["repositories"]:
             for key in ("host", "backend", "name"):
