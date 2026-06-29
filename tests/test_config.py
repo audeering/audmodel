@@ -1,3 +1,5 @@
+import re
+
 import pytest
 import yaml
 
@@ -61,7 +63,7 @@ def test_config_file(tmpdir):
         cf.write("repositories:\n")
     error_msg = (
         "You cannot specify an empty 'repositories:' section "
-        f"in the configuration file '{config_file}'."
+        f"in the configuration file '{re.escape(config_file)}'."
     )
     with pytest.raises(ValueError, match=error_msg):
         audmodel.core.config.load_configuration_file(config_file)
