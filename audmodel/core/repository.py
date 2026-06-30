@@ -1,5 +1,3 @@
-import sys
-
 import audbackend
 
 import audmodel.core.define as define
@@ -35,16 +33,11 @@ class Repository:
         "s3": audbackend.backend.Minio,
     }
 
-    if hasattr(audbackend.backend, "Artifactory"):
-        _backends["artifactory"] = audbackend.backend.Artifactory  # pragma: no cover
-
     backend_registry = _backends
     r"""Backend registry.
 
     Holds mapping between registered backend names,
     and their corresponding backend classes.
-    The ``"artifactory"`` backend is currently not available
-    under Python >=3.13.
 
     """
 
@@ -94,14 +87,9 @@ class Repository:
             interface to repository
 
         Raises:
-            ValueError: if an artifactory backend is requested in Python>=3.13
             ValueError: if a non-supported backend is requested
 
         """
-        if sys.version_info >= (3, 13) and self.backend == "artifactory":
-            raise ValueError(  # pragma: no cover
-                "The 'artifactory' backend is not supported in Python>=3.13"
-            )
         if self.backend not in self.backend_registry:
             raise ValueError(f"'{self.backend}' is not a registered backend")
         backend_class = self.backend_registry[self.backend]

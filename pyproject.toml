@@ -13,7 +13,6 @@ license-files = ['LICENSE']
 keywords = [
     'machine learning',
     'model',
-    'Artifactory',
 ]
 classifiers = [
     'Development Status :: 5 - Production/Stable',

@@ -89,13 +89,7 @@ You can run tests with pytest_::
 
     uv run pytest
 
-To run the tests on the Gitlab CI server,
-contributors have to make sure
-they have an existing ``artifactory-tokenizer`` repository
-as described in the `Artifactory tokenizer documentation`_.
-
 .. _pytest: https://pytest.org/
-.. _Artifactory tokenizer documentation: https://gitlab.audeering.com/devops/artifactory/tree/master/token
 
 
 Creating a New Release

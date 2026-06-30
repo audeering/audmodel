@@ -1,16 +1,8 @@
-import sys
-
 import pytest
 
 import audbackend
 
 import audmodel
-
-
-if hasattr(audbackend.backend, "Artifactory"):
-    artifactory_backend = audbackend.backend.Artifactory
-else:
-    artifactory_backend = None
 
 
 @pytest.mark.parametrize(
@@ -78,17 +70,6 @@ def test_repository_repr(backend, host, repo, expected):
             audbackend.backend.FileSystem,
             audbackend.interface.Versioned,
         ),
-        pytest.param(
-            "artifactory",
-            "host",
-            "repo",
-            artifactory_backend,
-            audbackend.interface.Maven,
-            marks=pytest.mark.skipif(
-                sys.version_info >= (3, 13),
-                reason="No artifactory backend support in Python>=3.13",
-            ),
-        ),
     ],
 )
 def test_repository_create_backend_interface(
@@ -124,17 +105,6 @@ def test_repository_create_backend_interface(
             "repo",
             "'custom' is not a registered backend",
             ValueError,
-        ),
-        pytest.param(
-            "artifactory",
-            "host",
-            "repo",
-            "The 'artifactory' backend is not supported in Python>=3.13",
-            ValueError,
-            marks=pytest.mark.skipif(
-                sys.version_info < (3, 13),
-                reason="Should only fail for Python>=3.13",
-            ),
         ),
     ],
 )
