@@ -1136,15 +1136,6 @@ def url(
     # Check for underlying backend of backend interface
     if isinstance(backend_interface.backend, audbackend.backend.FileSystem):
         path = backend_interface.sep.join([backend_interface.backend._root, path])
-    elif isinstance(
-        backend_interface.backend, audbackend.backend.Artifactory
-    ):  # pragma: nocover
-        # The tests should work locally,
-        # so we don't test using a repository on Artifactory.
-        # I tested the following line,
-        # by manually calling
-        # audmodel.url("90398682-2.0.0")
-        path = str(backend_interface.backend.path(path))
     return path
 
 

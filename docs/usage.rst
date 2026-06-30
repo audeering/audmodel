@@ -120,8 +120,7 @@ Let's define the arguments for our example model:
     }
     subgroup = "emotion.cnn"
 
-Per default :mod:`audmodel` uses repositories
-on Artifactory and S3.
+By default :mod:`audmodel` uses repositories on S3.
 For this example
 we create a local temporary repository
 in which the model is stored.
