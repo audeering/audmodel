@@ -431,11 +431,11 @@ def publish(
     params: dict[str, object],
     version: str,
     *,
+    repository: Repository,
     alias: str | None = None,
     author: str | None = None,
     date: datetime.date | None = None,
     meta: dict[str, object] | None = None,
-    repository: Repository | None = None,
     subgroup: str | None = None,
     tmp_root: str | None = None,
     verbose: bool = False,
@@ -504,13 +504,13 @@ def publish(
         name: model name
         params: dictionary with parameters
         version: version string
+        repository: repository where the model will be published
         alias: optional alias name for the model.
             If provided, the model can be accessed using this alias
             in addition to its UID
         author: author name(s), defaults to user name
         date: date, defaults to current timestamp
         meta: dictionary with meta information
-        repository: repository where the model will be published
         subgroup: subgroup under which
             the model is stored on backend.
             ``.`` are replaced by ``/``
