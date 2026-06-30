@@ -285,7 +285,10 @@ def test_publish_tmp_root(tmp_path):
 
 def test_publish_missing_repository_raises():
     """Test error message if repository is None."""
-    error_msg = "You have to provide a repository, see audmodel.Repository"
+    error_msg = (
+        "You have to provide a repository, "
+        "see audmodel.config.REPOSITORIES for an example."
+    )
     with pytest.raises(ValueError, match=error_msg):
         audmodel.publish(
             pytest.MODEL_ROOT,

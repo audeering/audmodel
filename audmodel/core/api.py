@@ -596,7 +596,10 @@ def publish(
     subgroup = subgroup or ""
 
     if repository is None:
-        raise ValueError("You have to provide a repository, see audmodel.Repository")
+        raise ValueError(
+            "You have to provide a repository, "
+            "see audmodel.config.REPOSITORIES for an example."
+        )
 
     if subgroup == define.UID_FOLDER:
         raise ValueError(f"It is not allowed to set subgroup to '{define.UID_FOLDER}'.")
