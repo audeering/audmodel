@@ -1068,6 +1068,41 @@ def update_meta(
     return meta_backend
 
 
+def _url(
+    backend_interface: audbackend.interface.Base,
+    path: str,
+) -> str:
+    r"""Convert a backend path into a URL.
+
+    Depending on the underlying backend
+    of the given backend interface,
+    the path on the backend
+    is turned into a URL
+    pointing to the corresponding file.
+
+    Args:
+        backend_interface: backend interface
+        path: path on the backend, including version
+
+    Returns:
+        URL to the file on the backend
+
+    """
+    backend = backend_interface.backend
+    if isinstance(backend, audbackend.backend.FileSystem):
+        path = backend_interface.sep.join([backend._root, path])
+    elif isinstance(backend, audbackend.backend.Minio):
+        scheme = "https" if backend._client._base_url.is_https else "http"
+        path = backend_interface.sep.join(
+            [
+                f"{scheme}://{backend.host}",
+                backend.repository,
+                backend.path(path),
+            ]
+        )
+    return path
+
+
 def url(
     uid: str,
     *,
@@ -1133,10 +1168,7 @@ def url(
             f"'type' has to be one of 'model', 'header', 'meta', not '{type}'"
         )
     path = backend_interface._path_with_version(path, version)
-    # Check for underlying backend of backend interface
-    if isinstance(backend_interface.backend, audbackend.backend.FileSystem):
-        path = backend_interface.sep.join([backend_interface.backend._root, path])
-    return path
+    return _url(backend_interface, path)
 
 
 def version(

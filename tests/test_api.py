@@ -8,6 +8,8 @@ import audbackend
 import audeer
 
 import audmodel
+import audmodel.core.api
+import audmodel.core.define as define
 
 
 audmodel.config.CACHE_ROOT = pytest.CACHE_ROOT
@@ -284,11 +286,49 @@ def test_update_meta():
 
 
 def test_url():
+    uid = audmodel.uid(
+        pytest.NAME,
+        pytest.PARAMS,
+        "1.0.0",
+        subgroup=SUBGROUP,
+    )
+
+    # Wrong type
     with pytest.raises(ValueError):
-        uid = audmodel.uid(
-            pytest.NAME,
-            pytest.PARAMS,
-            "1.0.0",
-            subgroup=SUBGROUP,
-        )
         audmodel.url(uid, type="something")
+
+    # File-system backend
+    # (the test models are published to a file-system repository)
+    for type, ext in [
+        ("model", "zip"),
+        ("header", "header.yaml"),
+        ("meta", "meta.yaml"),
+    ]:
+        path = audmodel.url(uid, type=type)
+        assert os.path.exists(path)
+        assert path.startswith(audeer.path(pytest.HOST, pytest.REPOSITORIES[0].name))
+        assert os.path.basename(path) == f"{uid}.{ext}"
+
+
+def test_url_minio():
+    """URL construction for the Minio/S3 backend.
+
+    The Minio backend is not tested against a running server,
+    so we verify the URL construction
+    of the helper function directly.
+
+    """
+    host = "s3.dualstack.eu-north-1.amazonaws.com"
+    repository = "audmodel-public"
+    repository_object = audmodel.Repository(repository, host, "s3")
+    backend_interface = repository_object.create_backend_interface()
+
+    path = backend_interface.join(
+        "/", define.UID_FOLDER, f"d4e9c65b.{define.HEADER_EXT}"
+    )
+    path = backend_interface._path_with_version(path, "3.0.0")
+
+    url = audmodel.core.api._url(backend_interface, path)
+    assert url == (
+        f"https://{host}/{repository}/_uid/d4e9c65b/3.0.0/d4e9c65b-3.0.0.header.yaml"
+    )
