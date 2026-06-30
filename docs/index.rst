@@ -7,6 +7,7 @@
     
     installation
     authentication
+    configuration
     usage
 
 .. Warning: the usage of genindex is a hack to get a TOC entry, see

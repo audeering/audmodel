@@ -1,3 +1,13 @@
+import os
+
+
+# Configuration files
+CONFIG_FILE = os.path.join("etc", "audmodel.yaml")
+r"""Path to default configuration file shipped with the package."""
+
+USER_CONFIG_FILE = "~/.config/audmodel.yaml"
+r"""Path to user configuration file."""
+
 HEADER_EXT = "header.yaml"
 r"""Extension of header file."""
 

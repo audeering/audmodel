@@ -7,6 +7,7 @@ import audmodel
 def docstring_examples(doctest_namespace):  # pragma: no cover
     r"""Publish model for doctests."""
     repository = pytest.REPOSITORIES[0]
+    cache_root = audmodel.config.CACHE_ROOT
     audmodel.config.REPOSITORIES = [repository]
     subgroup = "audmodel.dummy.cnn"
     for version, meta in pytest.META.items():
@@ -33,3 +34,4 @@ def docstring_examples(doctest_namespace):  # pragma: no cover
     doctest_namespace["repository"] = repository
     yield
     audmodel.config.REPOSITORIES = pytest.REPOSITORIES
+    audmodel.config.CACHE_ROOT = cache_root
