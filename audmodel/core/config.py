@@ -102,7 +102,7 @@ class config:
     containing the following attributes:
 
     * :attr:`audmodel.Repository.name`: repository name,
-      e.g. ``"models-local"``
+      e.g. ``"audmodel-public"``
     * :attr:`audmodel.Repository.backend`: backend name,
       e.g. ``"s3"``
     * :attr:`audmodel.Repository.host`: host name,
