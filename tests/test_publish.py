@@ -26,7 +26,7 @@ SUBGROUP = f"{pytest.ID}.publish"
             pytest.DATE,
             pytest.META["1.0.0"],
             SUBGROUP,
-            None,
+            audmodel.config.REPOSITORIES[0],
         ),
         # different name
         pytest.param(
@@ -137,6 +137,19 @@ SUBGROUP = f"{pytest.ID}.publish"
             pytest.META["1.0.0"],
             "_uid",
             audmodel.config.REPOSITORIES[0],
+            marks=pytest.mark.xfail(raises=ValueError),
+        ),
+        # missing repository
+        pytest.param(
+            pytest.MODEL_ROOT,
+            pytest.NAME,
+            pytest.PARAMS,
+            "1.0.0",
+            pytest.AUTHOR,
+            pytest.DATE,
+            pytest.META["1.0.0"],
+            SUBGROUP,
+            None,
             marks=pytest.mark.xfail(raises=ValueError),
         ),
     ),
@@ -272,6 +285,7 @@ def test_publish_tmp_root(tmp_path):
         date=pytest.DATE,
         subgroup=f"{SUBGROUP}.tmp_root",
         tmp_root=tmp_root,
+        repository=pytest.REPOSITORIES[0],
     )
 
     assert audmodel.exists(uid)
