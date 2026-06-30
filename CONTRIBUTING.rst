@@ -1,29 +1,29 @@
 Contributing
 ============
 
-If you would like to add new functionality fell free to create a `merge
+If you would like to add new functionality fell free to create a `pull
 request`_ . If you find errors, omissions, inconsistencies or other things
 that need improvement, please create an issue_.
 Contributions are always welcome!
 
-.. _issue: https://gitlab.audeering.com/tools/audmodel/issues/new?issue%5BD=
-.. _merge request: https://gitlab.audeering.com/tools/audmodel/merge_requests/new
+.. _issue: https://github.com/audeering/audmodel/issues
+.. _pull request: https://github.com/audeering/audmodel/compare
 
 
 Development Installation
 ------------------------
 
 Instead of pip-installing the latest release from PyPI, you should get the
-newest development version from Gitlab_::
+newest development version from GitHub_::
 
-    git clone git@srv-app-01.audeering.local:tools/audmodel.git
+    git git@github.com:audeering/audmodel.git
     cd audmodel
     uv sync
 
-.. _Gitlab: https://gitlab.audeering.com/tools/audmodel
+.. _GitHub: https://github.com/audeering/audmodel
 
 This way, your installation always stays up-to-date, even if you pull new
-changes from the Gitlab repository.
+changes from the GitHub repository.
 
 
 Coding Convention
@@ -100,4 +100,4 @@ New releases are made using the following steps:
 #. Update ``CHANGELOG.rst``
 #. Commit those changes as "Release X.Y.Z"
 #. Create an (annotated) tag with ``git tag -a vX.Y.Z``
-#. Push the commit and the tag to Github
+#. Push the commit and the tag to GitHub
