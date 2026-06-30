@@ -4,27 +4,11 @@ Authentication
 To download or publish a model,
 a user has to authenticate.
 
-Credentials for the ``models-local`` repository
-on Artifactory
-are stored in ``~/.artifactory_python.cfg``:
+Credentials for repositories on S3
+are stored in ``~/.config/audbackend/minio.cfg``.
 
-.. code-block:: cfg
-
-    [artifactory.audeering.com/artifactory]
-    username = MY_USERNAME
-    password = MY_API_KEY
-
-Alternatively,
-they can export them as environment variables:
-
-.. code-block:: bash
-
-    export ARTIFACTORY_USERNAME="MY_USERNAME"
-    export ARTIFACTORY_API_KEY="MY_API_KEY"
-
-Credentials for the ``audmodel-internal`` repository
-on S3
-are stored in ``~/.config/audbackend/minio.cfg``:
+E.g. for write access to ``audmodel-public``,
+you need to add
 
 .. code-block:: cfg
 
