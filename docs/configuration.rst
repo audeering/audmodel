@@ -20,7 +20,7 @@ using :class:`audmodel.config`.
 '~/audmodel'
 
 >>> audmodel.config.REPOSITORIES
-[Repository('models-local', 'https://artifactory.audeering.com/artifactory', 'artifactory'), Repository('audmodel-internal', 's3.dualstack.eu-north-1.amazonaws.com', 's3')]
+[Repository('audmodel-public', 's3.dualstack.eu-north-1.amazonaws.com', 's3')]
 
 >>> audmodel.config.CACHE_ROOT = "/user/cache"
 >>> audmodel.config.CACHE_ROOT
