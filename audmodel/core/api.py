@@ -431,11 +431,11 @@ def publish(
     params: dict[str, object],
     version: str,
     *,
+    repository: Repository,
     alias: str | None = None,
     author: str | None = None,
     date: datetime.date | None = None,
     meta: dict[str, object] | None = None,
-    repository: Repository | None = None,
     subgroup: str | None = None,
     tmp_root: str | None = None,
     verbose: bool = False,
@@ -504,14 +504,13 @@ def publish(
         name: model name
         params: dictionary with parameters
         version: version string
+        repository: repository where the model will be published
         alias: optional alias name for the model.
             If provided, the model can be accessed using this alias
             in addition to its UID
         author: author name(s), defaults to user name
         date: date, defaults to current timestamp
         meta: dictionary with meta information
-        repository: repository where the model will be published,
-            defaults to ``config.REPOSITORIES[0]``
         subgroup: subgroup under which
             the model is stored on backend.
             ``.`` are replaced by ``/``
@@ -530,6 +529,7 @@ def publish(
         unique model ID
 
     Raises:
+        ValueError: if ``repository`` is ``None``
         audbackend.BackendError: if connection to repository on backend
             cannot be established
         RuntimeError: if a model with same UID exists already
@@ -596,7 +596,10 @@ def publish(
     subgroup = subgroup or ""
 
     if repository is None:
-        repository = config.REPOSITORIES[0]
+        raise ValueError(
+            "You have to provide a repository, "
+            "see audmodel.config.REPOSITORIES for an example."
+        )
 
     if subgroup == define.UID_FOLDER:
         raise ValueError(f"It is not allowed to set subgroup to '{define.UID_FOLDER}'.")
