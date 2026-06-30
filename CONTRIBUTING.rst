@@ -100,7 +100,4 @@ New releases are made using the following steps:
 #. Update ``CHANGELOG.rst``
 #. Commit those changes as "Release X.Y.Z"
 #. Create an (annotated) tag with ``git tag -a vX.Y.Z``
-#. Make sure you have an `artifactory-tokenizer`_ project
-#. Push the commit and the tag to Gitlab
-
-.. _artifactory-tokenizer: https://gitlab.audeering.com/devops/artifactory/tree/master/token
+#. Push the commit and the tag to Github
