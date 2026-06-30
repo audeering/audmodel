@@ -139,19 +139,6 @@ SUBGROUP = f"{pytest.ID}.publish"
             audmodel.config.REPOSITORIES[0],
             marks=pytest.mark.xfail(raises=ValueError),
         ),
-        # missing repository
-        pytest.param(
-            pytest.MODEL_ROOT,
-            pytest.NAME,
-            pytest.PARAMS,
-            "1.0.0",
-            pytest.AUTHOR,
-            pytest.DATE,
-            pytest.META["1.0.0"],
-            SUBGROUP,
-            None,
-            marks=pytest.mark.xfail(raises=ValueError),
-        ),
     ),
 )
 def test_publish(root, name, subgroup, params, author, date, meta, version, repository):
@@ -294,3 +281,16 @@ def test_publish_tmp_root(tmp_path):
     # but the folder we created stays around
     assert os.path.isdir(tmp_root)
     assert audeer.list_file_names(tmp_root) == []
+
+
+def test_publish_missing_repository_raises():
+    """Test error message if repository is None."""
+    error_msg = "You have to provide a repository, see audmodel.Repository"
+    with pytest.raises(ValueError, match=error_msg):
+        audmodel.publish(
+            pytest.MODEL_ROOT,
+            pytest.NAME,
+            {},
+            "1.0.0",
+            repository=None,
+        )
