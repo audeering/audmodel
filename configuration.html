@@ -5,10 +5,11 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Python Module Index &mdash; Documentation</title>
+  <title>Configuration &mdash; Documentation</title>
   
 
   
@@ -34,15 +35,10 @@
   <link rel="stylesheet" href="_static/css/custom.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-
+    <link rel="next" title="Usage" href="usage.html" />
+    <link rel="prev" title="Authentication" href="authentication.html" />
     
   
-
-    <script>
-      DOCUMENTATION_OPTIONS.COLLAPSE_INDEX = true;
-    </script>
-
-
 
   
   <script src="_static/js/modernizr.min.js"></script>
@@ -98,10 +94,10 @@
             
             
               <p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
-<ul>
+<ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="authentication.html">Authentication</a></li>
-<li class="toctree-l1"><a class="reference internal" href="configuration.html">Configuration</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Configuration</a></li>
 <li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">API Documentation</span></p>
@@ -139,8 +135,9 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
-      <li>Python Module Index</li>
+      <li>Configuration</li>
       <li class="wy-breadcrumbs-aside">
+              <a href="https://github.com/audeering/audmodel/" class="fa fa-github"> GitHub</a>
       </li>
   </ul>
   <hr/>
@@ -148,29 +145,55 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-
-   <h1>Python Module Index</h1>
-
-   <div class="modindex-jumpbox">
-   <a href="#cap-a"><strong>a</strong></a>
-   </div>
-
-   <table class="indextable modindextable">
-     <tr class="pcap"><td></td><td>&#160;</td><td></td></tr>
-     <tr class="cap" id="cap-a"><td></td><td>
-       <strong>a</strong></td><td></td></tr>
-     <tr>
-       <td></td>
-       <td>
-       <a href="api/audmodel.html#module-audmodel"><code class="xref">audmodel</code></a></td><td>
-       <em></em></td></tr>
-   </table>
+  <section id="configuration">
+<span id="id1"></span><h1>Configuration<a class="headerlink" href="#configuration" title="Link to this heading">¶</a></h1>
+<p><a class="reference internal" href="api/audmodel.html#module-audmodel" title="audmodel"><code class="xref py py-mod docutils literal notranslate"><span class="pre">audmodel</span></code></a> can be configured with a <code class="file docutils literal notranslate"><span class="pre">~/.config/audmodel.yaml</span></code> file.
+The configuration file is read during import
+and will override the default settings.
+The default settings are:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">cache_root</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">~/audmodel</span>
+<span class="nt">repositories</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">audmodel-public</span>
+<span class="w">    </span><span class="nt">host</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">s3.dualstack.eu-north-1.amazonaws.com</span>
+<span class="w">    </span><span class="nt">backend</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">s3</span>
+</pre></div>
+</div>
+<p>After loading <a class="reference internal" href="api/audmodel.html#module-audmodel" title="audmodel"><code class="xref py py-mod docutils literal notranslate"><span class="pre">audmodel</span></code></a>
+they can be accessed
+or changed
+using <a class="reference internal" href="api/audmodel.config.html#audmodel.config" title="audmodel.config"><code class="xref py py-class docutils literal notranslate"><span class="pre">audmodel.config</span></code></a>.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">audmodel</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">CACHE_ROOT</span>
+<span class="go">&#39;~/audmodel&#39;</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">audmodel</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">REPOSITORIES</span>
+<span class="go">[Repository(&#39;audmodel-public&#39;, &#39;s3.dualstack.eu-north-1.amazonaws.com&#39;, &#39;s3&#39;)]</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">audmodel</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">CACHE_ROOT</span> <span class="o">=</span> <span class="s2">&quot;/user/cache&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">audmodel</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">CACHE_ROOT</span>
+<span class="go">&#39;/user/cache&#39;</span>
+</pre></div>
+</div>
+<p>The cache folder
+can also be overridden
+with the <code class="docutils literal notranslate"><span class="pre">AUDMODEL_CACHE_ROOT</span></code> environment variable.</p>
+</section>
 
 
            </div>
            
           </div>
           <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="usage.html" class="btn btn-neutral float-right" title="Usage" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="authentication.html" class="btn btn-neutral float-left" title="Authentication" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
   
 
   <hr/>

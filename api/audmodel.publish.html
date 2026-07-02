@@ -69,7 +69,7 @@
             
             
               <div class="version">
-                v1.4.2
+                v1.5.0
               </div>
             
           
@@ -97,6 +97,7 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../authentication.html">Authentication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../configuration.html">Configuration</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../usage.html">Usage</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">API Documentation</span></p>
@@ -162,7 +163,7 @@
           <li><a href="audmodel.html">audmodel</a> &raquo;</li>
       <li>publish()</li>
       <li class="wy-breadcrumbs-aside">
-              <a href="https://gitlab.audeering.com/audeering/audmodel/" class="fa fa-gitlab"> GitLab</a>
+              <a href="https://github.com/audeering/audmodel/" class="fa fa-github"> GitHub</a>
       </li>
   </ul>
   <hr/>
@@ -174,7 +175,7 @@
 <h1>publish()<a class="headerlink" href="#publish" title="Link to this heading">¶</a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="audmodel.publish">
-<span class="sig-prename descclassname"><span class="pre">audmodel.</span></span><span class="sig-name descname"><span class="pre">publish</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">root</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">alias</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">author</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">date</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">meta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">repository</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subgroup</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tmp_root</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/audmodel/core/api.html#publish"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audmodel.publish" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">audmodel.</span></span><span class="sig-name descname"><span class="pre">publish</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">root</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">repository</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alias</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">author</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">date</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">meta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subgroup</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tmp_root</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/audmodel/core/api.html#publish"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audmodel.publish" title="Link to this definition">¶</a></dt>
 <dd><p>Zip model and publish as a new artifact.</p>
 <p>Before publishing a model,
 pick meaningful values for
@@ -273,14 +274,13 @@ might contain:</p>
 <li><p><strong>name</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – model name</p></li>
 <li><p><strong>params</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a>]</span>) – dictionary with parameters</p></li>
 <li><p><strong>version</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – version string</p></li>
+<li><p><strong>repository</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="audmodel.Repository.html#audmodel.Repository" title="audmodel.core.repository.Repository"><code class="xref py py-class docutils literal notranslate"><span class="pre">Repository</span></code></a></span>) – repository where the model will be published</p></li>
 <li><p><strong>alias</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>) – optional alias name for the model.
 If provided, the model can be accessed using this alias
 in addition to its UID</p></li>
 <li><p><strong>author</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>) – author name(s), defaults to user name</p></li>
 <li><p><strong>date</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.date" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">date</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>) – date, defaults to current timestamp</p></li>
 <li><p><strong>meta</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a>] | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>) – dictionary with meta information</p></li>
-<li><p><strong>repository</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="audmodel.Repository.html#audmodel.Repository" title="audmodel.core.repository.Repository"><code class="xref py py-class docutils literal notranslate"><span class="pre">Repository</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>) – repository where the model will be published,
-defaults to <code class="docutils literal notranslate"><span class="pre">config.REPOSITORIES[0]</span></code></p></li>
 <li><p><strong>subgroup</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>) – subgroup under which
 the model is stored on backend.
 <code class="docutils literal notranslate"><span class="pre">.</span></code> are replaced by <code class="docutils literal notranslate"><span class="pre">/</span></code>
@@ -304,7 +304,8 @@ the system default temporary folder is used</p></li>
 </dd>
 <dt class="field-even">Raises<span class="colon">:</span></dt>
 <dd class="field-even"><ul class="simple">
-<li><p><a class="reference external" href="https://audeering.github.io/audbackend/api/audbackend.BackendError.html#audbackend.BackendError" title="(in audbackend v2.3.2)"><strong>audbackend.BackendError</strong></a> – if connection to repository on backend
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.14)"><strong>ValueError</strong></a> – if <code class="docutils literal notranslate"><span class="pre">repository</span></code> is <code class="docutils literal notranslate"><span class="pre">None</span></code></p></li>
+<li><p><a class="reference external" href="https://audeering.github.io/audbackend/api/audbackend.BackendError.html#audbackend.BackendError" title="(in audbackend v3.0.0)"><strong>audbackend.BackendError</strong></a> – if connection to repository on backend
     cannot be established</p></li>
 <li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#RuntimeError" title="(in Python v3.14)"><strong>RuntimeError</strong></a> – if a model with same UID exists already</p></li>
 <li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#RuntimeError" title="(in Python v3.14)"><strong>RuntimeError</strong></a> – if an unexpected error occurs during publishing</p></li>
@@ -391,28 +392,11 @@ the system default temporary folder is used</p></li>
   <hr/>
 
   <div>
-      
-      
-      
-      
-      
-      
-      
-      
-        <ul>
-          <li><a href="http://data.pp.audeering.com">Data</a></li>
-          <li><a href="http://devops.pp.audeering.com/sphinx/">Docs</a></li>
-          <li><a href="http://devops.pp.audeering.com/">Infra</a></li>
-          <li><a href="http://models.pp.audeering.com">Models</a></li>
-          <li><a href="http://research.pp.audeering.com">Research</a></li>
-          <li><a href="http://tools.pp.audeering.com">Tools</a></li>
-        </ul>
-      
     <p>
         
         
         
-          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2026/05/13 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2026/07/02 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>

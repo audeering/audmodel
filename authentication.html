@@ -35,7 +35,7 @@
   <link rel="stylesheet" href="_static/css/custom.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Usage" href="usage.html" />
+    <link rel="next" title="Configuration" href="configuration.html" />
     <link rel="prev" title="Installation" href="installation.html" />
     
   
@@ -69,7 +69,7 @@
             
             
               <div class="version">
-                v1.4.2
+                v1.5.0
               </div>
             
           
@@ -97,6 +97,7 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Authentication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configuration.html">Configuration</a></li>
 <li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">API Documentation</span></p>
@@ -136,7 +137,7 @@
       <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
       <li>Authentication</li>
       <li class="wy-breadcrumbs-aside">
-              <a href="https://gitlab.audeering.com/audeering/audmodel/" class="fa fa-gitlab"> GitLab</a>
+              <a href="https://github.com/audeering/audmodel/" class="fa fa-github"> GitHub</a>
       </li>
   </ul>
   <hr/>
@@ -148,23 +149,10 @@
 <h1>Authentication<a class="headerlink" href="#authentication" title="Link to this heading">¶</a></h1>
 <p>To download or publish a model,
 a user has to authenticate.</p>
-<p>Credentials for the <code class="docutils literal notranslate"><span class="pre">models-local</span></code> repository
-on Artifactory
-are stored in <code class="docutils literal notranslate"><span class="pre">~/.artifactory_python.cfg</span></code>:</p>
-<div class="highlight-cfg notranslate"><div class="highlight"><pre><span></span><span class="k">[artifactory.audeering.com/artifactory]</span>
-<span class="na">username</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">MY_USERNAME</span>
-<span class="na">password</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">MY_API_KEY</span>
-</pre></div>
-</div>
-<p>Alternatively,
-they can export them as environment variables:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">ARTIFACTORY_USERNAME</span><span class="o">=</span><span class="s2">&quot;MY_USERNAME&quot;</span>
-<span class="nb">export</span><span class="w"> </span><span class="nv">ARTIFACTORY_API_KEY</span><span class="o">=</span><span class="s2">&quot;MY_API_KEY&quot;</span>
-</pre></div>
-</div>
-<p>Credentials for the <code class="docutils literal notranslate"><span class="pre">audmodel-internal</span></code> repository
-on S3
-are stored in <code class="docutils literal notranslate"><span class="pre">~/.config/audbackend/minio.cfg</span></code>:</p>
+<p>Credentials for repositories on S3
+are stored in <code class="docutils literal notranslate"><span class="pre">~/.config/audbackend/minio.cfg</span></code>.</p>
+<p>E.g. for write access to <code class="docutils literal notranslate"><span class="pre">audmodel-public</span></code>,
+you need to add</p>
 <div class="highlight-cfg notranslate"><div class="highlight"><pre><span></span><span class="k">[s3.dualstack.eu-north-1.amazonaws.com]</span>
 <span class="na">access_key</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">MY_ACCESS_KEY</span>
 <span class="na">secret_key</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">MY_SECRET_KEY</span>
@@ -186,7 +174,7 @@ users can export them as environment variables:</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="usage.html" class="btn btn-neutral float-right" title="Usage" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="configuration.html" class="btn btn-neutral float-right" title="Configuration" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="installation.html" class="btn btn-neutral float-left" title="Installation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
@@ -197,28 +185,11 @@ users can export them as environment variables:</p>
   <hr/>
 
   <div>
-      
-      
-      
-      
-      
-      
-      
-      
-        <ul>
-          <li><a href="http://data.pp.audeering.com">Data</a></li>
-          <li><a href="http://devops.pp.audeering.com/sphinx/">Docs</a></li>
-          <li><a href="http://devops.pp.audeering.com/">Infra</a></li>
-          <li><a href="http://models.pp.audeering.com">Models</a></li>
-          <li><a href="http://research.pp.audeering.com">Research</a></li>
-          <li><a href="http://tools.pp.audeering.com">Tools</a></li>
-        </ul>
-      
     <p>
         
         
         
-          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2026/05/13 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2026/07/02 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>

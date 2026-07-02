@@ -69,7 +69,7 @@
             
             
               <div class="version">
-                v1.4.2
+                v1.5.0
               </div>
             
           
@@ -97,6 +97,7 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="authentication.html">Authentication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configuration.html">Configuration</a></li>
 <li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">API Documentation</span></p>
@@ -143,7 +144,7 @@
       <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
       <li>Contributing</li>
       <li class="wy-breadcrumbs-aside">
-              <a href="https://gitlab.audeering.com/audeering/audmodel/" class="fa fa-gitlab"> GitLab</a>
+              <a href="https://github.com/audeering/audmodel/" class="fa fa-github"> GitHub</a>
       </li>
   </ul>
   <hr/>
@@ -153,21 +154,21 @@
             
   <section id="contributing">
 <h1>Contributing<a class="headerlink" href="#contributing" title="Link to this heading">¶</a></h1>
-<p>If you would like to add new functionality fell free to create a <a class="reference external" href="https://gitlab.audeering.com/tools/audmodel/merge_requests/new">merge
+<p>If you would like to add new functionality fell free to create a <a class="reference external" href="https://github.com/audeering/audmodel/compare">pull
 request</a> . If you find errors, omissions, inconsistencies or other things
-that need improvement, please create an <a class="reference external" href="https://gitlab.audeering.com/tools/audmodel/issues/new?issue%5BD=">issue</a>.
+that need improvement, please create an <a class="reference external" href="https://github.com/audeering/audmodel/issues">issue</a>.
 Contributions are always welcome!</p>
 <section id="development-installation">
 <h2>Development Installation<a class="headerlink" href="#development-installation" title="Link to this heading">¶</a></h2>
 <p>Instead of pip-installing the latest release from PyPI, you should get the
-newest development version from <a class="reference external" href="https://gitlab.audeering.com/tools/audmodel">Gitlab</a>:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">clone</span> <span class="n">git</span><span class="nd">@srv</span><span class="o">-</span><span class="n">app</span><span class="o">-</span><span class="mf">01.</span><span class="n">audeering</span><span class="o">.</span><span class="n">local</span><span class="p">:</span><span class="n">tools</span><span class="o">/</span><span class="n">audmodel</span><span class="o">.</span><span class="n">git</span>
+newest development version from <a class="reference external" href="https://github.com/audeering/audmodel">GitHub</a>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">git</span><span class="nd">@github</span><span class="o">.</span><span class="n">com</span><span class="p">:</span><span class="n">audeering</span><span class="o">/</span><span class="n">audmodel</span><span class="o">.</span><span class="n">git</span>
 <span class="n">cd</span> <span class="n">audmodel</span>
 <span class="n">uv</span> <span class="n">sync</span>
 </pre></div>
 </div>
 <p>This way, your installation always stays up-to-date, even if you pull new
-changes from the Gitlab repository.</p>
+changes from the GitHub repository.</p>
 </section>
 <section id="coding-convention">
 <h2>Coding Convention<a class="headerlink" href="#coding-convention" title="Link to this heading">¶</a></h2>
@@ -218,10 +219,6 @@ in the directory <code class="file docutils literal notranslate"><span class="pr
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">uv</span> <span class="n">run</span> <span class="n">pytest</span>
 </pre></div>
 </div>
-<p>To run the tests on the Gitlab CI server,
-contributors have to make sure
-they have an existing <code class="docutils literal notranslate"><span class="pre">artifactory-tokenizer</span></code> repository
-as described in the <a class="reference external" href="https://gitlab.audeering.com/devops/artifactory/tree/master/token">Artifactory tokenizer documentation</a>.</p>
 </section>
 <section id="creating-a-new-release">
 <h2>Creating a New Release<a class="headerlink" href="#creating-a-new-release" title="Link to this heading">¶</a></h2>
@@ -230,8 +227,7 @@ as described in the <a class="reference external" href="https://gitlab.audeering
 <li><p>Update <code class="docutils literal notranslate"><span class="pre">CHANGELOG.rst</span></code></p></li>
 <li><p>Commit those changes as “Release X.Y.Z”</p></li>
 <li><p>Create an (annotated) tag with <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">tag</span> <span class="pre">-a</span> <span class="pre">vX.Y.Z</span></code></p></li>
-<li><p>Make sure you have an <a class="reference external" href="https://gitlab.audeering.com/devops/artifactory/tree/master/token">artifactory-tokenizer</a> project</p></li>
-<li><p>Push the commit and the tag to Gitlab</p></li>
+<li><p>Push the commit and the tag to GitHub</p></li>
 </ol>
 </section>
 </section>
@@ -255,28 +251,11 @@ as described in the <a class="reference external" href="https://gitlab.audeering
   <hr/>
 
   <div>
-      
-      
-      
-      
-      
-      
-      
-      
-        <ul>
-          <li><a href="http://data.pp.audeering.com">Data</a></li>
-          <li><a href="http://devops.pp.audeering.com/sphinx/">Docs</a></li>
-          <li><a href="http://devops.pp.audeering.com/">Infra</a></li>
-          <li><a href="http://models.pp.audeering.com">Models</a></li>
-          <li><a href="http://research.pp.audeering.com">Research</a></li>
-          <li><a href="http://tools.pp.audeering.com">Tools</a></li>
-        </ul>
-      
     <p>
         
         
         
-          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2026/05/13 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2026/07/02 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>

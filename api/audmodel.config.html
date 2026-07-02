@@ -69,7 +69,7 @@
             
             
               <div class="version">
-                v1.4.2
+                v1.5.0
               </div>
             
           
@@ -97,6 +97,7 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../authentication.html">Authentication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../configuration.html">Configuration</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../usage.html">Usage</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">API Documentation</span></p>
@@ -166,7 +167,7 @@
           <li><a href="audmodel.html">audmodel</a> &raquo;</li>
       <li>config</li>
       <li class="wy-breadcrumbs-aside">
-              <a href="https://gitlab.audeering.com/audeering/audmodel/" class="fa fa-gitlab"> GitLab</a>
+              <a href="https://github.com/audeering/audmodel/" class="fa fa-github"> GitHub</a>
       </li>
   </ul>
   <hr/>
@@ -179,7 +180,20 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="audmodel.config">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">audmodel.</span></span><span class="sig-name descname"><span class="pre">config</span></span><a class="reference internal" href="../_modules/audmodel/core/config.html#config"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audmodel.config" title="Link to this definition">¶</a></dt>
-<dd><p>Get/set defaults for the <a class="reference internal" href="audmodel.html#module-audmodel" title="audmodel"><code class="xref py py-mod docutils literal notranslate"><span class="pre">audmodel</span></code></a> module.</p>
+<dd><p>Get/set configuration values for the <a class="reference internal" href="audmodel.html#module-audmodel" title="audmodel"><code class="xref py py-mod docutils literal notranslate"><span class="pre">audmodel</span></code></a> module.</p>
+<p>The configuration values are read in during module import
+from the <a class="reference internal" href="../configuration.html#configuration"><span class="std std-ref">configuration file</span></a>
+<code class="file docutils literal notranslate"><span class="pre">~/.config/audmodel.yaml</span></code>.
+You can change the configuration values after import,
+by setting the attributes directly.
+The cache related configuration value <a class="reference internal" href="#audmodel.config.CACHE_ROOT" title="audmodel.config.CACHE_ROOT"><code class="xref py py-attr docutils literal notranslate"><span class="pre">config.CACHE_ROOT</span></code></a>
+can be overridden by the <code class="docutils literal notranslate"><span class="pre">AUDMODEL_CACHE_ROOT</span></code> environment variable.</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">config</span><span class="o">.</span><span class="n">CACHE_ROOT</span> <span class="o">=</span> <span class="s2">&quot;~/caches/audmodel&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config</span><span class="o">.</span><span class="n">CACHE_ROOT</span>
+<span class="go">&#39;~/caches/audmodel&#39;</span>
+</pre></div>
+</div>
 </dd></dl>
 
 <section id="cache-root">
@@ -195,8 +209,18 @@
 <h2>REPOSITORIES<a class="headerlink" href="#repositories" title="Link to this heading">¶</a></h2>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="audmodel.config.REPOSITORIES">
-<span class="sig-prename descclassname"><span class="pre">config.</span></span><span class="sig-name descname"><span class="pre">REPOSITORIES</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[Repository('models-local',</span> <span class="pre">'https://artifactory.audeering.com/artifactory',</span> <span class="pre">'artifactory'),</span> <span class="pre">Repository('audmodel-internal',</span> <span class="pre">'s3.dualstack.eu-north-1.amazonaws.com',</span> <span class="pre">'s3')]</span></span><a class="headerlink" href="#audmodel.config.REPOSITORIES" title="Link to this definition">¶</a></dt>
-<dd><p>Default repositories (will be searched in given order).</p>
+<span class="sig-prename descclassname"><span class="pre">config.</span></span><span class="sig-name descname"><span class="pre">REPOSITORIES</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[Repository('audmodel-public',</span> <span class="pre">'s3.dualstack.eu-north-1.amazonaws.com',</span> <span class="pre">'s3')]</span></span><a class="headerlink" href="#audmodel.config.REPOSITORIES" title="Link to this definition">¶</a></dt>
+<dd><p>Repositories, will be iterated in given order.</p>
+<p>A repository is defined by the object <a class="reference internal" href="audmodel.Repository.html#audmodel.Repository" title="audmodel.Repository"><code class="xref py py-class docutils literal notranslate"><span class="pre">audmodel.Repository</span></code></a>,
+containing the following attributes:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="audmodel.Repository.html#audmodel.Repository.name" title="audmodel.Repository.name"><code class="xref py py-attr docutils literal notranslate"><span class="pre">audmodel.Repository.name</span></code></a>: repository name,
+e.g. <code class="docutils literal notranslate"><span class="pre">&quot;audmodel-public&quot;</span></code></p></li>
+<li><p><a class="reference internal" href="audmodel.Repository.html#audmodel.Repository.backend" title="audmodel.Repository.backend"><code class="xref py py-attr docutils literal notranslate"><span class="pre">audmodel.Repository.backend</span></code></a>: backend name,
+e.g. <code class="docutils literal notranslate"><span class="pre">&quot;s3&quot;</span></code></p></li>
+<li><p><a class="reference internal" href="audmodel.Repository.html#audmodel.Repository.host" title="audmodel.Repository.host"><code class="xref py py-attr docutils literal notranslate"><span class="pre">audmodel.Repository.host</span></code></a>: host name,
+e.g. <code class="docutils literal notranslate"><span class="pre">&quot;s3.dualstack.eu-north-1.amazonaws.com&quot;</span></code></p></li>
+</ul>
 </dd></dl>
 
 </section>
@@ -221,28 +245,11 @@
   <hr/>
 
   <div>
-      
-      
-      
-      
-      
-      
-      
-      
-        <ul>
-          <li><a href="http://data.pp.audeering.com">Data</a></li>
-          <li><a href="http://devops.pp.audeering.com/sphinx/">Docs</a></li>
-          <li><a href="http://devops.pp.audeering.com/">Infra</a></li>
-          <li><a href="http://models.pp.audeering.com">Models</a></li>
-          <li><a href="http://research.pp.audeering.com">Research</a></li>
-          <li><a href="http://tools.pp.audeering.com">Tools</a></li>
-        </ul>
-      
     <p>
         
         
         
-          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2026/05/13 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2026/07/02 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>

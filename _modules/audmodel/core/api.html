@@ -66,7 +66,7 @@
             
             
               <div class="version">
-                v1.4.2
+                v1.5.0
               </div>
             
           
@@ -94,6 +94,7 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../authentication.html">Authentication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../configuration.html">Configuration</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../usage.html">Usage</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">API Documentation</span></p>
@@ -610,11 +611,11 @@
     <span class="n">params</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">object</span><span class="p">],</span>
     <span class="n">version</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
+    <span class="n">repository</span><span class="p">:</span> <span class="n">Repository</span><span class="p">,</span>
     <span class="n">alias</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">author</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">date</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">date</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">meta</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">object</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">repository</span><span class="p">:</span> <span class="n">Repository</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">subgroup</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">tmp_root</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
@@ -683,14 +684,13 @@
 <span class="sd">        name: model name</span>
 <span class="sd">        params: dictionary with parameters</span>
 <span class="sd">        version: version string</span>
+<span class="sd">        repository: repository where the model will be published</span>
 <span class="sd">        alias: optional alias name for the model.</span>
 <span class="sd">            If provided, the model can be accessed using this alias</span>
 <span class="sd">            in addition to its UID</span>
 <span class="sd">        author: author name(s), defaults to user name</span>
 <span class="sd">        date: date, defaults to current timestamp</span>
 <span class="sd">        meta: dictionary with meta information</span>
-<span class="sd">        repository: repository where the model will be published,</span>
-<span class="sd">            defaults to ``config.REPOSITORIES[0]``</span>
 <span class="sd">        subgroup: subgroup under which</span>
 <span class="sd">            the model is stored on backend.</span>
 <span class="sd">            ``.`` are replaced by ``/``</span>
@@ -709,6 +709,7 @@
 <span class="sd">        unique model ID</span>
 
 <span class="sd">    Raises:</span>
+<span class="sd">        ValueError: if ``repository`` is ``None``</span>
 <span class="sd">        audbackend.BackendError: if connection to repository on backend</span>
 <span class="sd">            cannot be established</span>
 <span class="sd">        RuntimeError: if a model with same UID exists already</span>
@@ -775,7 +776,10 @@
     <span class="n">subgroup</span> <span class="o">=</span> <span class="n">subgroup</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span>
 
     <span class="k">if</span> <span class="n">repository</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">repository</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">REPOSITORIES</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">&quot;You have to provide a repository, &quot;</span>
+            <span class="s2">&quot;see audmodel.config.REPOSITORIES for an example.&quot;</span>
+        <span class="p">)</span>
 
     <span class="k">if</span> <span class="n">subgroup</span> <span class="o">==</span> <span class="n">define</span><span class="o">.</span><span class="n">UID_FOLDER</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;It is not allowed to set subgroup to &#39;</span><span class="si">{</span><span class="n">define</span><span class="o">.</span><span class="n">UID_FOLDER</span><span class="si">}</span><span class="s2">&#39;.&quot;</span><span class="p">)</span>
@@ -1333,15 +1337,6 @@
     <span class="c1"># Check for underlying backend of backend interface</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">backend_interface</span><span class="o">.</span><span class="n">backend</span><span class="p">,</span> <span class="n">audbackend</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">FileSystem</span><span class="p">):</span>
         <span class="n">path</span> <span class="o">=</span> <span class="n">backend_interface</span><span class="o">.</span><span class="n">sep</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">backend_interface</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">_root</span><span class="p">,</span> <span class="n">path</span><span class="p">])</span>
-    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span>
-        <span class="n">backend_interface</span><span class="o">.</span><span class="n">backend</span><span class="p">,</span> <span class="n">audbackend</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">Artifactory</span>
-    <span class="p">):</span>  <span class="c1"># pragma: nocover</span>
-        <span class="c1"># The tests should work locally,</span>
-        <span class="c1"># so we don&#39;t test using a repository on Artifactory.</span>
-        <span class="c1"># I tested the following line,</span>
-        <span class="c1"># by manually calling</span>
-        <span class="c1"># audmodel.url(&quot;90398682-2.0.0&quot;)</span>
-        <span class="n">path</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">backend_interface</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">path</span><span class="p">(</span><span class="n">path</span><span class="p">))</span>
     <span class="k">return</span> <span class="n">path</span></div>
 
 
@@ -1434,28 +1429,11 @@
   <hr/>
 
   <div>
-      
-      
-      
-      
-      
-      
-      
-      
-        <ul>
-          <li><a href="http://data.pp.audeering.com">Data</a></li>
-          <li><a href="http://devops.pp.audeering.com/sphinx/">Docs</a></li>
-          <li><a href="http://devops.pp.audeering.com/">Infra</a></li>
-          <li><a href="http://models.pp.audeering.com">Models</a></li>
-          <li><a href="http://research.pp.audeering.com">Research</a></li>
-          <li><a href="http://tools.pp.audeering.com">Tools</a></li>
-        </ul>
-      
     <p>
         
         
         
-          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2026/05/13 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2026/07/02 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>
