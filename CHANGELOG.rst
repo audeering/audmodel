@@ -13,7 +13,7 @@ Version 1.5.0 (2026-07-02)
 * Added: configuration via ``~/.config/audmodel.yaml`` config file
 * Changed: depend on ``audbackend[all]>=3.0.0``
 * Changed: make ``audmodel-public`` the new and only default repository
-* Changed: make the keyword argument ``repository``
+* Changed: make the keyword-only argument ``repository``
   in ``audmodel.publish()``
   a required argument
 * Removed: support for Artifactory backends
