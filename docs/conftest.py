@@ -79,7 +79,7 @@ def default_configuration():
 # We use several ``sybil.Sybil`` instances
 # to pass different fixtures to different files.
 parsers = [
-    DocTestParser(optionflags=ELLIPSIS + NORMALIZE_WHITESPACE),
+    DocTestParser(optionflags=ELLIPSIS | NORMALIZE_WHITESPACE),
     PythonCodeBlockParser(),
     SkipParser(),
 ]
