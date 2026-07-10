@@ -29,7 +29,8 @@ def docstring_examples(doctest_namespace):  # pragma: no cover
                 repository=repository,
                 subgroup=subgroup,
             )
-    # Make model root and repo variables available in doctests
+    # Make audmodel, model root and repo variables available in doctests
+    doctest_namespace["audmodel"] = audmodel
     doctest_namespace["model_root"] = pytest.MODEL_ROOT
     doctest_namespace["repository"] = repository
     yield

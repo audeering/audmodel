@@ -82,8 +82,8 @@ class config:
     can be overridden by the ``AUDMODEL_CACHE_ROOT`` environment variable.
 
     Examples:
-        >>> config.CACHE_ROOT = "~/caches/audmodel"
-        >>> config.CACHE_ROOT
+        >>> audmodel.config.CACHE_ROOT = "~/caches/audmodel"
+        >>> audmodel.config.CACHE_ROOT
         '~/caches/audmodel'
 
     """

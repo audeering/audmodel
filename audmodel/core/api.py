@@ -52,7 +52,7 @@ def author(
         filelock.Timeout: if cache lock could not be acquired
 
     Examples:
-        >>> author("d4e9c65b-3.0.0")
+        >>> audmodel.author("d4e9c65b-3.0.0")
         'Calvin and Hobbes'
 
     """
@@ -81,7 +81,7 @@ def date(
         filelock.Timeout: if cache lock could not be acquired
 
     Examples:
-        >>> date("d4e9c65b-3.0.0")
+        >>> audmodel.date("d4e9c65b-3.0.0")
         '1985-11-18'
 
     """
@@ -108,7 +108,7 @@ def default_cache_root() -> str:
 
     Examples:
         >>> import audeer
-        >>> cache_root = default_cache_root()
+        >>> cache_root = audmodel.default_cache_root()
         >>> audeer.list_dir_names(cache_root, basenames=True)
         ['d4e9c65b']
 
@@ -132,9 +132,9 @@ def exists(
             cannot be established
 
     Examples:
-        >>> exists("d4e9c65b-3.0.0")
+        >>> audmodel.exists("d4e9c65b-3.0.0")
         True
-        >>> exists("d4e9c65b-9.9.9")
+        >>> audmodel.exists("d4e9c65b-9.9.9")
         False
 
     """
@@ -170,7 +170,7 @@ def header(
         dictionary with header fields
 
     Examples:
-        >>> d = header("d4e9c65b-3.0.0")
+        >>> d = audmodel.header("d4e9c65b-3.0.0")
         >>> print(yaml.dump(d))
         author: Calvin and Hobbes
         date: 1985-11-18
@@ -207,9 +207,9 @@ def latest_version(
         RuntimeError: if model does not exist
 
     Examples:
-        >>> latest_version("d4e9c65b")
+        >>> audmodel.latest_version("d4e9c65b")
         '3.0.0'
-        >>> latest_version("d4e9c65b-1.0.0")
+        >>> audmodel.latest_version("d4e9c65b-1.0.0")
         '3.0.0'
 
     """
@@ -247,7 +247,7 @@ def legacy_uid(
         unique model ID
 
     Examples:
-        >>> legacy_uid(
+        >>> audmodel.legacy_uid(
         ...     "test",
         ...     {
         ...         "model": "cnn10",
@@ -306,7 +306,7 @@ def load(
         filelock.Timeout: if cache lock could not be acquired
 
     Examples:
-        >>> root = load("d4e9c65b-3.0.0")
+        >>> root = audmodel.load("d4e9c65b-3.0.0")
         >>> "/".join(root.split(os.path.sep)[-2:])
         'd4e9c65b/3.0.0'
 
@@ -340,7 +340,7 @@ def meta(
         filelock.Timeout: if cache lock could not be acquired
 
     Examples:
-        >>> d = meta("d4e9c65b-3.0.0")
+        >>> d = audmodel.meta("d4e9c65b-3.0.0")
         >>> print(yaml.dump(d))
         data:
           emodb:
@@ -387,7 +387,7 @@ def name(
         filelock.Timeout: if cache lock could not be acquired
 
     Examples:
-        >>> name("d4e9c65b-3.0.0")
+        >>> audmodel.name("d4e9c65b-3.0.0")
         'torch'
 
     """
@@ -418,7 +418,7 @@ def parameters(
         filelock.Timeout: if cache lock could not be acquired
 
     Examples:
-        >>> parameters("d4e9c65b-3.0.0")
+        >>> audmodel.parameters("d4e9c65b-3.0.0")
         {'model': 'cnn10', 'data': 'emodb', 'feature': 'melspec', 'sampling_rate': 16000}
 
     """  # noqa: E501
@@ -578,7 +578,7 @@ def publish(
         ...         },
         ...     },
         ... }
-        >>> publish(
+        >>> audmodel.publish(
         ...     model_root,
         ...     name,
         ...     params,
@@ -749,7 +749,7 @@ def resolve_alias(
         RuntimeError: if alias does not exist
 
     Examples:
-        >>> resolve_alias("my-model")  # doctest: +SKIP
+        >>> audmodel.resolve_alias("my-model")  # doctest: +SKIP
         'd4e9c65b-3.0.0'
 
     """
@@ -781,7 +781,7 @@ def aliases(
         RuntimeError: if model does not exist
 
     Examples:
-        >>> aliases("d4e9c65b-3.0.0")  # doctest: +SKIP
+        >>> audmodel.aliases("d4e9c65b-3.0.0")  # doctest: +SKIP
         ['my-model', 'production-model']
 
     """
@@ -815,7 +815,7 @@ def set_alias(
             or it does contain chars other than ``[A-Za-z0-9._-]+``
 
     Examples:
-        >>> set_alias("my-model", "d4e9c65b-3.0.0")  # doctest: +SKIP
+        >>> audmodel.set_alias("my-model", "d4e9c65b-3.0.0")  # doctest: +SKIP
 
     """
     if not utils.valid_alias(alias):
@@ -903,7 +903,7 @@ def subgroup(
         filelock.Timeout: if cache lock could not be acquired
 
     Examples:
-        >>> subgroup("d4e9c65b-3.0.0")
+        >>> audmodel.subgroup("d4e9c65b-3.0.0")
         'audmodel.dummy.cnn'
 
     """
@@ -936,7 +936,7 @@ def uid(
         unique or short model ID
 
     Examples:
-        >>> uid(
+        >>> audmodel.uid(
         ...     "torch",
         ...     {
         ...         "model": "cnn10",
@@ -947,7 +947,7 @@ def uid(
         ...     subgroup="audmodel.dummy.cnn",
         ... )
         'd4e9c65b'
-        >>> uid(
+        >>> audmodel.uid(
         ...     "torch",
         ...     {
         ...         "model": "cnn10",
@@ -1007,7 +1007,7 @@ def update_meta(
         ...         "cnn10": {"layers": 10},
         ...     },
         ... }
-        >>> d = update_meta("d4e9c65b-3.0.0", meta)
+        >>> d = audmodel.update_meta("d4e9c65b-3.0.0", meta)
         >>> print(yaml.dump(d))
         data:
           emodb:
@@ -1024,7 +1024,7 @@ def update_meta(
             optimizer: adam
             layers: 10
         <BLANKLINE>
-        >>> d = update_meta("d4e9c65b-3.0.0", meta, replace=True)
+        >>> d = audmodel.update_meta("d4e9c65b-3.0.0", meta, replace=True)
         >>> print(yaml.dump(d))
         model:
           cnn10:
@@ -1098,13 +1098,13 @@ def url(
         ValueError: if wrong ``type`` is given
 
     Examples:
-        >>> path = url("d4e9c65b-3.0.0")
+        >>> path = audmodel.url("d4e9c65b-3.0.0")
         >>> os.path.basename(path)
         'd4e9c65b-3.0.0.zip'
-        >>> path = url("d4e9c65b-3.0.0", type="header")
+        >>> path = audmodel.url("d4e9c65b-3.0.0", type="header")
         >>> os.path.basename(path)
         'd4e9c65b-3.0.0.header.yaml'
-        >>> path = url("d4e9c65b-3.0.0", type="meta")
+        >>> path = audmodel.url("d4e9c65b-3.0.0", type="meta")
         >>> os.path.basename(path)
         'd4e9c65b-3.0.0.meta.yaml'
 
@@ -1163,7 +1163,7 @@ def version(
         filelock.Timeout: if cache lock could not be acquired
 
     Examples:
-        >>> version("d4e9c65b-3.0.0")
+        >>> audmodel.version("d4e9c65b-3.0.0")
         '3.0.0'
 
     """
@@ -1191,9 +1191,9 @@ def versions(
         RuntimeError: if model does not exist
 
     Examples:
-        >>> versions("d4e9c65b")
+        >>> audmodel.versions("d4e9c65b")
         ['1.0.0', '2.0.0', '3.0.0', '4.0.0']
-        >>> versions("d4e9c65b-2.0.0")
+        >>> audmodel.versions("d4e9c65b-2.0.0")
         ['1.0.0', '2.0.0', '3.0.0', '4.0.0']
 
     """
