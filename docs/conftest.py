@@ -34,7 +34,7 @@ def run_in_tmpdir(tmpdir_factory):
 def reset_config():
     """Restore config values that are changed inside the documentation."""
     cache_root = audmodel.config.CACHE_ROOT
-    repositories = audmodel.config.REPOSITORIES
+    repositories = list(audmodel.config.REPOSITORIES)
     # Other tests set ``AUDMODEL_CACHE_ROOT``,
     # which would take precedence over ``config.CACHE_ROOT``.
     # Remove it here, so the cache folder used in the documentation
