@@ -4,6 +4,7 @@ import os
 
 import pytest
 import sybil
+from sybil.parsers.rest import CaptureParser
 from sybil.parsers.rest import DocTestParser
 from sybil.parsers.rest import PythonCodeBlockParser
 from sybil.parsers.rest import SkipParser
@@ -79,6 +80,7 @@ def default_configuration():
 # We use several ``sybil.Sybil`` instances
 # to pass different fixtures to different files.
 parsers = [
+    CaptureParser(),
     DocTestParser(optionflags=ELLIPSIS | NORMALIZE_WHITESPACE),
     PythonCodeBlockParser(),
     SkipParser(),

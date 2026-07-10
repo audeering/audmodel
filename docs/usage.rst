@@ -3,6 +3,8 @@ Usage
 
 .. invisible-code-block: python
 
+    import contextlib
+    import io
     import os
 
     import audeer
@@ -18,6 +20,29 @@ Usage
             with open(path, "w"):
                 pass
         return root
+
+
+    def show_model(path):
+        path = audeer.safe_path(path)
+        for root, dirs, files in os.walk(path):
+            dirs.sort()
+            files.sort()
+            level = root.replace(path, "").count(os.sep)
+            indent = " " * 4 * (level)
+            print("{}{}/".format(indent, os.path.basename(root)))
+            subindent = " " * 4 * (level + 1)
+            for f in files:
+                print("{}{}".format(subindent, f))
+
+
+    def model_tree(path):
+        # Capture the output of ``show_model()`` as a string,
+        # so it can be compared against the folder tree
+        # shown in the documentation.
+        buffer = io.StringIO()
+        with contextlib.redirect_stdout(buffer):
+            show_model(path)
+        return buffer.getvalue().strip() + "\n"
 
 
     cache_dir = audeer.mkdir("./tmp/cache")
@@ -61,6 +86,12 @@ consisting of the following files:
         readme.txt
         log/
             eval.yaml
+
+.. -> expected_tree
+
+.. invisible-code-block: python
+
+    assert model_tree(root_v1) == expected_tree
 
 Before we can publish a model,
 we have to define several arguments:
@@ -200,6 +231,12 @@ we will then have the following structure.
         log/
             eval.yaml
 
+.. -> expected_tree
+
+.. invisible-code-block: python
+
+    assert model_tree(model_root) == expected_tree
+
 
 Model alias
 -----------
@@ -279,6 +316,12 @@ this time called ``root_v2``:
         readme.txt
         log/
             eval.yaml
+
+.. -> expected_tree
+
+.. invisible-code-block: python
+
+    assert model_tree(root_v2) == expected_tree
 
 As this model has the same parameters, name, and subgroup
 as our previous model,
