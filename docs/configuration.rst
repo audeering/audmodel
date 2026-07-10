@@ -16,15 +16,21 @@ they can be accessed
 or changed
 using :class:`audmodel.config`.
 
->>> audmodel.config.CACHE_ROOT
-'~/audmodel'
+.. code-block:: pycon
 
->>> audmodel.config.REPOSITORIES
-[Repository('audmodel-public', 's3.dualstack.eu-north-1.amazonaws.com', 's3')]
+    >>> audmodel.config.CACHE_ROOT
+    '~/audmodel'
 
->>> audmodel.config.CACHE_ROOT = "/user/cache"
->>> audmodel.config.CACHE_ROOT
-'/user/cache'
+.. code-block:: pycon
+
+    >>> audmodel.config.REPOSITORIES
+    [Repository('audmodel-public', 's3.dualstack.eu-north-1.amazonaws.com', 's3')]
+
+.. code-block:: pycon
+
+    >>> audmodel.config.CACHE_ROOT = "/user/cache"
+    >>> audmodel.config.CACHE_ROOT
+    '/user/cache'
 
 The cache folder
 can also be overridden
