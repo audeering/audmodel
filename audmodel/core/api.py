@@ -726,6 +726,60 @@ def publish(
     return uid
 
 
+def repository(
+    uid: str,
+    *,
+    cache_root: str | None = None,
+) -> Repository:
+    r"""Repository of a model.
+
+    Returns the repository
+    in which the model is stored,
+    by searching through
+    :attr:`audmodel.config.REPOSITORIES`.
+
+    Args:
+        uid: unique model ID (omit version for latest version) or alias
+        cache_root: cache folder where models and headers are stored.
+            If not set :meth:`audmodel.default_cache_root` is used
+
+    Returns:
+        repository that stores the model
+
+    Raises:
+        audbackend.BackendError: if connection to repository on backend
+            cannot be established
+        RuntimeError: if model does not exist
+
+    Examples:
+        >>> import audmodel
+        >>> audmodel.repository("d4e9c65b-3.0.0").name
+        'repo1'
+
+    """
+    cache_root = audeer.safe_path(cache_root or default_cache_root())
+    short_id, version = split_uid(uid, cache_root)
+
+    for repo in config.REPOSITORIES:
+        backend_interface = repo.create_backend_interface()
+        path = backend_interface.join(
+            "/",
+            define.UID_FOLDER,
+            f"{short_id}.{define.HEADER_EXT}",
+        )
+        with backend_interface.backend:
+            header_exists = backend_interface.exists(
+                path,
+                version,
+                suppress_backend_errors=True,
+            )
+        if header_exists:
+            return repo
+
+    # If no repository can be found, the requested model does not exist
+    raise_model_not_found_error(short_id, version)
+
+
 def resolve_alias(
     alias: str,
     *,
