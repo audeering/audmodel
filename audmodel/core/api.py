@@ -752,7 +752,6 @@ def repository(
         RuntimeError: if model does not exist
 
     Examples:
-        >>> import audmodel
         >>> audmodel.repository("d4e9c65b-3.0.0").name
         'repo1'
 
