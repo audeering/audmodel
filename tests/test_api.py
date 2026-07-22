@@ -277,6 +277,11 @@ def test_repository():
     )
     assert audmodel.repository(uid) == pytest.REPOSITORIES[0]
 
+    # Alias
+    alias = "test-repository-alias"
+    audmodel.set_alias(alias, uid)
+    assert audmodel.repository(alias) == pytest.REPOSITORIES[0]
+
     # Short ID resolves to latest version
     short_id = audmodel.uid(
         pytest.NAME,
