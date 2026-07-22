@@ -758,7 +758,6 @@ def repository(
     """
     cache_root = audeer.safe_path(cache_root or default_cache_root())
     short_id, version = split_uid(uid, cache_root)
-
     repo, _, _ = header_storage_location(short_id, version)
     return repo
 
