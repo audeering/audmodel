@@ -14,7 +14,7 @@ from audmodel.core.backend import get_aliases
 from audmodel.core.backend import get_archive
 from audmodel.core.backend import get_header
 from audmodel.core.backend import get_meta
-from audmodel.core.backend import header_path
+from audmodel.core.backend import header_storage_location
 from audmodel.core.backend import header_versions
 from audmodel.core.backend import meta_path
 from audmodel.core.backend import put_alias
@@ -759,24 +759,8 @@ def repository(
     cache_root = audeer.safe_path(cache_root or default_cache_root())
     short_id, version = split_uid(uid, cache_root)
 
-    for repo in config.REPOSITORIES:
-        backend_interface = repo.create_backend_interface()
-        path = backend_interface.join(
-            "/",
-            define.UID_FOLDER,
-            f"{short_id}.{define.HEADER_EXT}",
-        )
-        with backend_interface.backend:
-            header_exists = backend_interface.exists(
-                path,
-                version,
-                suppress_backend_errors=True,
-            )
-        if header_exists:
-            return repo
-
-    # If no repository can be found, the requested model does not exist
-    raise_model_not_found_error(short_id, version)
+    repo, _, _ = header_storage_location(short_id, version)
+    return repo
 
 
 def resolve_alias(
@@ -1173,7 +1157,7 @@ def url(
             verbose,
         )
     elif type == "header":
-        backend_interface, path = header_path(short_id, version)
+        _, backend_interface, path = header_storage_location(short_id, version)
     elif type == "meta":
         backend_interface, path = meta_path(
             short_id,

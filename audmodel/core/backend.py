@@ -1,7 +1,10 @@
+from __future__ import annotations
+
 from collections.abc import Sequence
 import os
 import shutil
 import tempfile
+from typing import TYPE_CHECKING
 
 import oyaml as yaml
 
@@ -12,6 +15,10 @@ from audmodel.core.config import config
 import audmodel.core.define as define
 from audmodel.core.lock import lock
 import audmodel.core.utils as utils
+
+
+if TYPE_CHECKING:  # pragma: no cover
+    from audmodel.core.repository import Repository
 
 
 SERIALIZE_ERROR_MESSAGE = "Cannot serialize the following object to a YAML file:\n"
@@ -150,7 +157,7 @@ def get_header(
         RuntimeError: if requested model does not exist
 
     """
-    backend_interface, remote_path = header_path(short_id, version)
+    _, backend_interface, remote_path = header_storage_location(short_id, version)
     local_path = os.path.join(
         cache_root,
         short_id,
@@ -252,18 +259,22 @@ def get_meta(
     return backend_interface, meta
 
 
-def header_path(
+def header_storage_location(
     short_id: str,
     version: str,
-) -> tuple[audbackend.interface.Maven, str]:
-    r"""Return backend and header path.
+) -> tuple[Repository, audbackend.interface.Maven, str]:
+    r"""Return repository, backend and header path.
+
+    It searches through :attr:`audmodel.config.REPOSITORIES`
+    for the repository
+    that contains the requested model header.
 
     Args:
         short_id: model ID without version
         version: model version
 
     Returns:
-        backend interface, path to header on backend
+        repository, backend interface, path to header on backend
 
     Raises:
         BackendError: if connection to backend
@@ -291,10 +302,10 @@ def header_path(
                 suppress_backend_errors=True,
             )
         if header_exists:
-            return backend_interface, path
+            return repository, backend_interface, path
 
     # If no repository can be found,
-    # reuested model does not exist
+    # requested model does not exist
     raise_model_not_found_error(short_id, version)
 
 
@@ -672,7 +683,7 @@ def aliases_path(
         RuntimeError: if requested model does not exist
 
     """
-    backend_interface, path = header_path(short_id, version)
+    _, backend_interface, path = header_storage_location(short_id, version)
     aliases_path = backend_interface.join(
         "/",
         define.UID_FOLDER,
