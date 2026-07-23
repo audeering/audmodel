@@ -14,7 +14,7 @@ from audmodel.core.backend import get_aliases
 from audmodel.core.backend import get_archive
 from audmodel.core.backend import get_header
 from audmodel.core.backend import get_meta
-from audmodel.core.backend import header_path
+from audmodel.core.backend import header_storage_location
 from audmodel.core.backend import header_versions
 from audmodel.core.backend import meta_path
 from audmodel.core.backend import put_alias
@@ -726,6 +726,42 @@ def publish(
     return uid
 
 
+def repository(
+    uid: str,
+    *,
+    cache_root: str | None = None,
+) -> Repository:
+    r"""Repository of a model.
+
+    Returns the repository
+    in which the model is stored,
+    by searching through
+    :attr:`audmodel.config.REPOSITORIES`.
+
+    Args:
+        uid: unique model ID (omit version for latest version) or alias
+        cache_root: cache folder where models and headers are stored.
+            If not set :meth:`audmodel.default_cache_root` is used
+
+    Returns:
+        repository that stores the model
+
+    Raises:
+        audbackend.BackendError: if connection to repository on backend
+            cannot be established
+        RuntimeError: if model does not exist
+
+    Examples:
+        >>> audmodel.repository("d4e9c65b-3.0.0").name
+        'repo1'
+
+    """
+    cache_root = audeer.safe_path(cache_root or default_cache_root())
+    short_id, version = split_uid(uid, cache_root)
+    repo, _, _ = header_storage_location(short_id, version)
+    return repo
+
+
 def resolve_alias(
     alias: str,
     *,
@@ -1120,7 +1156,7 @@ def url(
             verbose,
         )
     elif type == "header":
-        backend_interface, path = header_path(short_id, version)
+        _, backend_interface, path = header_storage_location(short_id, version)
     elif type == "meta":
         backend_interface, path = meta_path(
             short_id,

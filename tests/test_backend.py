@@ -8,8 +8,8 @@ audmodel.config.CACHE_ROOT = pytest.CACHE_ROOT
 audmodel.config.REPOSITORIES = pytest.REPOSITORIES
 
 
-def test_header_path_empty_version():
-    """Test header_path with empty version string.
+def test_header_storage_location_empty_version():
+    """Test header_storage_location with empty version string.
 
     When version is empty or None,
     the function should break out of the repository loop
@@ -21,8 +21,8 @@ def test_header_path_empty_version():
 
     error_msg = f"A model with ID '{short_id}' does not exist."
     with pytest.raises(RuntimeError, match=error_msg):
-        backend.header_path(short_id, version)
+        backend.header_storage_location(short_id, version)
 
     # Also test with None
     with pytest.raises(RuntimeError, match=error_msg):
-        backend.header_path(short_id, None)
+        backend.header_storage_location(short_id, None)

@@ -70,6 +70,7 @@ def fixture_publish_model():
         audmodel.meta,
         audmodel.name,
         audmodel.parameters,
+        audmodel.repository,
         audmodel.subgroup,
         lambda uid: audmodel.update_meta(uid, {}),
         audmodel.url,
@@ -142,6 +143,9 @@ def test_bad_uid(uid, expected_error):
 
     with pytest.raises(RuntimeError, match=expected_error):
         audmodel.parameters(uid)
+
+    with pytest.raises(RuntimeError, match=expected_error):
+        audmodel.repository(uid)
 
     with pytest.raises(RuntimeError, match=expected_error):
         audmodel.subgroup(uid)
@@ -261,6 +265,37 @@ def test_uid(name, params, version, subgroup, expected):
         subgroup=subgroup,
     )
     assert uid == expected
+
+
+def test_repository():
+    # Full UID
+    uid = audmodel.uid(
+        pytest.NAME,
+        pytest.PARAMS,
+        "1.0.0",
+        subgroup=SUBGROUP,
+    )
+    assert audmodel.repository(uid) == pytest.REPOSITORIES[0]
+
+    # Alias
+    alias = "test-repository-alias"
+    audmodel.set_alias(alias, uid)
+    assert audmodel.repository(alias) == pytest.REPOSITORIES[0]
+
+    # Short ID resolves to latest version
+    short_id = audmodel.uid(
+        pytest.NAME,
+        pytest.PARAMS,
+        subgroup=SUBGROUP,
+    )
+    assert audmodel.repository(short_id) == pytest.REPOSITORIES[0]
+
+    # Non-existing version
+    with pytest.raises(
+        RuntimeError,
+        match=f"A model with ID '{short_id}-9.9.9' does not exist.",
+    ):
+        audmodel.repository(f"{short_id}-9.9.9")
 
 
 def test_update_meta():
