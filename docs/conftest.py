@@ -9,9 +9,10 @@ from sybil.parsers.rest import DocTestParser
 from sybil.parsers.rest import PythonCodeBlockParser
 from sybil.parsers.rest import SkipParser
 
+import audeer
+
 import audmodel
 from audmodel.core.config import global_config_file
-from audmodel.core.config import load_configuration_file
 
 
 def imports(namespace):
@@ -62,7 +63,7 @@ def default_configuration():
     cache_root = audmodel.config.CACHE_ROOT
     repositories = audmodel.config.REPOSITORIES
 
-    default = load_configuration_file(global_config_file)
+    default = audeer.load_configuration(global_config_file)
     audmodel.config.CACHE_ROOT = default["cache_root"]
     audmodel.config.REPOSITORIES = [
         audmodel.Repository(repo["name"], repo["host"], repo["backend"])

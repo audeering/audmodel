@@ -1,7 +1,5 @@
 import os
 
-import oyaml as yaml
-
 import audeer
 
 from audmodel.core.define import CONFIG_FILE
@@ -13,15 +11,11 @@ CWD = audeer.script_dir()
 global_config_file = os.path.join(CWD, CONFIG_FILE)
 
 
-def load_configuration_file(config_file: str) -> dict:
-    r"""Read configuration from YAML file.
+def validate_config(config: dict):
+    r"""Validate configuration.
 
     Args:
-        config_file: path to configuration file.
-            File doesn't have to exist
-
-    Returns:
-        dictionary containing configuration entries
+        config: configuration dictionary
 
     Raises:
         ValueError: if ``repositories`` section is present,
@@ -30,20 +24,11 @@ def load_configuration_file(config_file: str) -> dict:
             ``backend``, or ``name`` key
 
     """
-    if not os.path.exists(config_file):
-        return {}
-
-    with open(config_file) as cf:
-        config = yaml.load(cf, Loader=yaml.BaseLoader)
-        if config is None:
-            return {}
-
-    # Check that we have provided a valid repositories configuration
     if "repositories" in config:
-        if len(config["repositories"]) == 0:
+        if not config["repositories"]:
             raise ValueError(
                 "You cannot specify an empty 'repositories:' section "
-                f"in the configuration file '{config_file}'."
+                "in a configuration file."
             )
         for repo in config["repositories"]:
             for key in ("host", "backend", "name"):
@@ -51,8 +36,6 @@ def load_configuration_file(config_file: str) -> dict:
                     raise ValueError(
                         f"Your repository is missing a '{key}' entry: '{repo}'."
                     )
-
-    return config
 
 
 def load_config() -> dict:
@@ -62,12 +45,11 @@ def load_config() -> dict:
     when the same setting exists in both files.
 
     """
-    # Global config
-    config = load_configuration_file(global_config_file)
-    # User config
-    user_config = load_configuration_file(audeer.path(USER_CONFIG_FILE))
-    config.update(user_config)
-    return config
+    return audeer.load_configuration(
+        global_config_file,
+        audeer.path(USER_CONFIG_FILE),
+        validate=validate_config,
+    )
 
 
 class config:
