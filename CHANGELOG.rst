@@ -7,6 +7,13 @@ The format is based on `Keep a Changelog`_,
 and this project adheres to `Semantic Versioning`_.
 
 
+Version 1.5.1 (2026-08-06)
+--------------------------
+
+* Added: ``audmodel.repository()``
+  to return the repository a model is published
+
+
 Version 1.5.0 (2026-07-02)
 --------------------------
 
