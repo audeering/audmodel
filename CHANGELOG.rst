@@ -12,6 +12,7 @@ Version 1.5.1 (2026-08-06)
 
 * Added: ``audmodel.repository()``
   to return the repository a model is published
+* Changed: depend on ``filelock>=3.10``
 
 
 Version 1.5.0 (2026-07-02)
