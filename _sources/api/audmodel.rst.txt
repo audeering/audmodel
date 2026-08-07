@@ -22,6 +22,7 @@ audmodel
     parameters
     publish
     Repository
+    repository
     resolve_alias
     set_alias
     subgroup

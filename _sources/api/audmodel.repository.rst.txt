@@ -1,0 +1,6 @@
+﻿repository\(\)
+==============
+
+.. currentmodule:: audmodel
+
+.. autofunction:: audmodel.repository

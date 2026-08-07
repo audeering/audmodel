@@ -29,8 +29,6 @@
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="_static/css/audeering.css" type="text/css" />
-  <link rel="stylesheet" href="_static/jupyter-sphinx.css" type="text/css" />
-  <link rel="stylesheet" href="_static/thebelab.css" type="text/css" />
   <link rel="stylesheet" href="_static/copybutton.css" type="text/css" />
   <link rel="stylesheet" href="_static/css/custom.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
@@ -69,7 +67,7 @@
             
             
               <div class="version">
-                v1.5.0
+                v1.5.1
               </div>
             
           
@@ -157,10 +155,6 @@
             
   <section id="usage">
 <h1>Usage<a class="headerlink" href="#usage" title="Link to this heading">¶</a></h1>
-<div class="jupyter_cell docutils container">
-<div class="cell_output docutils container">
-</div>
-</div>
 <section id="introduction">
 <h2>Introduction<a class="headerlink" href="#introduction" title="Link to this heading">¶</a></h2>
 <p><a class="reference internal" href="api/audmodel.html#module-audmodel" title="audmodel"><code class="xref py py-mod docutils literal notranslate"><span class="pre">audmodel</span></code></a> is a versatile tool
@@ -177,17 +171,13 @@ and <strong>metadata</strong>
 <h2>Publish a model<a class="headerlink" href="#publish-a-model" title="Link to this heading">¶</a></h2>
 <p>Let’s assume we have a model folder <code class="docutils literal notranslate"><span class="pre">root_v1</span></code>,
 consisting of the following files:</p>
-<div class="jupyter_cell docutils container">
-<div class="cell_output docutils container">
-<div class="output stream highlight-none notranslate"><div class="highlight"><pre><span></span>root_v1/
-    readme.txt
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>root_v1/
     model.onnx
     model.yaml
+    readme.txt
     log/
         eval.yaml
 </pre></div>
-</div>
-</div>
 </div>
 <p>Before we can publish a model,
 we have to define several arguments:</p>
@@ -203,9 +193,7 @@ we have to define several arguments:</p>
 have a look at the discussion in the API documentation of
 <a class="reference internal" href="api/audmodel.publish.html#audmodel.publish" title="audmodel.publish"><code class="xref py py-func docutils literal notranslate"><span class="pre">audmodel.publish()</span></code></a>.</p>
 <p>Let’s define the arguments for our example model:</p>
-<div class="jupyter_cell jupyter_container docutils container">
-<div class="cell_input code_cell docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;onnx&quot;</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;onnx&quot;</span>
 <span class="n">params</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s2">&quot;model&quot;</span><span class="p">:</span> <span class="s2">&quot;cnn10&quot;</span><span class="p">,</span>
     <span class="s2">&quot;data&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;emodb&quot;</span><span class="p">,</span> <span class="s2">&quot;msppodcast&quot;</span><span class="p">],</span>
@@ -213,7 +201,7 @@ have a look at the discussion in the API documentation of
     <span class="s2">&quot;sampling_rate&quot;</span><span class="p">:</span> <span class="mi">16000</span><span class="p">,</span>
 <span class="p">}</span>
 <span class="n">version</span> <span class="o">=</span> <span class="s2">&quot;1.0.0&quot;</span>
-<span class="n">author</span><span class="o">=</span><span class="s2">&quot;sphinx&quot;</span>
+<span class="n">author</span> <span class="o">=</span> <span class="s2">&quot;sphinx&quot;</span>
 <span class="n">meta</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s2">&quot;model&quot;</span><span class="p">:</span> <span class="p">{</span>
         <span class="s2">&quot;cnn10&quot;</span><span class="p">:</span> <span class="p">{</span>
@@ -236,17 +224,11 @@ have a look at the discussion in the API documentation of
 <span class="n">subgroup</span> <span class="o">=</span> <span class="s2">&quot;emotion.cnn&quot;</span>
 </pre></div>
 </div>
-</div>
-<div class="cell_output docutils container">
-</div>
-</div>
 <p>By default <a class="reference internal" href="api/audmodel.html#module-audmodel" title="audmodel"><code class="xref py py-mod docutils literal notranslate"><span class="pre">audmodel</span></code></a> uses repositories on S3.
 For this example
 we create a local temporary repository
 in which the model is stored.</p>
-<div class="jupyter_cell jupyter_container docutils container">
-<div class="cell_input code_cell docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">audeer</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">audeer</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">audmodel</span>
 
 <span class="n">repo</span> <span class="o">=</span> <span class="s2">&quot;models&quot;</span>
@@ -256,32 +238,20 @@ in which the model is stored.</p>
 <span class="n">audmodel</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">REPOSITORIES</span> <span class="o">=</span> <span class="p">[</span><span class="n">repository</span><span class="p">]</span>
 </pre></div>
 </div>
-</div>
-<div class="cell_output docutils container">
-</div>
-</div>
 <p>Now we can publish the model with</p>
-<div class="jupyter_cell jupyter_container docutils container">
-<div class="cell_input code_cell docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">uid</span> <span class="o">=</span> <span class="n">audmodel</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span>
-    <span class="n">root_v1</span><span class="p">,</span>
-    <span class="n">name</span><span class="p">,</span>
-    <span class="n">params</span><span class="p">,</span>
-    <span class="n">version</span><span class="p">,</span>
-    <span class="n">author</span><span class="o">=</span><span class="n">author</span><span class="p">,</span>
-    <span class="n">meta</span><span class="o">=</span><span class="n">meta</span><span class="p">,</span>
-    <span class="n">subgroup</span><span class="o">=</span><span class="n">subgroup</span><span class="p">,</span>
-    <span class="n">repository</span><span class="o">=</span><span class="n">repository</span><span class="p">,</span>
-<span class="p">)</span>
-<span class="n">uid</span>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">uid</span> <span class="o">=</span> <span class="n">audmodel</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">root_v1</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">name</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">params</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">version</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">author</span><span class="o">=</span><span class="n">author</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">meta</span><span class="o">=</span><span class="n">meta</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">subgroup</span><span class="o">=</span><span class="n">subgroup</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">repository</span><span class="o">=</span><span class="n">repository</span><span class="p">,</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">uid</span>
+<span class="go">&#39;3e120e8d-1.0.0&#39;</span>
 </pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>&#39;3e120e8d-1.0.0&#39;
-</pre></div>
-</div>
-</div>
 </div>
 <p>The publishing process returns a unique model ID,
 that can be used to access the model.
@@ -291,87 +261,40 @@ The model ID is derived from
 <section id="load-a-model">
 <h2>Load a model<a class="headerlink" href="#load-a-model" title="Link to this heading">¶</a></h2>
 <p>With the model ID we can check if a model exists:</p>
-<div class="jupyter_cell jupyter_container docutils container">
-<div class="cell_input code_cell docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">audmodel</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">uid</span><span class="p">)</span>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">audmodel</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">uid</span><span class="p">)</span>
+<span class="go">True</span>
 </pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>True
-</pre></div>
-</div>
-</div>
 </div>
 <p>Or get its name,</p>
-<div class="jupyter_cell jupyter_container docutils container">
-<div class="cell_input code_cell docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">audmodel</span><span class="o">.</span><span class="n">name</span><span class="p">(</span><span class="n">uid</span><span class="p">)</span>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">audmodel</span><span class="o">.</span><span class="n">name</span><span class="p">(</span><span class="n">uid</span><span class="p">)</span>
+<span class="go">&#39;onnx&#39;</span>
 </pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>&#39;onnx&#39;
-</pre></div>
-</div>
-</div>
 </div>
 <p>parameters,</p>
-<div class="jupyter_cell jupyter_container docutils container">
-<div class="cell_input code_cell docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">audmodel</span><span class="o">.</span><span class="n">parameters</span><span class="p">(</span><span class="n">uid</span><span class="p">)</span>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">audmodel</span><span class="o">.</span><span class="n">parameters</span><span class="p">(</span><span class="n">uid</span><span class="p">)</span>
+<span class="go">{&#39;model&#39;: &#39;cnn10&#39;, &#39;data&#39;: [&#39;emodb&#39;, &#39;msppodcast&#39;], &#39;feature&#39;: &#39;melspec&#39;, &#39;sampling_rate&#39;: 16000}</span>
 </pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>{&#39;model&#39;: &#39;cnn10&#39;,
- &#39;data&#39;: [&#39;emodb&#39;, &#39;msppodcast&#39;],
- &#39;feature&#39;: &#39;melspec&#39;,
- &#39;sampling_rate&#39;: 16000}
-</pre></div>
-</div>
-</div>
 </div>
 <p>and meta fields.</p>
-<div class="jupyter_cell jupyter_container docutils container">
-<div class="cell_input code_cell docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">audmodel</span><span class="o">.</span><span class="n">meta</span><span class="p">(</span><span class="n">uid</span><span class="p">)</span>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">audmodel</span><span class="o">.</span><span class="n">meta</span><span class="p">(</span><span class="n">uid</span><span class="p">)</span>
+<span class="go">{&#39;model&#39;: {&#39;cnn10&#39;: {&#39;learning-rate&#39;: 0.01, &#39;optimizer&#39;: &#39;adam&#39;}},</span>
+<span class="go"> &#39;data&#39;: {&#39;emodb&#39;: {&#39;version&#39;: &#39;1.1.1&#39;}, &#39;msppodcast&#39;: {&#39;version&#39;: &#39;2.6.0&#39;}},</span>
+<span class="go"> &#39;feature&#39;: {&#39;melspec&#39;: {&#39;win_dur&#39;: &#39;32ms&#39;, &#39;hop_dur&#39;: &#39;10ms&#39;, &#39;mel_bins&#39;: 64}}}</span>
 </pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>{&#39;model&#39;: {&#39;cnn10&#39;: {&#39;learning-rate&#39;: 0.01, &#39;optimizer&#39;: &#39;adam&#39;}},
- &#39;data&#39;: {&#39;emodb&#39;: {&#39;version&#39;: &#39;1.1.1&#39;}, &#39;msppodcast&#39;: {&#39;version&#39;: &#39;2.6.0&#39;}},
- &#39;feature&#39;: {&#39;melspec&#39;: {&#39;win_dur&#39;: &#39;32ms&#39;,
-   &#39;hop_dur&#39;: &#39;10ms&#39;,
-   &#39;mel_bins&#39;: 64}}}
-</pre></div>
-</div>
-</div>
 </div>
 <p>To actually load the actual model, we do:</p>
-<div class="jupyter_cell jupyter_container docutils container">
-<div class="cell_input code_cell docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">model_root</span> <span class="o">=</span> <span class="n">audmodel</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">uid</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">model_root</span> <span class="o">=</span> <span class="n">audmodel</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">uid</span><span class="p">)</span>
 </pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-</div>
 </div>
 <p>Inside the <code class="file docutils literal notranslate"><span class="pre">model_root</span></code> folder
 we will then have the following structure.</p>
-<div class="jupyter_cell docutils container">
-<div class="cell_output docutils container">
-<div class="output stream highlight-none notranslate"><div class="highlight"><pre><span></span>1.0.0/
-    readme.txt
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>1.0.0/
     model.onnx
     model.yaml
+    readme.txt
     log/
         eval.yaml
 </pre></div>
-</div>
-</div>
 </div>
 </section>
 <section id="model-alias">
@@ -381,63 +304,29 @@ we can create different model aliases
 to refer to a model.
 An alias can already be selected during publication,
 or it can be set afterwards with</p>
-<div class="jupyter_cell jupyter_container docutils container">
-<div class="cell_input code_cell docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">audmodel</span><span class="o">.</span><span class="n">set_alias</span><span class="p">(</span><span class="s2">&quot;emotion-small&quot;</span><span class="p">,</span> <span class="n">uid</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">audmodel</span><span class="o">.</span><span class="n">set_alias</span><span class="p">(</span><span class="s2">&quot;emotion-small&quot;</span><span class="p">,</span> <span class="n">uid</span><span class="p">)</span>
 </pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-</div>
 </div>
 <p>We can inspect the corresponding model ID with</p>
-<div class="jupyter_cell jupyter_container docutils container">
-<div class="cell_input code_cell docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">audmodel</span><span class="o">.</span><span class="n">resolve_alias</span><span class="p">(</span><span class="s2">&quot;emotion-small&quot;</span><span class="p">)</span>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">audmodel</span><span class="o">.</span><span class="n">resolve_alias</span><span class="p">(</span><span class="s2">&quot;emotion-small&quot;</span><span class="p">)</span>
+<span class="go">&#39;3e120e8d-1.0.0&#39;</span>
 </pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>&#39;3e120e8d-1.0.0&#39;
-</pre></div>
-</div>
-</div>
 </div>
 <p>and use the alias instead of the model ID
 to access the model, e.g.</p>
-<div class="jupyter_cell jupyter_container docutils container">
-<div class="cell_input code_cell docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">model_root</span> <span class="o">=</span> <span class="n">audmodel</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;emotion-small&quot;</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">model_root</span> <span class="o">=</span> <span class="n">audmodel</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;emotion-small&quot;</span><span class="p">)</span>
 </pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-</div>
 </div>
 <p>Note, that resolving a model alias always
 requires access to the backend on which the model is stored.</p>
 <p>We can add more than one alias for a model</p>
-<div class="jupyter_cell jupyter_container docutils container">
-<div class="cell_input code_cell docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">audmodel</span><span class="o">.</span><span class="n">set_alias</span><span class="p">(</span><span class="s2">&quot;emotion-production&quot;</span><span class="p">,</span> <span class="n">uid</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">audmodel</span><span class="o">.</span><span class="n">set_alias</span><span class="p">(</span><span class="s2">&quot;emotion-production&quot;</span><span class="p">,</span> <span class="n">uid</span><span class="p">)</span>
 </pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-</div>
 </div>
 <p>and can inspect existing aliases for a model ID with</p>
-<div class="jupyter_cell jupyter_container docutils container">
-<div class="cell_input code_cell docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">audmodel</span><span class="o">.</span><span class="n">aliases</span><span class="p">(</span><span class="n">uid</span><span class="p">)</span>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">audmodel</span><span class="o">.</span><span class="n">aliases</span><span class="p">(</span><span class="n">uid</span><span class="p">)</span>
+<span class="go">[&#39;emotion-production&#39;, &#39;emotion-small&#39;]</span>
 </pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>[&#39;emotion-production&#39;, &#39;emotion-small&#39;]
-</pre></div>
-</div>
-</div>
 </div>
 <p>We can update to which model ID an alias is pointing
 by running <a class="reference internal" href="api/audmodel.set_alias.html#audmodel.set_alias" title="audmodel.set_alias"><code class="xref py py-func docutils literal notranslate"><span class="pre">audmodel.set_alias()</span></code></a> again,
@@ -452,117 +341,61 @@ and update only the <code class="docutils literal notranslate"><span class="pre"
 As an example,
 let’s assume we switch to less Mel frequency bins
 in the feature extractor.</p>
-<div class="jupyter_cell jupyter_container docutils container">
-<div class="cell_input code_cell docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">meta</span><span class="p">[</span><span class="s2">&quot;feature&quot;</span><span class="p">][</span><span class="s2">&quot;melspec&quot;</span><span class="p">][</span><span class="s2">&quot;mel_bins&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">32</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">meta</span><span class="p">[</span><span class="s2">&quot;feature&quot;</span><span class="p">][</span><span class="s2">&quot;melspec&quot;</span><span class="p">][</span><span class="s2">&quot;mel_bins&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">32</span>
 </pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-</div>
 </div>
 <p>Let’s again assume we have a model folder,
 this time called <code class="docutils literal notranslate"><span class="pre">root_v2</span></code>:</p>
-<div class="jupyter_cell docutils container">
-<div class="cell_output docutils container">
-<div class="output stream highlight-none notranslate"><div class="highlight"><pre><span></span>root_v2/
-    readme.txt
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>root_v2/
     model.onnx
     model.yaml
+    readme.txt
     log/
         eval.yaml
 </pre></div>
-</div>
-</div>
 </div>
 <p>As this model has the same parameters, name, and subgroup
 as our previous model,
 we choose a new version number,
 and publish it with:</p>
-<div class="jupyter_cell jupyter_container docutils container">
-<div class="cell_input code_cell docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">uid_v1</span> <span class="o">=</span> <span class="n">uid</span>
-<span class="n">uid</span> <span class="o">=</span> <span class="n">audmodel</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span>
-    <span class="n">root_v2</span><span class="p">,</span>
-    <span class="n">name</span><span class="p">,</span>
-    <span class="n">params</span><span class="p">,</span>
-    <span class="s2">&quot;2.0.0&quot;</span><span class="p">,</span>
-    <span class="n">meta</span><span class="o">=</span><span class="n">meta</span><span class="p">,</span>
-    <span class="n">subgroup</span><span class="o">=</span><span class="n">subgroup</span><span class="p">,</span>
-    <span class="n">repository</span><span class="o">=</span><span class="n">repository</span><span class="p">,</span>
-<span class="p">)</span>
-<span class="n">uid</span>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">uid_v1</span> <span class="o">=</span> <span class="n">uid</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">uid</span> <span class="o">=</span> <span class="n">audmodel</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">root_v2</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">name</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">params</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="s2">&quot;2.0.0&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">meta</span><span class="o">=</span><span class="n">meta</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">subgroup</span><span class="o">=</span><span class="n">subgroup</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">repository</span><span class="o">=</span><span class="n">repository</span><span class="p">,</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">uid</span>
+<span class="go">&#39;3e120e8d-2.0.0&#39;</span>
 </pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>&#39;3e120e8d-2.0.0&#39;
-</pre></div>
-</div>
-</div>
 </div>
 <p>Now we have published two versions of the model:</p>
-<div class="jupyter_cell jupyter_container docutils container">
-<div class="cell_input code_cell docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">audmodel</span><span class="o">.</span><span class="n">versions</span><span class="p">(</span><span class="n">uid</span><span class="p">)</span>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">audmodel</span><span class="o">.</span><span class="n">versions</span><span class="p">(</span><span class="n">uid</span><span class="p">)</span>
+<span class="go">[&#39;1.0.0&#39;, &#39;2.0.0&#39;]</span>
 </pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>[&#39;1.0.0&#39;, &#39;2.0.0&#39;]
-</pre></div>
-</div>
-</div>
 </div>
 <p>To find the latest version we can do:</p>
-<div class="jupyter_cell jupyter_container docutils container">
-<div class="cell_input code_cell docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">audmodel</span><span class="o">.</span><span class="n">latest_version</span><span class="p">(</span><span class="n">uid</span><span class="p">)</span>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">audmodel</span><span class="o">.</span><span class="n">latest_version</span><span class="p">(</span><span class="n">uid</span><span class="p">)</span>
+<span class="go">&#39;2.0.0&#39;</span>
 </pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>&#39;2.0.0&#39;
-</pre></div>
-</div>
-</div>
 </div>
 <p>We can update our existing model aliases
 to point to the newest version.</p>
-<div class="jupyter_cell jupyter_container docutils container">
-<div class="cell_input code_cell docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">audmodel</span><span class="o">.</span><span class="n">set_alias</span><span class="p">(</span><span class="s2">&quot;emotion-small&quot;</span><span class="p">,</span> <span class="n">uid</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">audmodel</span><span class="o">.</span><span class="n">set_alias</span><span class="p">(</span><span class="s2">&quot;emotion-small&quot;</span><span class="p">,</span> <span class="n">uid</span><span class="p">)</span>
 <span class="n">audmodel</span><span class="o">.</span><span class="n">set_alias</span><span class="p">(</span><span class="s2">&quot;emotion-production&quot;</span><span class="p">,</span> <span class="n">uid</span><span class="p">)</span>
 </pre></div>
 </div>
-</div>
-<div class="cell_output docutils container">
-</div>
-</div>
 <p>Now, all model aliases are only pointing to the new version:</p>
-<div class="jupyter_cell jupyter_container docutils container">
-<div class="cell_input code_cell docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">audmodel</span><span class="o">.</span><span class="n">aliases</span><span class="p">(</span><span class="n">uid_v1</span><span class="p">)</span>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">audmodel</span><span class="o">.</span><span class="n">aliases</span><span class="p">(</span><span class="n">uid_v1</span><span class="p">)</span>
+<span class="go">[]</span>
 </pre></div>
 </div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>[]
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">audmodel</span><span class="o">.</span><span class="n">aliases</span><span class="p">(</span><span class="n">uid</span><span class="p">)</span>
+<span class="go">[&#39;emotion-production&#39;, &#39;emotion-small&#39;]</span>
 </pre></div>
-</div>
-</div>
-</div>
-<div class="jupyter_cell jupyter_container docutils container">
-<div class="cell_input code_cell docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">audmodel</span><span class="o">.</span><span class="n">aliases</span><span class="p">(</span><span class="n">uid</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>[&#39;emotion-production&#39;, &#39;emotion-small&#39;]
-</pre></div>
-</div>
-</div>
 </div>
 </section>
 <section id="update-metadata">
@@ -575,75 +408,31 @@ by passing a dictionary
 that holds new / altered information.
 As the following example shows
 this even works with nested fields.</p>
-<div class="jupyter_cell jupyter_container docutils container">
-<div class="cell_input code_cell docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">meta</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s2">&quot;model&quot;</span><span class="p">:</span> <span class="p">{</span>
-        <span class="s2">&quot;cnn10&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;layers&quot;</span><span class="p">:</span> <span class="mi">10</span><span class="p">},</span>
-    <span class="p">},</span>
-<span class="p">}</span>
-<span class="n">audmodel</span><span class="o">.</span><span class="n">update_meta</span><span class="p">(</span><span class="n">uid</span><span class="p">,</span> <span class="n">meta</span><span class="p">)</span>
-<span class="n">audmodel</span><span class="o">.</span><span class="n">meta</span><span class="p">(</span><span class="n">uid</span><span class="p">)</span>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">meta</span> <span class="o">=</span> <span class="p">{</span>
+<span class="gp">... </span>    <span class="s2">&quot;model&quot;</span><span class="p">:</span> <span class="p">{</span>
+<span class="gp">... </span>        <span class="s2">&quot;cnn10&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;layers&quot;</span><span class="p">:</span> <span class="mi">10</span><span class="p">},</span>
+<span class="gp">... </span>    <span class="p">},</span>
+<span class="gp">... </span><span class="p">}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">audmodel</span><span class="o">.</span><span class="n">update_meta</span><span class="p">(</span><span class="n">uid</span><span class="p">,</span> <span class="n">meta</span><span class="p">)</span>
+<span class="go">{&#39;model&#39;: {&#39;cnn10&#39;: {&#39;learning-rate&#39;: 0.01, &#39;optimizer&#39;: &#39;adam&#39;, &#39;layers&#39;: 10}},</span>
+<span class="go"> &#39;data&#39;: {&#39;emodb&#39;: {&#39;version&#39;: &#39;1.1.1&#39;}, &#39;msppodcast&#39;: {&#39;version&#39;: &#39;2.6.0&#39;}},</span>
+<span class="go"> &#39;feature&#39;: {&#39;melspec&#39;: {&#39;win_dur&#39;: &#39;32ms&#39;, &#39;hop_dur&#39;: &#39;10ms&#39;, &#39;mel_bins&#39;: 32}}}</span>
 </pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>{&#39;model&#39;: {&#39;cnn10&#39;: {&#39;learning-rate&#39;: 0.01,
-   &#39;optimizer&#39;: &#39;adam&#39;,
-   &#39;layers&#39;: 10}},
- &#39;data&#39;: {&#39;emodb&#39;: {&#39;version&#39;: &#39;1.1.1&#39;}, &#39;msppodcast&#39;: {&#39;version&#39;: &#39;2.6.0&#39;}},
- &#39;feature&#39;: {&#39;melspec&#39;: {&#39;win_dur&#39;: &#39;32ms&#39;,
-   &#39;hop_dur&#39;: &#39;10ms&#39;,
-   &#39;mel_bins&#39;: 32}}}
-</pre></div>
-</div>
-</div>
 </div>
 <p>Alternatively,
 we can replace the metadata.</p>
-<div class="jupyter_cell jupyter_container docutils container">
-<div class="cell_input code_cell docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">meta</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;new&quot;</span><span class="p">:</span> <span class="s2">&quot;meta&quot;</span><span class="p">}</span>
-<span class="n">audmodel</span><span class="o">.</span><span class="n">update_meta</span><span class="p">(</span><span class="n">uid</span><span class="p">,</span> <span class="n">meta</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="n">audmodel</span><span class="o">.</span><span class="n">meta</span><span class="p">(</span><span class="n">uid</span><span class="p">)</span>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">meta</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;new&quot;</span><span class="p">:</span> <span class="s2">&quot;meta&quot;</span><span class="p">}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">audmodel</span><span class="o">.</span><span class="n">update_meta</span><span class="p">(</span><span class="n">uid</span><span class="p">,</span> <span class="n">meta</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="go">{&#39;new&#39;: &#39;meta&#39;}</span>
 </pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>{&#39;new&#39;: &#39;meta&#39;}
-</pre></div>
-</div>
-</div>
 </div>
 </section>
 <section id="cache-folder">
 <h2>Cache folder<a class="headerlink" href="#cache-folder" title="Link to this heading">¶</a></h2>
 <p>Models are unpacked to the model cache folder,
 which can be checked by:</p>
-<div class="jupyter_cell jupyter_container docutils container">
-<div class="cell_input code_cell docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">cache_root</span> <span class="o">=</span> <span class="n">audmodel</span><span class="o">.</span><span class="n">default_cache_root</span><span class="p">()</span>
-<span class="n">cache_root</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">cache_root</span> <span class="o">=</span> <span class="n">audmodel</span><span class="o">.</span><span class="n">default_cache_root</span><span class="p">()</span>
 </pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>&#39;/home/runner/work/audmodel/audmodel/tmp/cache&#39;
-</pre></div>
-</div>
-</div>
-</div>
-<div class="jupyter_cell jupyter_container docutils container">
-<div class="cell_input code_cell docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">audeer</span><span class="o">.</span><span class="n">list_dir_names</span><span class="p">(</span><span class="n">cache_root</span><span class="p">,</span> <span class="n">basenames</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>[&#39;3e120e8d&#39;]
-</pre></div>
-</div>
-</div>
 </div>
 <p>We can change the location of the cache folder
 by setting an environment variable:</p>
@@ -651,7 +440,7 @@ by setting an environment variable:</p>
 </pre></div>
 </div>
 <p>Or by changing it inside <a class="reference internal" href="api/audmodel.config.html#audmodel.config" title="audmodel.config"><code class="xref py py-class docutils literal notranslate"><span class="pre">audmodel.config</span></code></a>:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">audmodel</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">CACHE_ROOT</span><span class="o">=</span><span class="s2">&quot;/path/to/your/cache&quot;</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">audmodel</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">CACHE_ROOT</span> <span class="o">=</span> <span class="s2">&quot;/path/to/your/cache&quot;</span>
 </pre></div>
 </div>
 <p>Or individually,
@@ -660,6 +449,10 @@ with a non empty <code class="docutils literal notranslate"><span class="pre">ca
 <p>Within the model cache folder
 the model is placed in a unique sub-folder, namely
 <code class="docutils literal notranslate"><span class="pre">&lt;uid&gt;/&lt;version&gt;</span></code>.</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">audeer</span><span class="o">.</span><span class="n">list_dir_names</span><span class="p">(</span><span class="n">cache_root</span><span class="p">,</span> <span class="n">basenames</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="go">[&#39;3e120e8d&#39;]</span>
+</pre></div>
+</div>
 </section>
 <section id="shared-cache-folder">
 <h2>Shared cache folder<a class="headerlink" href="#shared-cache-folder" title="Link to this heading">¶</a></h2>
@@ -672,10 +465,6 @@ in <code class="docutils literal notranslate"><span class="pre">audb</span></cod
 when trying to access the same file.
 You can only use a shared cache on the same platform
 as the file lock mechanism is not cross-platform compatible.</p>
-<div class="jupyter_cell docutils container">
-<div class="cell_output docutils container">
-</div>
-</div>
 </section>
 </section>
 
@@ -702,7 +491,7 @@ as the file lock mechanism is not cross-platform compatible.</p>
         
         
         
-          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2026/07/02 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2026/08/07 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>
@@ -737,11 +526,8 @@ as the file lock mechanism is not cross-platform compatible.</p>
         <script src="_static/documentation_options.js?v=5929fcd5"></script>
         <script src="_static/doctools.js?v=fd6eb6e6"></script>
         <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
-        <script src="_static/thebelab-helper.js"></script>
         <script src="_static/clipboard.min.js?v=a7894cd8"></script>
         <script src="_static/copybutton.js?v=ccdb6887"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
     
 
   
