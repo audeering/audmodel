@@ -682,8 +682,8 @@ def publish(
             subgroup,
             root,
             backend_interface,
+            compression,
             verbose,
-            compression=compression,
             tmp_root=tmp_root,
         )
         if alias:
