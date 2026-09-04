@@ -326,10 +326,11 @@ def test_publish_compression(tmp_path, compression, expected_compress_type):
         file.write("a" * 10000)
 
     kwargs = {} if compression is None else {"compression": compression}
+    effective_compression = 1 if compression is None else compression
     uid = audmodel.publish(
         root,
         pytest.NAME,
-        {"compression": compression},
+        {"compression": effective_compression, "compression_arg": compression},
         "1.0.0",
         author=pytest.AUTHOR,
         date=pytest.DATE,
