@@ -517,19 +517,14 @@ def publish(
             ``1``-``9`` selects a deflate level.
             Deflate is single threaded,
             and dominates the publication time
-            of large models,
-            while it shrinks
-            a typical model checkpoint
-            by around 20% only.
+            of large models.
             Higher levels than ``1``
             hardly compress better
             on model weights,
             but take at least twice as long.
             Select ``0``,
             if you want to publish
-            as fast as possible,
-            and neither storage
-            nor download time matters
+            as fast as possible
         date: date, defaults to current timestamp
         meta: dictionary with meta information
         subgroup: subgroup under which
