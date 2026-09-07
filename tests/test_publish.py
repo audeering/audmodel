@@ -1,4 +1,5 @@
 import os
+import zipfile
 
 import pytest
 
@@ -296,4 +297,69 @@ def test_publish_missing_repository_raises():
             {},
             "1.0.0",
             repository=None,
+        )
+
+
+@pytest.mark.parametrize(
+    "compression, expected_compress_type",
+    [
+        # deflate level 1 by default
+        (None, zipfile.ZIP_DEFLATED),
+        (0, zipfile.ZIP_STORED),
+        (1, zipfile.ZIP_DEFLATED),
+        (9, zipfile.ZIP_DEFLATED),
+    ],
+)
+def test_publish_compression(tmp_path, compression, expected_compress_type):
+    r"""Test compression of the published model archive.
+
+    Args:
+        tmp_path: tmp_path fixture
+        compression: compression level,
+            ``None`` publishes without the argument
+        expected_compress_type: expected compression method
+            of the entries in the model archive
+
+    """
+    root = audeer.mkdir(tmp_path, "model")
+    with open(os.path.join(root, "model.bin"), "w") as file:
+        file.write("a" * 10000)
+
+    kwargs = {} if compression is None else {"compression": compression}
+    effective_compression = 1 if compression is None else compression
+    uid = audmodel.publish(
+        root,
+        pytest.NAME,
+        {"compression": effective_compression, "compression_arg": compression},
+        "1.0.0",
+        author=pytest.AUTHOR,
+        date=pytest.DATE,
+        subgroup=f"{SUBGROUP}.compression",
+        repository=pytest.REPOSITORIES[0],
+        **kwargs,
+    )
+
+    with zipfile.ZipFile(audmodel.url(uid)) as archive:
+        infos = archive.infolist()
+    assert [info.filename for info in infos] == ["model.bin"]
+    assert infos[0].compress_type == expected_compress_type
+
+
+@pytest.mark.parametrize("compression", [-1, 10])
+def test_publish_compression_error(compression):
+    r"""Test error for a compression level outside 0-9.
+
+    Args:
+        compression: invalid compression level
+
+    """
+    error_msg = f"'compression' has to be between 0 and 9, not {compression}."
+    with pytest.raises(ValueError, match=error_msg):
+        audmodel.publish(
+            pytest.MODEL_ROOT,
+            pytest.NAME,
+            {},
+            "1.0.0",
+            compression=compression,
+            repository=pytest.REPOSITORIES[0],
         )

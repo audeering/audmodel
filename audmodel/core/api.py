@@ -434,6 +434,7 @@ def publish(
     repository: Repository,
     alias: str | None = None,
     author: str | None = None,
+    compression: int = 1,
     date: datetime.date | None = None,
     meta: dict[str, object] | None = None,
     subgroup: str | None = None,
@@ -509,6 +510,21 @@ def publish(
             If provided, the model can be accessed using this alias
             in addition to its UID
         author: author name(s), defaults to user name
+        compression: compression level
+            of the model archive.
+            ``0`` stores the model files
+            without compression,
+            ``1``-``9`` selects a deflate level.
+            Deflate is single threaded,
+            and dominates the publication time
+            of large models.
+            Higher levels than ``1``
+            hardly compress better
+            on model weights,
+            but take at least twice as long.
+            Select ``0``,
+            if you want to publish
+            as fast as possible
         date: date, defaults to current timestamp
         meta: dictionary with meta information
         subgroup: subgroup under which
@@ -540,6 +556,7 @@ def publish(
         FileNotFoundError: if ``root`` folder cannot be found
         ValueError: if ``alias`` can be confused with an UID,
             or it does contain chars other than ``[A-Za-z0-9._-]+``
+        ValueError: if ``compression`` is not between 0 and 9
 
     Examples:
         >>> # Assuming your model files are stored under `model_root`
@@ -616,6 +633,9 @@ def publish(
             "and are not allowed to be confused with a model ID."
         )
 
+    if not 0 <= compression <= 9:
+        raise ValueError(f"'compression' has to be between 0 and 9, not {compression}.")
+
     if not os.path.isdir(root):
         raise FileNotFoundError(
             errno.ENOENT,
@@ -662,6 +682,7 @@ def publish(
             subgroup,
             root,
             backend_interface,
+            compression,
             verbose,
             tmp_root=tmp_root,
         )

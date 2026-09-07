@@ -389,6 +389,7 @@ def put_archive(
     subgroup: str,
     root: str,
     backend_interface: audbackend.interface.Maven,
+    compression: int,
     verbose: bool,
     tmp_root: str | None = None,
 ) -> str:
@@ -401,6 +402,11 @@ def put_archive(
         subgroup: model subgroup
         root: path to model root folder
         backend_interface: backend interface instance
+        compression: compression level
+            of the model archive.
+            ``0`` stores the model files
+            without compression,
+            ``1``-``9`` selects a deflate level
         verbose: if ``True`` show message
             when uploading file
         tmp_root: folder under which the temporary archive
@@ -433,6 +439,7 @@ def put_archive(
             root,
             files,
             src_path,
+            compression=compression,
             verbose=verbose,
         )
         with backend_interface.backend:
