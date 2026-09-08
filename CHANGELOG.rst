@@ -7,6 +7,15 @@ The format is based on `Keep a Changelog`_,
 and this project adheres to `Semantic Versioning`_.
 
 
+Version 1.5.2 (2026-09-08)
+--------------------------
+
+* Added: ``compression`` argument to ``audmodel.publish()``
+  to select compression of ZIP file.
+  Use ``0`` to disable compression
+* Changed: default compression of model ZIP files from 6 to 1
+
+
 Version 1.5.1 (2026-08-06)
 --------------------------
 
