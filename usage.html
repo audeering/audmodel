@@ -67,7 +67,7 @@
             
             
               <div class="version">
-                v1.5.1
+                v1.5.2
               </div>
             
           
@@ -193,35 +193,35 @@ we have to define several arguments:</p>
 have a look at the discussion in the API documentation of
 <a class="reference internal" href="api/audmodel.publish.html#audmodel.publish" title="audmodel.publish"><code class="xref py py-func docutils literal notranslate"><span class="pre">audmodel.publish()</span></code></a>.</p>
 <p>Let’s define the arguments for our example model:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;onnx&quot;</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">name</span> <span class="o">=</span> <span class="s2">"onnx"</span>
 <span class="n">params</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s2">&quot;model&quot;</span><span class="p">:</span> <span class="s2">&quot;cnn10&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;data&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;emodb&quot;</span><span class="p">,</span> <span class="s2">&quot;msppodcast&quot;</span><span class="p">],</span>
-    <span class="s2">&quot;feature&quot;</span><span class="p">:</span> <span class="s2">&quot;melspec&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;sampling_rate&quot;</span><span class="p">:</span> <span class="mi">16000</span><span class="p">,</span>
+    <span class="s2">"model"</span><span class="p">:</span> <span class="s2">"cnn10"</span><span class="p">,</span>
+    <span class="s2">"data"</span><span class="p">:</span> <span class="p">[</span><span class="s2">"emodb"</span><span class="p">,</span> <span class="s2">"msppodcast"</span><span class="p">],</span>
+    <span class="s2">"feature"</span><span class="p">:</span> <span class="s2">"melspec"</span><span class="p">,</span>
+    <span class="s2">"sampling_rate"</span><span class="p">:</span> <span class="mi">16000</span><span class="p">,</span>
 <span class="p">}</span>
-<span class="n">version</span> <span class="o">=</span> <span class="s2">&quot;1.0.0&quot;</span>
-<span class="n">author</span> <span class="o">=</span> <span class="s2">&quot;sphinx&quot;</span>
+<span class="n">version</span> <span class="o">=</span> <span class="s2">"1.0.0"</span>
+<span class="n">author</span> <span class="o">=</span> <span class="s2">"sphinx"</span>
 <span class="n">meta</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s2">&quot;model&quot;</span><span class="p">:</span> <span class="p">{</span>
-        <span class="s2">&quot;cnn10&quot;</span><span class="p">:</span> <span class="p">{</span>
-            <span class="s2">&quot;learning-rate&quot;</span><span class="p">:</span> <span class="mf">1e-2</span><span class="p">,</span>
-            <span class="s2">&quot;optimizer&quot;</span><span class="p">:</span> <span class="s2">&quot;adam&quot;</span><span class="p">,</span>
+    <span class="s2">"model"</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">"cnn10"</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">"learning-rate"</span><span class="p">:</span> <span class="mf">1e-2</span><span class="p">,</span>
+            <span class="s2">"optimizer"</span><span class="p">:</span> <span class="s2">"adam"</span><span class="p">,</span>
         <span class="p">},</span>
     <span class="p">},</span>
-    <span class="s2">&quot;data&quot;</span><span class="p">:</span> <span class="p">{</span>
-        <span class="s2">&quot;emodb&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;version&quot;</span><span class="p">:</span> <span class="s2">&quot;1.1.1&quot;</span><span class="p">},</span>
-        <span class="s2">&quot;msppodcast&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;version&quot;</span><span class="p">:</span> <span class="s2">&quot;2.6.0&quot;</span><span class="p">},</span>
+    <span class="s2">"data"</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">"emodb"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"version"</span><span class="p">:</span> <span class="s2">"1.1.1"</span><span class="p">},</span>
+        <span class="s2">"msppodcast"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"version"</span><span class="p">:</span> <span class="s2">"2.6.0"</span><span class="p">},</span>
     <span class="p">},</span>
-    <span class="s2">&quot;feature&quot;</span><span class="p">:</span> <span class="p">{</span>
-        <span class="s2">&quot;melspec&quot;</span><span class="p">:</span> <span class="p">{</span>
-            <span class="s2">&quot;win_dur&quot;</span><span class="p">:</span> <span class="s2">&quot;32ms&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;hop_dur&quot;</span><span class="p">:</span> <span class="s2">&quot;10ms&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;mel_bins&quot;</span><span class="p">:</span> <span class="mi">64</span><span class="p">,</span>
+    <span class="s2">"feature"</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">"melspec"</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">"win_dur"</span><span class="p">:</span> <span class="s2">"32ms"</span><span class="p">,</span>
+            <span class="s2">"hop_dur"</span><span class="p">:</span> <span class="s2">"10ms"</span><span class="p">,</span>
+            <span class="s2">"mel_bins"</span><span class="p">:</span> <span class="mi">64</span><span class="p">,</span>
         <span class="p">},</span>
     <span class="p">},</span>
 <span class="p">}</span>
-<span class="n">subgroup</span> <span class="o">=</span> <span class="s2">&quot;emotion.cnn&quot;</span>
+<span class="n">subgroup</span> <span class="o">=</span> <span class="s2">"emotion.cnn"</span>
 </pre></div>
 </div>
 <p>By default <a class="reference internal" href="api/audmodel.html#module-audmodel" title="audmodel"><code class="xref py py-mod docutils literal notranslate"><span class="pre">audmodel</span></code></a> uses repositories on S3.
@@ -231,10 +231,10 @@ in which the model is stored.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">audeer</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">audmodel</span>
 
-<span class="n">repo</span> <span class="o">=</span> <span class="s2">&quot;models&quot;</span>
-<span class="n">host</span> <span class="o">=</span> <span class="n">audeer</span><span class="o">.</span><span class="n">path</span><span class="p">(</span><span class="s2">&quot;./tmp/repo&quot;</span><span class="p">)</span>
+<span class="n">repo</span> <span class="o">=</span> <span class="s2">"models"</span>
+<span class="n">host</span> <span class="o">=</span> <span class="n">audeer</span><span class="o">.</span><span class="n">path</span><span class="p">(</span><span class="s2">"./tmp/repo"</span><span class="p">)</span>
 <span class="n">audeer</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">audeer</span><span class="o">.</span><span class="n">path</span><span class="p">(</span><span class="n">host</span><span class="p">,</span> <span class="n">repo</span><span class="p">))</span>
-<span class="n">repository</span> <span class="o">=</span> <span class="n">audmodel</span><span class="o">.</span><span class="n">Repository</span><span class="p">(</span><span class="n">repo</span><span class="p">,</span> <span class="n">host</span><span class="p">,</span> <span class="s2">&quot;file-system&quot;</span><span class="p">)</span>
+<span class="n">repository</span> <span class="o">=</span> <span class="n">audmodel</span><span class="o">.</span><span class="n">Repository</span><span class="p">(</span><span class="n">repo</span><span class="p">,</span> <span class="n">host</span><span class="p">,</span> <span class="s2">"file-system"</span><span class="p">)</span>
 <span class="n">audmodel</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">REPOSITORIES</span> <span class="o">=</span> <span class="p">[</span><span class="n">repository</span><span class="p">]</span>
 </pre></div>
 </div>
@@ -250,7 +250,7 @@ in which the model is stored.</p>
 <span class="gp">... </span>    <span class="n">repository</span><span class="o">=</span><span class="n">repository</span><span class="p">,</span>
 <span class="gp">... </span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">uid</span>
-<span class="go">&#39;3e120e8d-1.0.0&#39;</span>
+<span class="go">'3e120e8d-1.0.0'</span>
 </pre></div>
 </div>
 <p>The publishing process returns a unique model ID,
@@ -267,19 +267,19 @@ The model ID is derived from
 </div>
 <p>Or get its name,</p>
 <div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">audmodel</span><span class="o">.</span><span class="n">name</span><span class="p">(</span><span class="n">uid</span><span class="p">)</span>
-<span class="go">&#39;onnx&#39;</span>
+<span class="go">'onnx'</span>
 </pre></div>
 </div>
 <p>parameters,</p>
 <div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">audmodel</span><span class="o">.</span><span class="n">parameters</span><span class="p">(</span><span class="n">uid</span><span class="p">)</span>
-<span class="go">{&#39;model&#39;: &#39;cnn10&#39;, &#39;data&#39;: [&#39;emodb&#39;, &#39;msppodcast&#39;], &#39;feature&#39;: &#39;melspec&#39;, &#39;sampling_rate&#39;: 16000}</span>
+<span class="go">{'model': 'cnn10', 'data': ['emodb', 'msppodcast'], 'feature': 'melspec', 'sampling_rate': 16000}</span>
 </pre></div>
 </div>
 <p>and meta fields.</p>
 <div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">audmodel</span><span class="o">.</span><span class="n">meta</span><span class="p">(</span><span class="n">uid</span><span class="p">)</span>
-<span class="go">{&#39;model&#39;: {&#39;cnn10&#39;: {&#39;learning-rate&#39;: 0.01, &#39;optimizer&#39;: &#39;adam&#39;}},</span>
-<span class="go"> &#39;data&#39;: {&#39;emodb&#39;: {&#39;version&#39;: &#39;1.1.1&#39;}, &#39;msppodcast&#39;: {&#39;version&#39;: &#39;2.6.0&#39;}},</span>
-<span class="go"> &#39;feature&#39;: {&#39;melspec&#39;: {&#39;win_dur&#39;: &#39;32ms&#39;, &#39;hop_dur&#39;: &#39;10ms&#39;, &#39;mel_bins&#39;: 64}}}</span>
+<span class="go">{'model': {'cnn10': {'learning-rate': 0.01, 'optimizer': 'adam'}},</span>
+<span class="go"> 'data': {'emodb': {'version': '1.1.1'}, 'msppodcast': {'version': '2.6.0'}},</span>
+<span class="go"> 'feature': {'melspec': {'win_dur': '32ms', 'hop_dur': '10ms', 'mel_bins': 64}}}</span>
 </pre></div>
 </div>
 <p>To actually load the actual model, we do:</p>
@@ -304,28 +304,28 @@ we can create different model aliases
 to refer to a model.
 An alias can already be selected during publication,
 or it can be set afterwards with</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">audmodel</span><span class="o">.</span><span class="n">set_alias</span><span class="p">(</span><span class="s2">&quot;emotion-small&quot;</span><span class="p">,</span> <span class="n">uid</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">audmodel</span><span class="o">.</span><span class="n">set_alias</span><span class="p">(</span><span class="s2">"emotion-small"</span><span class="p">,</span> <span class="n">uid</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>We can inspect the corresponding model ID with</p>
-<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">audmodel</span><span class="o">.</span><span class="n">resolve_alias</span><span class="p">(</span><span class="s2">&quot;emotion-small&quot;</span><span class="p">)</span>
-<span class="go">&#39;3e120e8d-1.0.0&#39;</span>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">audmodel</span><span class="o">.</span><span class="n">resolve_alias</span><span class="p">(</span><span class="s2">"emotion-small"</span><span class="p">)</span>
+<span class="go">'3e120e8d-1.0.0'</span>
 </pre></div>
 </div>
 <p>and use the alias instead of the model ID
 to access the model, e.g.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">model_root</span> <span class="o">=</span> <span class="n">audmodel</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;emotion-small&quot;</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">model_root</span> <span class="o">=</span> <span class="n">audmodel</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">"emotion-small"</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Note, that resolving a model alias always
 requires access to the backend on which the model is stored.</p>
 <p>We can add more than one alias for a model</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">audmodel</span><span class="o">.</span><span class="n">set_alias</span><span class="p">(</span><span class="s2">&quot;emotion-production&quot;</span><span class="p">,</span> <span class="n">uid</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">audmodel</span><span class="o">.</span><span class="n">set_alias</span><span class="p">(</span><span class="s2">"emotion-production"</span><span class="p">,</span> <span class="n">uid</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>and can inspect existing aliases for a model ID with</p>
 <div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">audmodel</span><span class="o">.</span><span class="n">aliases</span><span class="p">(</span><span class="n">uid</span><span class="p">)</span>
-<span class="go">[&#39;emotion-production&#39;, &#39;emotion-small&#39;]</span>
+<span class="go">['emotion-production', 'emotion-small']</span>
 </pre></div>
 </div>
 <p>We can update to which model ID an alias is pointing
@@ -341,7 +341,7 @@ and update only the <code class="docutils literal notranslate"><span class="pre"
 As an example,
 let’s assume we switch to less Mel frequency bins
 in the feature extractor.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">meta</span><span class="p">[</span><span class="s2">&quot;feature&quot;</span><span class="p">][</span><span class="s2">&quot;melspec&quot;</span><span class="p">][</span><span class="s2">&quot;mel_bins&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">32</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">meta</span><span class="p">[</span><span class="s2">"feature"</span><span class="p">][</span><span class="s2">"melspec"</span><span class="p">][</span><span class="s2">"mel_bins"</span><span class="p">]</span> <span class="o">=</span> <span class="mi">32</span>
 </pre></div>
 </div>
 <p>Let’s again assume we have a model folder,
@@ -363,29 +363,29 @@ and publish it with:</p>
 <span class="gp">... </span>    <span class="n">root_v2</span><span class="p">,</span>
 <span class="gp">... </span>    <span class="n">name</span><span class="p">,</span>
 <span class="gp">... </span>    <span class="n">params</span><span class="p">,</span>
-<span class="gp">... </span>    <span class="s2">&quot;2.0.0&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="s2">"2.0.0"</span><span class="p">,</span>
 <span class="gp">... </span>    <span class="n">meta</span><span class="o">=</span><span class="n">meta</span><span class="p">,</span>
 <span class="gp">... </span>    <span class="n">subgroup</span><span class="o">=</span><span class="n">subgroup</span><span class="p">,</span>
 <span class="gp">... </span>    <span class="n">repository</span><span class="o">=</span><span class="n">repository</span><span class="p">,</span>
 <span class="gp">... </span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">uid</span>
-<span class="go">&#39;3e120e8d-2.0.0&#39;</span>
+<span class="go">'3e120e8d-2.0.0'</span>
 </pre></div>
 </div>
 <p>Now we have published two versions of the model:</p>
 <div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">audmodel</span><span class="o">.</span><span class="n">versions</span><span class="p">(</span><span class="n">uid</span><span class="p">)</span>
-<span class="go">[&#39;1.0.0&#39;, &#39;2.0.0&#39;]</span>
+<span class="go">['1.0.0', '2.0.0']</span>
 </pre></div>
 </div>
 <p>To find the latest version we can do:</p>
 <div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">audmodel</span><span class="o">.</span><span class="n">latest_version</span><span class="p">(</span><span class="n">uid</span><span class="p">)</span>
-<span class="go">&#39;2.0.0&#39;</span>
+<span class="go">'2.0.0'</span>
 </pre></div>
 </div>
 <p>We can update our existing model aliases
 to point to the newest version.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">audmodel</span><span class="o">.</span><span class="n">set_alias</span><span class="p">(</span><span class="s2">&quot;emotion-small&quot;</span><span class="p">,</span> <span class="n">uid</span><span class="p">)</span>
-<span class="n">audmodel</span><span class="o">.</span><span class="n">set_alias</span><span class="p">(</span><span class="s2">&quot;emotion-production&quot;</span><span class="p">,</span> <span class="n">uid</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">audmodel</span><span class="o">.</span><span class="n">set_alias</span><span class="p">(</span><span class="s2">"emotion-small"</span><span class="p">,</span> <span class="n">uid</span><span class="p">)</span>
+<span class="n">audmodel</span><span class="o">.</span><span class="n">set_alias</span><span class="p">(</span><span class="s2">"emotion-production"</span><span class="p">,</span> <span class="n">uid</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Now, all model aliases are only pointing to the new version:</p>
@@ -394,7 +394,7 @@ to point to the newest version.</p>
 </pre></div>
 </div>
 <div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">audmodel</span><span class="o">.</span><span class="n">aliases</span><span class="p">(</span><span class="n">uid</span><span class="p">)</span>
-<span class="go">[&#39;emotion-production&#39;, &#39;emotion-small&#39;]</span>
+<span class="go">['emotion-production', 'emotion-small']</span>
 </pre></div>
 </div>
 </section>
@@ -409,21 +409,21 @@ that holds new / altered information.
 As the following example shows
 this even works with nested fields.</p>
 <div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">meta</span> <span class="o">=</span> <span class="p">{</span>
-<span class="gp">... </span>    <span class="s2">&quot;model&quot;</span><span class="p">:</span> <span class="p">{</span>
-<span class="gp">... </span>        <span class="s2">&quot;cnn10&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;layers&quot;</span><span class="p">:</span> <span class="mi">10</span><span class="p">},</span>
+<span class="gp">... </span>    <span class="s2">"model"</span><span class="p">:</span> <span class="p">{</span>
+<span class="gp">... </span>        <span class="s2">"cnn10"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"layers"</span><span class="p">:</span> <span class="mi">10</span><span class="p">},</span>
 <span class="gp">... </span>    <span class="p">},</span>
 <span class="gp">... </span><span class="p">}</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">audmodel</span><span class="o">.</span><span class="n">update_meta</span><span class="p">(</span><span class="n">uid</span><span class="p">,</span> <span class="n">meta</span><span class="p">)</span>
-<span class="go">{&#39;model&#39;: {&#39;cnn10&#39;: {&#39;learning-rate&#39;: 0.01, &#39;optimizer&#39;: &#39;adam&#39;, &#39;layers&#39;: 10}},</span>
-<span class="go"> &#39;data&#39;: {&#39;emodb&#39;: {&#39;version&#39;: &#39;1.1.1&#39;}, &#39;msppodcast&#39;: {&#39;version&#39;: &#39;2.6.0&#39;}},</span>
-<span class="go"> &#39;feature&#39;: {&#39;melspec&#39;: {&#39;win_dur&#39;: &#39;32ms&#39;, &#39;hop_dur&#39;: &#39;10ms&#39;, &#39;mel_bins&#39;: 32}}}</span>
+<span class="go">{'model': {'cnn10': {'learning-rate': 0.01, 'optimizer': 'adam', 'layers': 10}},</span>
+<span class="go"> 'data': {'emodb': {'version': '1.1.1'}, 'msppodcast': {'version': '2.6.0'}},</span>
+<span class="go"> 'feature': {'melspec': {'win_dur': '32ms', 'hop_dur': '10ms', 'mel_bins': 32}}}</span>
 </pre></div>
 </div>
 <p>Alternatively,
 we can replace the metadata.</p>
-<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">meta</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;new&quot;</span><span class="p">:</span> <span class="s2">&quot;meta&quot;</span><span class="p">}</span>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">meta</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"new"</span><span class="p">:</span> <span class="s2">"meta"</span><span class="p">}</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">audmodel</span><span class="o">.</span><span class="n">update_meta</span><span class="p">(</span><span class="n">uid</span><span class="p">,</span> <span class="n">meta</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="go">{&#39;new&#39;: &#39;meta&#39;}</span>
+<span class="go">{'new': 'meta'}</span>
 </pre></div>
 </div>
 </section>
@@ -440,7 +440,7 @@ by setting an environment variable:</p>
 </pre></div>
 </div>
 <p>Or by changing it inside <a class="reference internal" href="api/audmodel.config.html#audmodel.config" title="audmodel.config"><code class="xref py py-class docutils literal notranslate"><span class="pre">audmodel.config</span></code></a>:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">audmodel</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">CACHE_ROOT</span> <span class="o">=</span> <span class="s2">&quot;/path/to/your/cache&quot;</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">audmodel</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">CACHE_ROOT</span> <span class="o">=</span> <span class="s2">"/path/to/your/cache"</span>
 </pre></div>
 </div>
 <p>Or individually,
@@ -450,7 +450,7 @@ with a non empty <code class="docutils literal notranslate"><span class="pre">ca
 the model is placed in a unique sub-folder, namely
 <code class="docutils literal notranslate"><span class="pre">&lt;uid&gt;/&lt;version&gt;</span></code>.</p>
 <div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">audeer</span><span class="o">.</span><span class="n">list_dir_names</span><span class="p">(</span><span class="n">cache_root</span><span class="p">,</span> <span class="n">basenames</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="go">[&#39;3e120e8d&#39;]</span>
+<span class="go">['3e120e8d']</span>
 </pre></div>
 </div>
 </section>
@@ -491,7 +491,7 @@ as the file lock mechanism is not cross-platform compatible.</p>
         
         
         
-          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2026/08/07 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2026/09/08 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>

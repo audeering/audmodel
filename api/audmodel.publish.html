@@ -67,7 +67,7 @@
             
             
               <div class="version">
-                v1.5.1
+                v1.5.2
               </div>
             
           
@@ -174,7 +174,7 @@
 <h1>publish()<a class="headerlink" href="#publish" title="Link to this heading">¶</a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="audmodel.publish">
-<span class="sig-prename descclassname"><span class="pre">audmodel.</span></span><span class="sig-name descname"><span class="pre">publish</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">root</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">repository</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alias</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">author</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">date</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">meta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subgroup</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tmp_root</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/audmodel/core/api.html#publish"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audmodel.publish" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">audmodel.</span></span><span class="sig-name descname"><span class="pre">publish</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">root</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">repository</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alias</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">author</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compression</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">date</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">meta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subgroup</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tmp_root</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/audmodel/core/api.html#publish"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#audmodel.publish" title="Link to this definition">¶</a></dt>
 <dd><p>Zip model and publish as a new artifact.</p>
 <p>Before publishing a model,
 pick meaningful values for
@@ -261,8 +261,8 @@ a <code class="docutils literal notranslate"><span class="pre">meta</span></code
 corresponding to the first <code class="docutils literal notranslate"><span class="pre">params</span></code> example from the table
 might contain:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
-    <span class="s1">&#39;model&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;facebook/wav2vec2-large&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;layers&#39;</span><span class="p">:</span> <span class="mi">24</span><span class="p">}},</span>
-    <span class="s1">&#39;data&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;msppodcast&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;version&#39;</span><span class="p">:</span> <span class="s1">&#39;2.6.0&#39;</span><span class="p">}},</span>
+    <span class="s1">'model'</span><span class="p">:</span> <span class="p">{</span><span class="s1">'facebook/wav2vec2-large'</span><span class="p">:</span> <span class="p">{</span><span class="s1">'layers'</span><span class="p">:</span> <span class="mi">24</span><span class="p">}},</span>
+    <span class="s1">'data'</span><span class="p">:</span> <span class="p">{</span><span class="s1">'msppodcast'</span><span class="p">:</span> <span class="p">{</span><span class="s1">'version'</span><span class="p">:</span> <span class="s1">'2.6.0'</span><span class="p">}},</span>
 <span class="p">}</span>
 </pre></div>
 </div>
@@ -278,6 +278,21 @@ might contain:</p>
 If provided, the model can be accessed using this alias
 in addition to its UID</p></li>
 <li><p><strong>author</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>) – author name(s), defaults to user name</p></li>
+<li><p><strong>compression</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span>) – compression level
+of the model archive.
+<code class="docutils literal notranslate"><span class="pre">0</span></code> stores the model files
+without compression,
+<code class="docutils literal notranslate"><span class="pre">1</span></code>-<code class="docutils literal notranslate"><span class="pre">9</span></code> selects a deflate level.
+Deflate is single threaded,
+and dominates the publication time
+of large models.
+Higher levels than <code class="docutils literal notranslate"><span class="pre">1</span></code>
+hardly compress better
+on model weights,
+but take at least twice as long.
+Select <code class="docutils literal notranslate"><span class="pre">0</span></code>,
+if you want to publish
+as fast as possible</p></li>
 <li><p><strong>date</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.date" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">date</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>) – date, defaults to current timestamp</p></li>
 <li><p><strong>meta</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a>] | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>) – dictionary with meta information</p></li>
 <li><p><strong>subgroup</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>) – subgroup under which
@@ -314,43 +329,44 @@ the system default temporary folder is used</p></li>
 <li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#FileNotFoundError" title="(in Python v3.14)"><strong>FileNotFoundError</strong></a> – if <code class="docutils literal notranslate"><span class="pre">root</span></code> folder cannot be found</p></li>
 <li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.14)"><strong>ValueError</strong></a> – if <code class="docutils literal notranslate"><span class="pre">alias</span></code> can be confused with an UID,
     or it does contain chars other than <code class="docutils literal notranslate"><span class="pre">[A-Za-z0-9._-]+</span></code></p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.14)"><strong>ValueError</strong></a> – if <code class="docutils literal notranslate"><span class="pre">compression</span></code> is not between 0 and 9</p></li>
 </ul>
 </dd>
 </dl>
 <p class="rubric">Examples</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Assuming your model files are stored under `model_root`</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># and your repository is given by `repository`</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="c1"># (which you usually don&#39;t specify, but use its default value)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># (which you usually don't specify, but use its default value)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">datetime</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;torch&quot;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">subgroup</span> <span class="o">=</span> <span class="s2">&quot;audmodel.dummy.cnn&quot;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">version</span> <span class="o">=</span> <span class="s2">&quot;4.0.0&quot;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">author</span> <span class="o">=</span> <span class="s2">&quot;Calvin and Hobbes&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">name</span> <span class="o">=</span> <span class="s2">"torch"</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">subgroup</span> <span class="o">=</span> <span class="s2">"audmodel.dummy.cnn"</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">version</span> <span class="o">=</span> <span class="s2">"4.0.0"</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">author</span> <span class="o">=</span> <span class="s2">"Calvin and Hobbes"</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="p">(</span><span class="mi">1985</span><span class="p">,</span> <span class="mi">11</span><span class="p">,</span> <span class="mi">18</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">params</span> <span class="o">=</span> <span class="p">{</span>
-<span class="gp">... </span>    <span class="s2">&quot;model&quot;</span><span class="p">:</span> <span class="s2">&quot;cnn10&quot;</span><span class="p">,</span>
-<span class="gp">... </span>    <span class="s2">&quot;data&quot;</span><span class="p">:</span> <span class="s2">&quot;emodb&quot;</span><span class="p">,</span>
-<span class="gp">... </span>    <span class="s2">&quot;feature&quot;</span><span class="p">:</span> <span class="s2">&quot;melspec&quot;</span><span class="p">,</span>
-<span class="gp">... </span>    <span class="s2">&quot;sampling_rate&quot;</span><span class="p">:</span> <span class="mi">16000</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="s2">"model"</span><span class="p">:</span> <span class="s2">"cnn10"</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="s2">"data"</span><span class="p">:</span> <span class="s2">"emodb"</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="s2">"feature"</span><span class="p">:</span> <span class="s2">"melspec"</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="s2">"sampling_rate"</span><span class="p">:</span> <span class="mi">16000</span><span class="p">,</span>
 <span class="gp">... </span><span class="p">}</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">meta</span> <span class="o">=</span> <span class="p">{</span>
-<span class="gp">... </span>    <span class="s2">&quot;model&quot;</span><span class="p">:</span> <span class="p">{</span>
-<span class="gp">... </span>        <span class="s2">&quot;cnn10&quot;</span><span class="p">:</span> <span class="p">{</span>
-<span class="gp">... </span>            <span class="s2">&quot;learning-rate&quot;</span><span class="p">:</span> <span class="mf">1e-4</span><span class="p">,</span>
-<span class="gp">... </span>            <span class="s2">&quot;optimizer&quot;</span><span class="p">:</span> <span class="s2">&quot;sgd&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="s2">"model"</span><span class="p">:</span> <span class="p">{</span>
+<span class="gp">... </span>        <span class="s2">"cnn10"</span><span class="p">:</span> <span class="p">{</span>
+<span class="gp">... </span>            <span class="s2">"learning-rate"</span><span class="p">:</span> <span class="mf">1e-4</span><span class="p">,</span>
+<span class="gp">... </span>            <span class="s2">"optimizer"</span><span class="p">:</span> <span class="s2">"sgd"</span><span class="p">,</span>
 <span class="gp">... </span>        <span class="p">},</span>
 <span class="gp">... </span>    <span class="p">},</span>
-<span class="gp">... </span>    <span class="s2">&quot;data&quot;</span><span class="p">:</span> <span class="p">{</span>
-<span class="gp">... </span>        <span class="s2">&quot;emodb&quot;</span><span class="p">:</span> <span class="p">{</span>
-<span class="gp">... </span>            <span class="s2">&quot;version&quot;</span><span class="p">:</span> <span class="s2">&quot;1.2.0&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="s2">"data"</span><span class="p">:</span> <span class="p">{</span>
+<span class="gp">... </span>        <span class="s2">"emodb"</span><span class="p">:</span> <span class="p">{</span>
+<span class="gp">... </span>            <span class="s2">"version"</span><span class="p">:</span> <span class="s2">"1.2.0"</span><span class="p">,</span>
 <span class="gp">... </span>        <span class="p">},</span>
 <span class="gp">... </span>    <span class="p">},</span>
-<span class="gp">... </span>    <span class="s2">&quot;feature&quot;</span><span class="p">:</span> <span class="p">{</span>
-<span class="gp">... </span>        <span class="s2">&quot;melspec&quot;</span><span class="p">:</span> <span class="p">{</span>
-<span class="gp">... </span>            <span class="s2">&quot;win_dur&quot;</span><span class="p">:</span> <span class="s2">&quot;32ms&quot;</span><span class="p">,</span>
-<span class="gp">... </span>            <span class="s2">&quot;hop_dur&quot;</span><span class="p">:</span> <span class="s2">&quot;10ms&quot;</span><span class="p">,</span>
-<span class="gp">... </span>            <span class="s2">&quot;num_fft&quot;</span><span class="p">:</span> <span class="mi">512</span><span class="p">,</span>
-<span class="gp">... </span>            <span class="s2">&quot;mel_bins&quot;</span><span class="p">:</span> <span class="mi">64</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="s2">"feature"</span><span class="p">:</span> <span class="p">{</span>
+<span class="gp">... </span>        <span class="s2">"melspec"</span><span class="p">:</span> <span class="p">{</span>
+<span class="gp">... </span>            <span class="s2">"win_dur"</span><span class="p">:</span> <span class="s2">"32ms"</span><span class="p">,</span>
+<span class="gp">... </span>            <span class="s2">"hop_dur"</span><span class="p">:</span> <span class="s2">"10ms"</span><span class="p">,</span>
+<span class="gp">... </span>            <span class="s2">"num_fft"</span><span class="p">:</span> <span class="mi">512</span><span class="p">,</span>
+<span class="gp">... </span>            <span class="s2">"mel_bins"</span><span class="p">:</span> <span class="mi">64</span><span class="p">,</span>
 <span class="gp">... </span>        <span class="p">},</span>
 <span class="gp">... </span>    <span class="p">},</span>
 <span class="gp">... </span><span class="p">}</span>
@@ -365,7 +381,7 @@ the system default temporary folder is used</p></li>
 <span class="gp">... </span>    <span class="n">subgroup</span><span class="o">=</span><span class="n">subgroup</span><span class="p">,</span>
 <span class="gp">... </span>    <span class="n">repository</span><span class="o">=</span><span class="n">repository</span><span class="p">,</span>
 <span class="gp">... </span><span class="p">)</span>
-<span class="go">&#39;d4e9c65b-4.0.0&#39;</span>
+<span class="go">'d4e9c65b-4.0.0'</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -395,7 +411,7 @@ the system default temporary folder is used</p></li>
         
         
         
-          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2026/08/07 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2026/09/08 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>

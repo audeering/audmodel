@@ -64,7 +64,7 @@
             
             
               <div class="version">
-                v1.5.1
+                v1.5.2
               </div>
             
           
@@ -149,7 +149,7 @@
 <div class="viewcode-block" id="Repository">
 <a class="viewcode-back" href="../../../api/audmodel.Repository.html#audmodel.Repository">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">Repository</span><span class="p">:</span>
-<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Repository object.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""Repository object.</span>
 
 <span class="sd">    It stores all information</span>
 <span class="sd">    needed to address a repository:</span>
@@ -167,24 +167,24 @@
 <span class="sd">        backend: repository backend</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        &gt;&gt;&gt; audmodel.Repository(&quot;data-local&quot;, &quot;/data&quot;, &quot;file-system&quot;)</span>
-<span class="sd">        Repository(&#39;data-local&#39;, &#39;/data&#39;, &#39;file-system&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; audmodel.Repository("data-local", "/data", "file-system")</span>
+<span class="sd">        Repository('data-local', '/data', 'file-system')</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="n">_backends</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s2">&quot;file-system&quot;</span><span class="p">:</span> <span class="n">audbackend</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">FileSystem</span><span class="p">,</span>
-        <span class="s2">&quot;minio&quot;</span><span class="p">:</span> <span class="n">audbackend</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">Minio</span><span class="p">,</span>
-        <span class="s2">&quot;s3&quot;</span><span class="p">:</span> <span class="n">audbackend</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">Minio</span><span class="p">,</span>
+        <span class="s2">"file-system"</span><span class="p">:</span> <span class="n">audbackend</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">FileSystem</span><span class="p">,</span>
+        <span class="s2">"minio"</span><span class="p">:</span> <span class="n">audbackend</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">Minio</span><span class="p">,</span>
+        <span class="s2">"s3"</span><span class="p">:</span> <span class="n">audbackend</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">Minio</span><span class="p">,</span>
     <span class="p">}</span>
 
     <span class="n">backend_registry</span> <span class="o">=</span> <span class="n">_backends</span>
-<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Backend registry.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""Backend registry.</span>
 
 <span class="sd">    Holds mapping between registered backend names,</span>
 <span class="sd">    and their corresponding backend classes.</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -193,14 +193,14 @@
         <span class="n">backend</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Repository name.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""Repository name."""</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">host</span> <span class="o">=</span> <span class="n">host</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Repository host.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""Repository host."""</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">backend</span> <span class="o">=</span> <span class="n">backend</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Repository backend.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""Repository backend."""</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Compare two repository instances.</span>
+<span class="w">        </span><span class="sd">"""Compare two repository instances.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            other: repository instance</span>
@@ -208,16 +208,16 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            ``True`` if the string representation of the repositories matches</span>
 
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">==</span> <span class="nb">str</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>  <span class="c1"># noqa: D105</span>
-        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;Repository(&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39;, &#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">host</span><span class="si">}</span><span class="s2">&#39;, &#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">backend</span><span class="si">}</span><span class="s2">&#39;)&quot;</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">"Repository('</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">', '</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">host</span><span class="si">}</span><span class="s2">', '</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">backend</span><span class="si">}</span><span class="s2">')"</span>
 
 <div class="viewcode-block" id="Repository.create_backend_interface">
 <a class="viewcode-back" href="../../../api/audmodel.Repository.html#audmodel.Repository.create_backend_interface">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">create_backend_interface</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">type</span><span class="p">[</span><span class="n">audbackend</span><span class="o">.</span><span class="n">interface</span><span class="o">.</span><span class="n">Base</span><span class="p">]:</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create backend interface to access repository.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""Create backend interface to access repository.</span>
 
 <span class="sd">        It wraps an :class:`audbackend.interface.Maven` interface</span>
 <span class="sd">        around the backend.</span>
@@ -236,9 +236,9 @@
 <span class="sd">        Raises:</span>
 <span class="sd">            ValueError: if a non-supported backend is requested</span>
 
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">backend</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">backend_registry</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">backend</span><span class="si">}</span><span class="s2">&#39; is not a registered backend&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"'</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">backend</span><span class="si">}</span><span class="s2">' is not a registered backend"</span><span class="p">)</span>
         <span class="n">backend_class</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">backend_registry</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">backend</span><span class="p">]</span>
         <span class="n">backend</span> <span class="o">=</span> <span class="n">backend_class</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">host</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">audbackend</span><span class="o">.</span><span class="n">interface</span><span class="o">.</span><span class="n">Maven</span><span class="p">(</span>
@@ -259,7 +259,7 @@
         <span class="n">backend_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">backend_class</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">audbackend</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">Base</span><span class="p">],</span>
     <span class="p">):</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Register backend class.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""Register backend class.</span>
 
 <span class="sd">        Adds an entry to the dictionary</span>
 <span class="sd">        stored in the class variable :data:`Repository.backend_registry`,</span>
@@ -268,18 +268,18 @@
 
 <span class="sd">        Args:</span>
 <span class="sd">            backend_name: name of the backend,</span>
-<span class="sd">                e.g. ``&quot;file-system&quot;``</span>
+<span class="sd">                e.g. ``"file-system"``</span>
 <span class="sd">            backend_class: class of the backend,</span>
 <span class="sd">                that should be associated with ``backend_name``,</span>
-<span class="sd">                e.g. ``&quot;audbackend.backend.Filesystem&quot;``</span>
+<span class="sd">                e.g. ``"audbackend.backend.Filesystem"``</span>
 
 <span class="sd">        Examples:</span>
 <span class="sd">            &gt;&gt;&gt; import audbackend</span>
 <span class="sd">            &gt;&gt;&gt; audmodel.Repository.register(</span>
-<span class="sd">            ...     &quot;file-system&quot;, audbackend.backend.FileSystem</span>
+<span class="sd">            ...     "file-system", audbackend.backend.FileSystem</span>
 <span class="sd">            ... )</span>
 
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="bp">cls</span><span class="o">.</span><span class="n">backend_registry</span><span class="p">[</span><span class="n">backend_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">backend_class</span></div>
 </div>
 
@@ -298,7 +298,7 @@
         
         
         
-          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2026/08/07 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2026/09/08 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>

@@ -64,7 +64,7 @@
             
             
               <div class="version">
-                v1.5.1
+                v1.5.2
               </div>
             
           
@@ -157,11 +157,11 @@
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">load_configuration_file</span><span class="p">(</span><span class="n">config_file</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
-<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Read configuration from YAML file.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""Read configuration from YAML file.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        config_file: path to configuration file.</span>
-<span class="sd">            File doesn&#39;t have to exist</span>
+<span class="sd">            File doesn't have to exist</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        dictionary containing configuration entries</span>
@@ -172,7 +172,7 @@
 <span class="sd">        ValueError: if repository has no ``host``</span>
 <span class="sd">            ``backend``, or ``name`` key</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">config_file</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">{}</span>
 
@@ -182,29 +182,29 @@
             <span class="k">return</span> <span class="p">{}</span>
 
     <span class="c1"># Check that we have provided a valid repositories configuration</span>
-    <span class="k">if</span> <span class="s2">&quot;repositories&quot;</span> <span class="ow">in</span> <span class="n">config</span><span class="p">:</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;repositories&quot;</span><span class="p">])</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+    <span class="k">if</span> <span class="s2">"repositories"</span> <span class="ow">in</span> <span class="n">config</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">"repositories"</span><span class="p">])</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">&quot;You cannot specify an empty &#39;repositories:&#39; section &quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;in the configuration file &#39;</span><span class="si">{</span><span class="n">config_file</span><span class="si">}</span><span class="s2">&#39;.&quot;</span>
+                <span class="s2">"You cannot specify an empty 'repositories:' section "</span>
+                <span class="sa">f</span><span class="s2">"in the configuration file '</span><span class="si">{</span><span class="n">config_file</span><span class="si">}</span><span class="s2">'."</span>
             <span class="p">)</span>
-        <span class="k">for</span> <span class="n">repo</span> <span class="ow">in</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;repositories&quot;</span><span class="p">]:</span>
-            <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;host&quot;</span><span class="p">,</span> <span class="s2">&quot;backend&quot;</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">repo</span> <span class="ow">in</span> <span class="n">config</span><span class="p">[</span><span class="s2">"repositories"</span><span class="p">]:</span>
+            <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"host"</span><span class="p">,</span> <span class="s2">"backend"</span><span class="p">,</span> <span class="s2">"name"</span><span class="p">):</span>
                 <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">repo</span><span class="p">:</span>
                     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                        <span class="sa">f</span><span class="s2">&quot;Your repository is missing a &#39;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">&#39; entry: &#39;</span><span class="si">{</span><span class="n">repo</span><span class="si">}</span><span class="s2">&#39;.&quot;</span>
+                        <span class="sa">f</span><span class="s2">"Your repository is missing a '</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">' entry: '</span><span class="si">{</span><span class="n">repo</span><span class="si">}</span><span class="s2">'."</span>
                     <span class="p">)</span>
 
     <span class="k">return</span> <span class="n">config</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">load_config</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Read configuration from configuration files.</span>
+<span class="w">    </span><span class="sd">"""Read configuration from configuration files.</span>
 
 <span class="sd">    User config values take precedence over global config values</span>
 <span class="sd">    when the same setting exists in both files.</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="c1"># Global config</span>
     <span class="n">config</span> <span class="o">=</span> <span class="n">load_configuration_file</span><span class="p">(</span><span class="n">global_config_file</span><span class="p">)</span>
     <span class="c1"># User config</span>
@@ -216,7 +216,7 @@
 <div class="viewcode-block" id="config">
 <a class="viewcode-back" href="../../../api/audmodel.config.html#audmodel.config">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">config</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get/set configuration values for the :mod:`audmodel` module.</span>
+<span class="w">    </span><span class="sd">"""Get/set configuration values for the :mod:`audmodel` module.</span>
 
 <span class="sd">    The configuration values are read in during module import</span>
 <span class="sd">    from the :ref:`configuration file &lt;configuration&gt;`</span>
@@ -227,33 +227,33 @@
 <span class="sd">    can be overridden by the ``AUDMODEL_CACHE_ROOT`` environment variable.</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        &gt;&gt;&gt; audmodel.config.CACHE_ROOT = &quot;~/caches/audmodel&quot;</span>
+<span class="sd">        &gt;&gt;&gt; audmodel.config.CACHE_ROOT = "~/caches/audmodel"</span>
 <span class="sd">        &gt;&gt;&gt; audmodel.config.CACHE_ROOT</span>
-<span class="sd">        &#39;~/caches/audmodel&#39;</span>
+<span class="sd">        '~/caches/audmodel'</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="n">_config</span> <span class="o">=</span> <span class="n">load_config</span><span class="p">()</span>
 
-    <span class="n">CACHE_ROOT</span> <span class="o">=</span> <span class="n">_config</span><span class="p">[</span><span class="s2">&quot;cache_root&quot;</span><span class="p">]</span>
-<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Default cache folder for storing models.&quot;&quot;&quot;</span>
+    <span class="n">CACHE_ROOT</span> <span class="o">=</span> <span class="n">_config</span><span class="p">[</span><span class="s2">"cache_root"</span><span class="p">]</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""Default cache folder for storing models."""</span>
 
     <span class="n">REPOSITORIES</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="n">Repository</span><span class="p">(</span><span class="n">r</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">],</span> <span class="n">r</span><span class="p">[</span><span class="s2">&quot;host&quot;</span><span class="p">],</span> <span class="n">r</span><span class="p">[</span><span class="s2">&quot;backend&quot;</span><span class="p">])</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">_config</span><span class="p">[</span><span class="s2">&quot;repositories&quot;</span><span class="p">]</span>
+        <span class="n">Repository</span><span class="p">(</span><span class="n">r</span><span class="p">[</span><span class="s2">"name"</span><span class="p">],</span> <span class="n">r</span><span class="p">[</span><span class="s2">"host"</span><span class="p">],</span> <span class="n">r</span><span class="p">[</span><span class="s2">"backend"</span><span class="p">])</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">_config</span><span class="p">[</span><span class="s2">"repositories"</span><span class="p">]</span>
     <span class="p">]</span>
-<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Repositories, will be iterated in given order.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""Repositories, will be iterated in given order.</span>
 
 <span class="sd">    A repository is defined by the object :class:`audmodel.Repository`,</span>
 <span class="sd">    containing the following attributes:</span>
 
 <span class="sd">    * :attr:`audmodel.Repository.name`: repository name,</span>
-<span class="sd">      e.g. ``&quot;audmodel-public&quot;``</span>
+<span class="sd">      e.g. ``"audmodel-public"``</span>
 <span class="sd">    * :attr:`audmodel.Repository.backend`: backend name,</span>
-<span class="sd">      e.g. ``&quot;s3&quot;``</span>
+<span class="sd">      e.g. ``"s3"``</span>
 <span class="sd">    * :attr:`audmodel.Repository.host`: host name,</span>
-<span class="sd">      e.g. ``&quot;s3.dualstack.eu-north-1.amazonaws.com&quot;``</span>
+<span class="sd">      e.g. ``"s3.dualstack.eu-north-1.amazonaws.com"``</span>
 
-<span class="sd">    &quot;&quot;&quot;</span></div>
+<span class="sd">    """</span></div>
 
 </pre></div>
 
@@ -270,7 +270,7 @@
         
         
         
-          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2026/08/07 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2026/09/08 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>
