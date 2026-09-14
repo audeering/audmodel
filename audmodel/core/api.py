@@ -689,12 +689,19 @@ def publish(
         # Create the archive before publishing any file,
         # as this can take a long time for large models,
         # and an interruption should not leave files on the backend
-        src_path = create_archive(
-            root,
-            archive_root,
-            compression,
-            verbose,
-        )
+        try:
+            src_path = create_archive(
+                root,
+                archive_root,
+                compression,
+                verbose,
+            )
+        except Exception:
+            # No file has been published yet,
+            # so no cleanup is needed.
+            # An interruption is not caught here,
+            # as it is not an 'Exception'
+            raise RuntimeError("Could not publish model due to an unexpected error.")
 
         try:
             put_header(

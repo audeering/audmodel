@@ -435,6 +435,46 @@ def test_publish_interrupted(monkeypatch, interrupted_function):
     assert_nothing_published(uid, alias)
 
 
+def test_publish_archive_error(monkeypatch):
+    r"""Test error during creation of the model archive.
+
+    An error during archive creation
+    has to be raised as ``RuntimeError``,
+    like any other unexpected error during publication.
+
+    Args:
+        monkeypatch: monkeypatch fixture
+
+    """
+
+    def raise_error(*args, **kwargs):
+        r"""Fail to create the model archive."""
+        raise PermissionError()
+
+    monkeypatch.setattr(api, "create_archive", raise_error)
+
+    name = pytest.NAME
+    params = {"interrupted": "archive"}
+    version = "1.0.0"
+    subgroup = f"{SUBGROUP}.interrupted"
+    alias = "alias-archive"
+
+    error_msg = "Could not publish model due to an unexpected error."
+    with pytest.raises(RuntimeError, match=error_msg):
+        audmodel.publish(
+            pytest.MODEL_ROOT,
+            name,
+            params,
+            version,
+            alias=alias,
+            subgroup=subgroup,
+            repository=pytest.REPOSITORIES[0],
+        )
+
+    uid = audmodel.uid(name, params, version, subgroup=subgroup)
+    assert_nothing_published(uid, alias)
+
+
 @pytest.mark.skipif(
     platform.system() == "Windows",
     reason="SIGTERM cannot be delivered to a running process under Windows",
