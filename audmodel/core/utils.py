@@ -1,9 +1,11 @@
 import collections
 from collections.abc import Sequence
+import contextlib
 import datetime
 import getpass
 import os
 import re
+import signal
 
 import audeer
 
@@ -110,6 +112,44 @@ def short_id(
     params = {key: params[key] for key in sorted(params)}
     unique_string = name + str(params)
     return audeer.uid(from_string=unique_string)[-8:]
+
+
+@contextlib.contextmanager
+def sigterm_as_interrupt():
+    r"""Raise ``KeyboardInterrupt`` when receiving SIGTERM.
+
+    By default,
+    SIGTERM terminates the process
+    without raising an error,
+    so cleanup code
+    inside a ``try``/``except`` block
+    is not executed.
+    Inside this context manager
+    SIGTERM raises a ``KeyboardInterrupt`` instead,
+    like pressing Ctrl+C does.
+    The previous handler is restored afterwards.
+
+    If no handler can be installed,
+    e.g. as we are not running in the main thread,
+    SIGTERM is not changed.
+
+    """
+
+    def handler(signum, frame):
+        r"""Raise ``KeyboardInterrupt`` when receiving a signal."""
+        raise KeyboardInterrupt("Interrupted by SIGTERM.")
+
+    try:
+        previous_handler = signal.signal(signal.SIGTERM, handler)
+    except ValueError:
+        # Signal handlers can only be installed in the main thread
+        yield
+        return
+
+    try:
+        yield
+    finally:
+        signal.signal(signal.SIGTERM, previous_handler)
 
 
 def update_dict(

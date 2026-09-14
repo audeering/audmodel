@@ -1,4 +1,6 @@
 import os
+import platform
+import signal
 import zipfile
 
 import pytest
@@ -7,6 +9,7 @@ import audbackend
 import audeer
 
 import audmodel
+from audmodel.core import api
 
 
 audmodel.config.CACHE_ROOT = pytest.CACHE_ROOT
@@ -363,3 +366,159 @@ def test_publish_compression_error(compression):
             compression=compression,
             repository=pytest.REPOSITORIES[0],
         )
+
+
+def assert_nothing_published(uid, alias):
+    r"""Assert no file of a model is stored in a repository.
+
+    Args:
+        uid: unique model ID
+        alias: alias of the model
+
+    """
+    assert not audmodel.exists(uid)
+    assert not audmodel.exists(alias)
+    short_id = uid.split("-")[0]
+    for repository in pytest.REPOSITORIES:
+        files = audeer.list_file_names(
+            audeer.path(repository.host, repository.name),
+            recursive=True,
+        )
+        files = [os.path.basename(file) for file in files]
+        assert not [file for file in files if short_id in file or alias in file]
+
+
+@pytest.mark.parametrize(
+    "interrupted_function",
+    ["put_header", "put_meta", "put_archive", "put_alias", "put_aliases"],
+)
+def test_publish_interrupted(monkeypatch, interrupted_function):
+    r"""Test publication interrupted by the user.
+
+    If publication is interrupted,
+    all files that have been published so far
+    have to be removed from the backend again.
+    Otherwise a model would be registered,
+    that cannot be loaded.
+
+    Args:
+        monkeypatch: monkeypatch fixture
+        interrupted_function: name of the function
+            during which publication is interrupted
+
+    """
+
+    def interrupt(*args, **kwargs):
+        r"""Interrupt publication."""
+        raise KeyboardInterrupt()
+
+    monkeypatch.setattr(api, interrupted_function, interrupt)
+
+    name = pytest.NAME
+    params = {"interrupted": interrupted_function}
+    version = "1.0.0"
+    subgroup = f"{SUBGROUP}.interrupted"
+    alias = f"alias-{interrupted_function}"
+
+    with pytest.raises(KeyboardInterrupt):
+        audmodel.publish(
+            pytest.MODEL_ROOT,
+            name,
+            params,
+            version,
+            alias=alias,
+            subgroup=subgroup,
+            repository=pytest.REPOSITORIES[0],
+        )
+
+    uid = audmodel.uid(name, params, version, subgroup=subgroup)
+    assert_nothing_published(uid, alias)
+
+
+@pytest.mark.skipif(
+    platform.system() == "Windows",
+    reason="SIGTERM cannot be delivered to a running process under Windows",
+)
+def test_publish_sigterm(monkeypatch):
+    r"""Test publication interrupted by SIGTERM.
+
+    SIGTERM does not raise an error by default,
+    but terminates the process,
+    which would leave a registered model
+    that cannot be loaded.
+
+    Args:
+        monkeypatch: monkeypatch fixture
+
+    """
+
+    def send_sigterm(*args, **kwargs):
+        r"""Send SIGTERM to the running process."""
+        os.kill(os.getpid(), signal.SIGTERM)
+
+    monkeypatch.setattr(api, "put_archive", send_sigterm)
+
+    name = pytest.NAME
+    params = {"interrupted": "sigterm"}
+    version = "1.0.0"
+    subgroup = f"{SUBGROUP}.interrupted"
+    alias = "alias-sigterm"
+
+    with pytest.raises(KeyboardInterrupt):
+        audmodel.publish(
+            pytest.MODEL_ROOT,
+            name,
+            params,
+            version,
+            alias=alias,
+            subgroup=subgroup,
+            repository=pytest.REPOSITORIES[0],
+        )
+
+    uid = audmodel.uid(name, params, version, subgroup=subgroup)
+    assert_nothing_published(uid, alias)
+
+
+def test_publish_after_interruption(monkeypatch):
+    r"""Test publication of a model that was interrupted before.
+
+    An interrupted publication
+    must not block publishing the same model again.
+
+    Args:
+        monkeypatch: monkeypatch fixture
+
+    """
+
+    def interrupt(*args, **kwargs):
+        r"""Interrupt publication."""
+        raise KeyboardInterrupt()
+
+    name = pytest.NAME
+    params = {"interrupted": "before"}
+    version = "1.0.0"
+    subgroup = f"{SUBGROUP}.interrupted"
+
+    with monkeypatch.context() as patch:
+        patch.setattr(api, "put_archive", interrupt)
+        with pytest.raises(KeyboardInterrupt):
+            audmodel.publish(
+                pytest.MODEL_ROOT,
+                name,
+                params,
+                version,
+                subgroup=subgroup,
+                repository=pytest.REPOSITORIES[0],
+            )
+
+    uid = audmodel.publish(
+        pytest.MODEL_ROOT,
+        name,
+        params,
+        version,
+        subgroup=subgroup,
+        repository=pytest.REPOSITORIES[0],
+    )
+
+    assert audmodel.exists(uid)
+    assert os.path.exists(audmodel.load(uid))

@@ -1,6 +1,7 @@
 import datetime
 import errno
 import os
+import tempfile
 
 import oyaml as yaml
 
@@ -9,6 +10,7 @@ import audeer
 
 from audmodel.core.backend import SERIALIZE_ERROR_MESSAGE
 from audmodel.core.backend import archive_path
+from audmodel.core.backend import create_archive
 from audmodel.core.backend import get_alias
 from audmodel.core.backend import get_aliases
 from audmodel.core.backend import get_archive
@@ -500,6 +502,18 @@ def publish(
             'data': {'msppodcast': {'version': '2.6.0'}},
         }
 
+    The model archive is created
+    before any file is published.
+    If publication fails afterwards,
+    or is interrupted by the user (Ctrl+C)
+    or by SIGTERM,
+    all files that have been published so far
+    are removed from the backend again.
+    Note,
+    this cannot be ensured
+    if the process is killed (SIGKILL),
+    or the machine crashes.
+
     Args:
         root: folder with model files
         name: model name
@@ -557,6 +571,8 @@ def publish(
         ValueError: if ``alias`` can be confused with an UID,
             or it does contain chars other than ``[A-Za-z0-9._-]+``
         ValueError: if ``compression`` is not between 0 and 9
+        KeyboardInterrupt: if publishing is interrupted
+            by the user (Ctrl+C) or by SIGTERM
 
     Examples:
         >>> # Assuming your model files are stored under `model_root`
@@ -660,89 +676,108 @@ def publish(
         version=version,
     )
 
-    try:
-        put_header(
-            short_id,
-            version,
-            header,
-            backend_interface,
-            verbose,
-        )
-        put_meta(
-            short_id,
-            version,
-            meta,
-            backend_interface,
-            verbose,
-        )
-        put_archive(
-            short_id,
-            version,
-            name,
-            subgroup,
+    if tmp_root is not None:
+        tmp_root = audeer.mkdir(tmp_root)
+
+    # Convert SIGTERM to KeyboardInterrupt,
+    # to ensure files are removed again from the backend
+    # if publication is interrupted
+    with (
+        utils.sigterm_as_interrupt(),
+        tempfile.TemporaryDirectory(dir=tmp_root) as archive_root,
+    ):
+        # Create the archive before publishing any file,
+        # as this can take a long time for large models,
+        # and an interruption should not leave files on the backend
+        src_path = create_archive(
             root,
-            backend_interface,
+            archive_root,
             compression,
             verbose,
-            tmp_root=tmp_root,
         )
-        if alias:
-            # Store mapping (alias -> UID)
-            put_alias(
-                alias,
-                uid,
-                backend_interface,
-                verbose,
-            )
-            # Update reverse (UID -> aliases) mapping
-            put_aliases(
+
+        try:
+            put_header(
                 short_id,
                 version,
-                [alias],
+                header,
                 backend_interface,
                 verbose,
             )
-    except Exception as ex:
-        # Otherwise remove already published files
-        with backend_interface.backend:
-            for ext in [define.HEADER_EXT, define.META_EXT, define.ALIASES_EXT]:
+            put_meta(
+                short_id,
+                version,
+                meta,
+                backend_interface,
+                verbose,
+            )
+            put_archive(
+                short_id,
+                version,
+                name,
+                subgroup,
+                src_path,
+                backend_interface,
+                verbose,
+            )
+            if alias:
+                # Store mapping (alias -> UID)
+                put_alias(
+                    alias,
+                    uid,
+                    backend_interface,
+                    verbose,
+                )
+                # Update reverse (UID -> aliases) mapping
+                put_aliases(
+                    short_id,
+                    version,
+                    [alias],
+                    backend_interface,
+                    verbose,
+                )
+        except (KeyboardInterrupt, Exception) as ex:
+            # Otherwise remove already published files
+            with backend_interface.backend:
+                for ext in [define.HEADER_EXT, define.META_EXT, define.ALIASES_EXT]:
+                    path = backend_interface.join(
+                        "/",
+                        define.UID_FOLDER,
+                        f"{short_id}.{ext}",
+                    )
+                    if backend_interface.exists(path, version):
+                        backend_interface.remove_file(path, version)
+
                 path = backend_interface.join(
                     "/",
-                    define.UID_FOLDER,
-                    f"{short_id}.{ext}",
+                    *subgroup.split("."),
+                    name,
+                    short_id + ".zip",
                 )
                 if backend_interface.exists(path, version):
                     backend_interface.remove_file(path, version)
 
-            path = backend_interface.join(
-                "/",
-                *subgroup.split("."),
-                name,
-                short_id + ".zip",
-            )
-            if backend_interface.exists(path, version):  # pragma: no cover
-                # we can probably assume that the archive
-                # does not exist on the backend
-                # if something goes wrong during 'put_archive()'
-                # so it's not likely we'll ever end up in this case
-                backend_interface.remove_file(path, version)
+                if alias:
+                    path = backend_interface.join(
+                        "/",
+                        define.ALIAS_FOLDER,
+                        f"{alias}.{define.ALIAS_EXT}",
+                    )
+                    if backend_interface.exists(path, "1.0.0"):
+                        backend_interface.remove_file(path, "1.0.0")
 
-            if alias:
-                path = backend_interface.join(
-                    "/",
-                    define.ALIAS_FOLDER,
-                    f"{alias}.{define.ALIAS_EXT}",
+            # Reraise our custom error if params or meta cannot be serialized
+            if isinstance(ex, RuntimeError) and ex.args[0].startswith(
+                SERIALIZE_ERROR_MESSAGE
+            ):
+                raise ex
+            elif isinstance(ex, KeyboardInterrupt):
+                # Never hide an interruption behind another error
+                raise
+            else:  # pragma: no cover
+                raise RuntimeError(
+                    "Could not publish model due to an unexpected error."
                 )
-                if backend_interface.exists(path, "1.0.0"):
-                    backend_interface.remove_file(path, "1.0.0")  # pragma: no cover
-
-        # Reraise our custom error if params or meta cannot be serialized
-        if isinstance(ex, RuntimeError) and ex.args[0].startswith(
-            SERIALIZE_ERROR_MESSAGE
-        ):
-            raise ex
-        else:  # pragma: no cover
-            raise RuntimeError("Could not publish model due to an unexpected error.")
 
     return uid
 

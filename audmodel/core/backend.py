@@ -62,6 +62,43 @@ def archive_path(
     return backend_interface, path
 
 
+def create_archive(
+    root: str,
+    archive_root: str,
+    compression: int,
+    verbose: bool,
+) -> str:
+    r"""Create archive of model files.
+
+    Args:
+        root: path to model root folder
+        archive_root: folder under which
+            the archive is created
+        compression: compression level
+            of the model archive.
+            ``0`` stores the model files
+            without compression,
+            ``1``-``9`` selects a deflate level
+        verbose: if ``True`` show progress bar
+            when creating archive
+
+    Returns:
+        path to model archive
+
+    """
+    src_path = os.path.join(archive_root, "model.zip")
+    files = utils.scan_files(root)
+    audeer.create_archive(
+        root,
+        files,
+        src_path,
+        compression=compression,
+        verbose=verbose,
+    )
+
+    return src_path
+
+
 def get_archive(
     short_id: str,
     version: str,
@@ -387,11 +424,9 @@ def put_archive(
     version: str,
     name: str,
     subgroup: str,
-    root: str,
+    src_path: str,
     backend_interface: audbackend.interface.Maven,
-    compression: int,
     verbose: bool,
-    tmp_root: str | None = None,
 ) -> str:
     r"""Put archive to backend.
 
@@ -400,19 +435,11 @@ def put_archive(
         version: model version
         name: model name
         subgroup: model subgroup
-        root: path to model root folder
+        src_path: path to the model archive,
+            as created by :func:`create_archive`
         backend_interface: backend interface instance
-        compression: compression level
-            of the model archive.
-            ``0`` stores the model files
-            without compression,
-            ``1``-``9`` selects a deflate level
         verbose: if ``True`` show message
             when uploading file
-        tmp_root: folder under which the temporary archive
-            is created.
-            If ``None``,
-            the system default temporary folder is used
 
     Returns:
         archive path on backend
@@ -429,26 +456,13 @@ def put_archive(
         short_id + ".zip",
     )
 
-    if tmp_root is not None:
-        tmp_root = audeer.mkdir(tmp_root)
-
-    with tempfile.TemporaryDirectory(dir=tmp_root) as archive_root:
-        src_path = os.path.join(archive_root, "model.zip")
-        files = utils.scan_files(root)
-        audeer.create_archive(
-            root,
-            files,
+    with backend_interface.backend:
+        backend_interface.put_file(
             src_path,
-            compression=compression,
+            dst_path,
+            version,
             verbose=verbose,
         )
-        with backend_interface.backend:
-            backend_interface.put_file(
-                src_path,
-                dst_path,
-                version,
-                verbose=verbose,
-            )
 
     return dst_path
 
