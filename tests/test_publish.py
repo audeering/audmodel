@@ -646,7 +646,7 @@ def test_publish_concurrent(monkeypatch):
         verbose,
     ):
         r"""Publish header of another process after publishing meta."""
-        original_put_meta(short_id, version, meta, backend_interface, verbose)
+        path = original_put_meta(short_id, version, meta, backend_interface, verbose)
         header = audmodel.core.utils.create_header(
             uid,
             author=other_author,
@@ -657,6 +657,7 @@ def test_publish_concurrent(monkeypatch):
             version=version,
         )
         api.put_header(short_id, version, header, backend_interface, verbose)
+        return path
 
     monkeypatch.setattr(api, "put_meta", put_meta_and_publish_concurrently)
 
@@ -766,3 +767,112 @@ def test_publish_dangling_alias(monkeypatch):
     assert audmodel.resolve_alias(alias) == uid
     assert audmodel.aliases(uid) == [alias]
     assert os.path.exists(audmodel.load(alias))
+
+
+@pytest.mark.parametrize("replaced_file", ["archive", "meta", "aliases", "alias"])
+def test_publish_concurrent_replaced_file(monkeypatch, tmp_path, replaced_file):
+    r"""Test files replaced by another process before publishing the header.
+
+    Another process publishing the same model
+    might replace files after we uploaded them,
+    but before we publish the header.
+    As our header registers the model,
+    the replaced files have to be uploaded again,
+    and a warning has to be shown.
+
+    Args:
+        monkeypatch: monkeypatch fixture
+        tmp_path: tmp_path fixture
+        replaced_file: file replaced by the other process
+
+    """
+    name = pytest.NAME
+    params = {"replaced": replaced_file}
+    version = "1.0.0"
+    subgroup = f"{SUBGROUP}.replaced"
+    alias = f"alias-replaced-{replaced_file}"
+    meta = {"replaced": replaced_file}
+    uid = audmodel.uid(name, params, version, subgroup=subgroup)
+    short_id = uid.split("-")[0]
+    repository = pytest.REPOSITORIES[0]
+    backend_interface = repository.create_backend_interface()
+    define = audmodel.core.define
+
+    paths = {
+        "archive": (
+            backend_interface.join("/", *subgroup.split("."), name, f"{short_id}.zip"),
+            version,
+        ),
+        "meta": (
+            backend_interface.join(
+                "/", define.UID_FOLDER, f"{short_id}.{define.META_EXT}"
+            ),
+            version,
+        ),
+        "aliases": (
+            backend_interface.join(
+                "/", define.UID_FOLDER, f"{short_id}.{define.ALIASES_EXT}"
+            ),
+            version,
+        ),
+        "alias": (
+            backend_interface.join(
+                "/", define.ALIAS_FOLDER, f"{alias}.{define.ALIAS_EXT}"
+            ),
+            "1.0.0",
+        ),
+    }
+    path, file_version = paths[replaced_file]
+    other_file = audeer.touch(tmp_path, "other")
+    with open(other_file, "w") as fp:
+        fp.write("file of other process")
+    other_checksum = audeer.md5(other_file)
+
+    original_exists = api.exists
+    calls = []
+
+    def exists_and_replace_file(uid):
+        r"""Replace file after the check performed before publishing header."""
+        result = original_exists(uid)
+        calls.append(uid)
+        if len(calls) == 2:
+            with backend_interface.backend:
+                backend_interface.put_file(other_file, path, file_version)
+        return result
+
+    monkeypatch.setattr(api, "exists", exists_and_replace_file)
+
+    warning_msg = (
+        f"Another process published a model with ID '{uid}' at the same time, "
+        f"and replaced the following files after they were uploaded: '{path}'. "
+        "The files are now uploaded again, "
+        "so the published model contains the correct files."
+    )
+    with pytest.warns(UserWarning, match=warning_msg):
+        assert (
+            audmodel.publish(
+                pytest.MODEL_ROOT,
+                name,
+                params,
+                version,
+                alias=alias,
+                meta=meta,
+                subgroup=subgroup,
+                repository=repository,
+            )
+            == uid
+        )
+
+    # Replaced file was uploaded again
+    with backend_interface.backend:
+        assert backend_interface.checksum(path, file_version) != other_checksum
+
+    # Published model contains the files of this process
+    assert audmodel.exists(uid)
+    assert audmodel.meta(uid) == meta
+    assert audmodel.aliases(uid) == [alias]
+    assert audmodel.resolve_alias(alias) == uid
+    model_root = audmodel.load(uid)
+    assert audeer.list_file_names(
+        model_root, recursive=True, basenames=True
+    ) == audeer.list_file_names(pytest.MODEL_ROOT, recursive=True, basenames=True)
