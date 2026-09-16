@@ -676,3 +676,88 @@ def test_publish_concurrent(monkeypatch):
     assert audmodel.exists(uid)
     assert audmodel.author(uid) == other_author
     assert os.path.exists(audmodel.load(uid))
+
+
+def test_publish_dangling_alias(monkeypatch):
+    r"""Test alias left behind by an aborted publication.
+
+    The alias is published before the header.
+    If publication is aborted afterwards,
+    and the published files cannot be removed,
+    e.g. due to a lost connection,
+    an alias pointing to an unregistered model is left behind.
+    Such an alias must not report the model as existing,
+    and must not block publishing the model again.
+
+    Args:
+        monkeypatch: monkeypatch fixture
+
+    """
+
+    def raise_error(*args, **kwargs):
+        r"""Fail to publish header."""
+        raise audbackend.BackendError(ConnectionError())
+
+    def do_not_remove(*args, **kwargs):
+        r"""Fail to remove files during cleanup."""
+
+    name = pytest.NAME
+    params = {"dangling": "alias"}
+    version = "1.0.0"
+    subgroup = f"{SUBGROUP}.dangling"
+    alias = "alias-dangling"
+    uid = audmodel.uid(name, params, version, subgroup=subgroup)
+
+    with monkeypatch.context() as patch:
+        patch.setattr(api, "put_header", raise_error)
+        patch.setattr(audbackend.interface.Maven, "remove_file", do_not_remove)
+        error_msg = "Could not publish model due to an unexpected error."
+        with pytest.raises(RuntimeError, match=error_msg):
+            audmodel.publish(
+                pytest.MODEL_ROOT,
+                name,
+                params,
+                version,
+                alias=alias,
+                subgroup=subgroup,
+                repository=pytest.REPOSITORIES[0],
+            )
+
+    # Archive, meta, and alias are left behind,
+    # but the header is missing
+    repository = pytest.REPOSITORIES[0]
+    files = audeer.list_file_names(
+        audeer.path(repository.host, repository.name),
+        recursive=True,
+    )
+    files = [os.path.basename(file) for file in files]
+    short_id = uid.split("-")[0]
+    assert f"{short_id}-{version}.zip" in files
+    assert f"{short_id}-{version}.{audmodel.core.define.META_EXT}" in files
+    assert f"{alias}-1.0.0.{audmodel.core.define.ALIAS_EXT}" in files
+    assert f"{short_id}-{version}.{audmodel.core.define.HEADER_EXT}" not in files
+
+    # Alias points to unregistered model
+    assert audmodel.resolve_alias(alias) == uid
+    assert not audmodel.exists(uid)
+    assert not audmodel.exists(alias)
+    with pytest.raises(RuntimeError, match=f"A model with ID '{uid}' does not exist."):
+        audmodel.load(alias)
+
+    # Publishing the model again repairs the alias
+    assert (
+        audmodel.publish(
+            pytest.MODEL_ROOT,
+            name,
+            params,
+            version,
+            alias=alias,
+            subgroup=subgroup,
+            repository=repository,
+        )
+        == uid
+    )
+    assert audmodel.exists(alias)
+    assert audmodel.resolve_alias(alias) == uid
+    assert audmodel.aliases(uid) == [alias]
+    assert os.path.exists(audmodel.load(alias))
