@@ -562,3 +562,117 @@ def test_publish_after_interruption(monkeypatch):
 
     assert audmodel.exists(uid)
     assert os.path.exists(audmodel.load(uid))
+
+
+def test_publish_order(monkeypatch):
+    r"""Test order in which files are published.
+
+    The header registers the model,
+    so it has to be published last.
+    Otherwise,
+    a publication that is aborted
+    without removing the published files,
+    e.g. due to a lost connection,
+    would leave a registered model
+    that cannot be loaded.
+
+    Args:
+        monkeypatch: monkeypatch fixture
+
+    """
+    functions = ["put_archive", "put_meta", "put_aliases", "put_alias", "put_header"]
+    called = []
+
+    def record(function):
+        r"""Wrap function to record its call."""
+        original = getattr(api, function)
+
+        def wrapper(*args, **kwargs):
+            called.append(function)
+            return original(*args, **kwargs)
+
+        return wrapper
+
+    for function in functions:
+        monkeypatch.setattr(api, function, record(function))
+
+    name = pytest.NAME
+    params = {"order": "header-last"}
+    version = "1.0.0"
+    subgroup = f"{SUBGROUP}.order"
+
+    audmodel.publish(
+        pytest.MODEL_ROOT,
+        name,
+        params,
+        version,
+        alias="alias-order",
+        subgroup=subgroup,
+        repository=pytest.REPOSITORIES[0],
+    )
+
+    assert called == functions
+
+
+def test_publish_concurrent(monkeypatch):
+    r"""Test publication of the same model by another process.
+
+    As the header is published last,
+    another process might publish the same model
+    while the archive is uploaded.
+    In this case,
+    an error has to be raised
+    without publishing our header,
+    and without removing the files of the other publication.
+
+    Args:
+        monkeypatch: monkeypatch fixture
+
+    """
+    name = pytest.NAME
+    params = {"concurrent": True}
+    version = "1.0.0"
+    subgroup = f"{SUBGROUP}.concurrent"
+    uid = audmodel.uid(name, params, version, subgroup=subgroup)
+    other_author = "other-process"
+
+    original_put_meta = api.put_meta
+
+    def put_meta_and_publish_concurrently(
+        short_id,
+        version,
+        meta,
+        backend_interface,
+        verbose,
+    ):
+        r"""Publish header of another process after publishing meta."""
+        original_put_meta(short_id, version, meta, backend_interface, verbose)
+        header = audmodel.core.utils.create_header(
+            uid,
+            author=other_author,
+            date=None,
+            name=name,
+            parameters=params,
+            subgroup=subgroup,
+            version=version,
+        )
+        api.put_header(short_id, version, header, backend_interface, verbose)
+
+    monkeypatch.setattr(api, "put_meta", put_meta_and_publish_concurrently)
+
+    error_msg = f"A model with ID '{uid}' exists already."
+    with pytest.raises(RuntimeError, match=error_msg):
+        audmodel.publish(
+            pytest.MODEL_ROOT,
+            name,
+            params,
+            version,
+            author="this-process",
+            subgroup=subgroup,
+            repository=pytest.REPOSITORIES[0],
+        )
+
+    # Model of other process is untouched and can be loaded
+    assert audmodel.exists(uid)
+    assert audmodel.author(uid) == other_author
+    assert os.path.exists(audmodel.load(uid))

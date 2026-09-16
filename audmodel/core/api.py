@@ -504,15 +504,21 @@ def publish(
 
     The model archive is created
     before any file is published.
-    If publication fails afterwards,
+    The header is published last,
+    as it registers the model in the repository.
+    If publication fails,
     or is interrupted by the user (Ctrl+C)
     or by SIGTERM,
     all files that have been published so far
     are removed from the backend again.
-    Note,
-    this cannot be ensured
-    if the process is killed (SIGKILL),
-    or the machine crashes.
+    If the process is killed (SIGKILL),
+    the connection is lost,
+    or the machine crashes,
+    the files cannot be removed,
+    but as the header is missing,
+    the model is not registered.
+    Publishing the same model again
+    replaces the remaining files.
 
     Args:
         root: folder with model files
@@ -562,7 +568,9 @@ def publish(
         ValueError: if ``repository`` is ``None``
         audbackend.BackendError: if connection to repository on backend
             cannot be established
-        RuntimeError: if a model with same UID exists already
+        RuntimeError: if a model with same UID exists already,
+            or was published by another process
+            in the meantime
         RuntimeError: if an unexpected error occurs during publishing
         RuntimeError: if ``meta`` or ``params``
             cannot be serialized to a YAML file
@@ -703,11 +711,20 @@ def publish(
             # as it is not an 'Exception'
             raise RuntimeError("Could not publish model due to an unexpected error.")
 
+        # The header registers the model,
+        # so it is published last.
+        # If publication is aborted
+        # without removing the published files,
+        # e.g. due to a lost connection,
+        # the model is not registered
+        # and publishing it again replaces the remaining files
         try:
-            put_header(
+            put_archive(
                 short_id,
                 version,
-                header,
+                name,
+                subgroup,
+                src_path,
                 backend_interface,
                 verbose,
             )
@@ -718,16 +735,15 @@ def publish(
                 backend_interface,
                 verbose,
             )
-            put_archive(
-                short_id,
-                version,
-                name,
-                subgroup,
-                src_path,
-                backend_interface,
-                verbose,
-            )
             if alias:
+                # Update reverse (UID -> aliases) mapping
+                put_aliases(
+                    short_id,
+                    version,
+                    [alias],
+                    backend_interface,
+                    verbose,
+                )
                 # Store mapping (alias -> UID)
                 put_alias(
                     alias,
@@ -735,11 +751,18 @@ def publish(
                     backend_interface,
                     verbose,
                 )
-                # Update reverse (UID -> aliases) mapping
-                put_aliases(
+            # Another process might have published
+            # the same model in the meantime.
+            # In this case,
+            # we do not publish our header,
+            # and do not remove any file,
+            # as they are shared with the other publication
+            published_in_the_meantime = exists(uid)
+            if not published_in_the_meantime:
+                put_header(
                     short_id,
                     version,
-                    [alias],
+                    header,
                     backend_interface,
                     verbose,
                 )
@@ -785,6 +808,9 @@ def publish(
                 raise RuntimeError(
                     "Could not publish model due to an unexpected error."
                 )
+
+    if published_in_the_meantime:
+        raise RuntimeError(f"A model with ID '{uid}' exists already.")
 
     return uid
 
