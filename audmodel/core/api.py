@@ -805,13 +805,22 @@ def publish(
             # as they are shared with the other publication
             published_in_the_meantime = exists(uid)
             if not published_in_the_meantime:
-                put_header(
+                header_path, header_checksum = put_header(
                     short_id,
                     version,
                     header,
                     backend_interface,
                     verbose,
                 )
+                # Another process might have passed the check as well,
+                # and replaced our header afterwards.
+                # Its header registers the model then,
+                # and we must not replace its files
+                published_in_the_meantime = (
+                    get_checksum(header_path, version, backend_interface)
+                    != header_checksum
+                )
+            if not published_in_the_meantime:
                 # Our header registers the model,
                 # so files replaced by another process
                 # have to be uploaded again

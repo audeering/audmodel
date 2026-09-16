@@ -498,7 +498,7 @@ def put_header(
     header: dict[str, object],
     backend_interface: audbackend.interface.Maven,
     verbose: bool,
-) -> str:
+) -> tuple[str, str]:
     r"""Put header to backend.
 
     Args:
@@ -510,7 +510,8 @@ def put_header(
             when uploading file
 
     Returns:
-        header path on backend
+        header path on backend,
+        MD5 checksum of header
 
     Raises:
         BackendError: if connection to backend
@@ -526,6 +527,7 @@ def put_header(
     with tempfile.TemporaryDirectory() as tmp_root:
         src_path = os.path.join(tmp_root, "model.yaml")
         write_yaml(src_path, header)
+        checksum = audeer.md5(src_path)
         with backend_interface.backend:
             backend_interface.put_file(
                 src_path,
@@ -534,7 +536,7 @@ def put_header(
                 verbose=verbose,
             )
 
-    return dst_path
+    return dst_path, checksum
 
 
 def put_meta(
