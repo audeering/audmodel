@@ -572,9 +572,12 @@ def publish(
         ValueError: if ``repository`` is ``None``
         audbackend.BackendError: if connection to repository on backend
             cannot be established
-        RuntimeError: if a model with same UID exists already,
-            or was published by another process
-            in the meantime
+        RuntimeError: if a model with same UID exists already
+        RuntimeError: if a model with same UID
+            was published by another process in the meantime.
+            In this case,
+            files of the other publication
+            might have been replaced by the ones of this process
         RuntimeError: if an unexpected error occurs during publishing
         RuntimeError: if ``meta`` or ``params``
             cannot be serialized to a YAML file
@@ -814,7 +817,13 @@ def publish(
                 )
 
     if published_in_the_meantime:
-        raise RuntimeError(f"A model with ID '{uid}' exists already.")
+        raise RuntimeError(
+            f"A model with ID '{uid}' "
+            "was published by another process in the meantime. "
+            "Its archive, metadata, or alias files "
+            "might have been replaced by the ones of this process. "
+            "Make sure the published model is the intended one."
+        )
 
     return uid
 

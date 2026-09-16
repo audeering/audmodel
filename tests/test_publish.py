@@ -660,7 +660,12 @@ def test_publish_concurrent(monkeypatch):
 
     monkeypatch.setattr(api, "put_meta", put_meta_and_publish_concurrently)
 
-    error_msg = f"A model with ID '{uid}' exists already."
+    error_msg = (
+        f"A model with ID '{uid}' "
+        "was published by another process in the meantime. "
+        "Its archive, metadata, or alias files "
+        "might have been replaced by the ones of this process."
+    )
     with pytest.raises(RuntimeError, match=error_msg):
         audmodel.publish(
             pytest.MODEL_ROOT,
