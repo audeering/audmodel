@@ -506,8 +506,12 @@ def publish(
     before any file is published.
     The header is published last,
     as it registers the model in the repository.
-    If publication fails,
-    or is interrupted by the user (Ctrl+C)
+    If another process publishes the same model
+    while this publication is in progress,
+    the shared files are intentionally not removed,
+    and a ``RuntimeError`` is raised.
+    For all other publication failures,
+    or if publication is interrupted by the user (Ctrl+C)
     or by SIGTERM,
     all files that have been published so far
     are removed from the backend again.
