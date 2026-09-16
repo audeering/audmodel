@@ -2,6 +2,7 @@ import datetime
 import errno
 import os
 import tempfile
+import warnings
 
 import oyaml as yaml
 
@@ -14,6 +15,7 @@ from audmodel.core.backend import create_archive
 from audmodel.core.backend import get_alias
 from audmodel.core.backend import get_aliases
 from audmodel.core.backend import get_archive
+from audmodel.core.backend import get_checksum
 from audmodel.core.backend import get_header
 from audmodel.core.backend import get_meta
 from audmodel.core.backend import header_storage_location
@@ -504,15 +506,34 @@ def publish(
 
     The model archive is created
     before any file is published.
-    If publication fails afterwards,
-    or is interrupted by the user (Ctrl+C)
+    The header is published last,
+    as it registers the model in the repository.
+    If another process publishes the same model
+    while this publication is in progress,
+    the shared files are intentionally not removed,
+    and a ``RuntimeError`` is raised.
+    For all other publication failures,
+    or if publication is interrupted by the user (Ctrl+C)
     or by SIGTERM,
     all files that have been published so far
     are removed from the backend again.
-    Note,
-    this cannot be ensured
-    if the process is killed (SIGKILL),
-    or the machine crashes.
+    If the process is killed (SIGKILL),
+    the connection is lost,
+    or the machine crashes,
+    the files cannot be removed,
+    but as the header is missing,
+    the model is not registered.
+    Publishing the same model again
+    replaces the remaining files.
+
+    If another process publishes the same model
+    at the same time,
+    only one of them registers the model,
+    the other one raises an error.
+    Files the other process replaced
+    after they were uploaded
+    are uploaded again,
+    and a warning is shown.
 
     Args:
         root: folder with model files
@@ -563,6 +584,11 @@ def publish(
         audbackend.BackendError: if connection to repository on backend
             cannot be established
         RuntimeError: if a model with same UID exists already
+        RuntimeError: if a model with same UID
+            was published by another process in the meantime.
+            In this case,
+            files of the other publication
+            might have been replaced by the ones of this process
         RuntimeError: if an unexpected error occurs during publishing
         RuntimeError: if ``meta`` or ``params``
             cannot be serialized to a YAML file
@@ -703,46 +729,110 @@ def publish(
             # as it is not an 'Exception'
             raise RuntimeError("Could not publish model due to an unexpected error.")
 
+        # The header registers the model,
+        # so it is published last.
+        # If publication is aborted
+        # without removing the published files,
+        # e.g. due to a lost connection,
+        # the model is not registered
+        # and publishing it again replaces the remaining files
         try:
-            put_header(
-                short_id,
-                version,
-                header,
-                backend_interface,
-                verbose,
-            )
-            put_meta(
-                short_id,
-                version,
-                meta,
-                backend_interface,
-                verbose,
-            )
-            put_archive(
-                short_id,
-                version,
-                name,
-                subgroup,
-                src_path,
-                backend_interface,
-                verbose,
-            )
+            # Upload functions with version of the uploaded file
+            uploads = [
+                (
+                    lambda: put_archive(
+                        short_id,
+                        version,
+                        name,
+                        subgroup,
+                        src_path,
+                        backend_interface,
+                        verbose,
+                    ),
+                    version,
+                ),
+                (
+                    lambda: put_meta(
+                        short_id,
+                        version,
+                        meta,
+                        backend_interface,
+                        verbose,
+                    ),
+                    version,
+                ),
+            ]
             if alias:
-                # Store mapping (alias -> UID)
-                put_alias(
-                    alias,
-                    uid,
-                    backend_interface,
-                    verbose,
-                )
-                # Update reverse (UID -> aliases) mapping
-                put_aliases(
+                uploads += [
+                    # Update reverse (UID -> aliases) mapping
+                    (
+                        lambda: put_aliases(
+                            short_id,
+                            version,
+                            [alias],
+                            backend_interface,
+                            verbose,
+                        ),
+                        version,
+                    ),
+                    # Store mapping (alias -> UID)
+                    (
+                        lambda: put_alias(
+                            alias,
+                            uid,
+                            backend_interface,
+                            verbose,
+                        ),
+                        "1.0.0",
+                    ),
+                ]
+
+            # Remember checksum of each uploaded file,
+            # to detect if another process
+            # publishing the same model
+            # replaces it in the meantime
+            published = []
+            for upload, file_version in uploads:
+                path = upload()
+                checksum = get_checksum(path, file_version, backend_interface)
+                published.append((upload, path, file_version, checksum))
+
+            # Another process might have published
+            # the same model in the meantime.
+            # In this case,
+            # we do not publish our header,
+            # and do not remove any file,
+            # as they are shared with the other publication
+            published_in_the_meantime = exists(uid)
+            if not published_in_the_meantime:
+                put_header(
                     short_id,
                     version,
-                    [alias],
+                    header,
                     backend_interface,
                     verbose,
                 )
+                # Our header registers the model,
+                # so files replaced by another process
+                # have to be uploaded again
+                replaced = [
+                    (upload, path)
+                    for upload, path, file_version, checksum in published
+                    if get_checksum(path, file_version, backend_interface) != checksum
+                ]
+                if replaced:
+                    paths = ", ".join(f"'{path}'" for _, path in replaced)
+                    warnings.warn(
+                        "Another process published "
+                        f"a model with ID '{uid}' at the same time, "
+                        "and replaced the following files "
+                        f"after they were uploaded: {paths}. "
+                        "The files are now uploaded again, "
+                        "so the published model contains "
+                        "the correct files."
+                    )
+                    for upload, _ in replaced:
+                        upload()
         except (KeyboardInterrupt, Exception) as ex:
             # Otherwise remove already published files
             with backend_interface.backend:
@@ -785,6 +875,15 @@ def publish(
                 raise RuntimeError(
                     "Could not publish model due to an unexpected error."
                 )
+
+    if published_in_the_meantime:
+        raise RuntimeError(
+            f"A model with ID '{uid}' "
+            "was published by another process in the meantime. "
+            "Its archive, metadata, or alias files "
+            "might have been replaced by the ones of this process. "
+            "Make sure the published model is the intended one."
+        )
 
     return uid
 

@@ -562,3 +562,317 @@ def test_publish_after_interruption(monkeypatch):
 
     assert audmodel.exists(uid)
     assert os.path.exists(audmodel.load(uid))
+
+
+def test_publish_order(monkeypatch):
+    r"""Test order in which files are published.
+
+    The header registers the model,
+    so it has to be published last.
+    Otherwise,
+    a publication that is aborted
+    without removing the published files,
+    e.g. due to a lost connection,
+    would leave a registered model
+    that cannot be loaded.
+
+    Args:
+        monkeypatch: monkeypatch fixture
+
+    """
+    functions = ["put_archive", "put_meta", "put_aliases", "put_alias", "put_header"]
+    called = []
+
+    def record(function):
+        r"""Wrap function to record its call."""
+        original = getattr(api, function)
+
+        def wrapper(*args, **kwargs):
+            called.append(function)
+            return original(*args, **kwargs)
+
+        return wrapper
+
+    for function in functions:
+        monkeypatch.setattr(api, function, record(function))
+
+    name = pytest.NAME
+    params = {"order": "header-last"}
+    version = "1.0.0"
+    subgroup = f"{SUBGROUP}.order"
+
+    audmodel.publish(
+        pytest.MODEL_ROOT,
+        name,
+        params,
+        version,
+        alias="alias-order",
+        subgroup=subgroup,
+        repository=pytest.REPOSITORIES[0],
+    )
+
+    assert called == functions
+
+
+def test_publish_concurrent(monkeypatch):
+    r"""Test publication of the same model by another process.
+
+    As the header is published last,
+    another process might publish the same model
+    while the archive is uploaded.
+    In this case,
+    an error has to be raised
+    without publishing our header,
+    and without removing the files of the other publication.
+
+    Args:
+        monkeypatch: monkeypatch fixture
+
+    """
+    name = pytest.NAME
+    params = {"concurrent": True}
+    version = "1.0.0"
+    subgroup = f"{SUBGROUP}.concurrent"
+    uid = audmodel.uid(name, params, version, subgroup=subgroup)
+    other_author = "other-process"
+
+    original_put_meta = api.put_meta
+
+    def put_meta_and_publish_concurrently(
+        short_id,
+        version,
+        meta,
+        backend_interface,
+        verbose,
+    ):
+        r"""Publish header of another process after publishing meta."""
+        path = original_put_meta(short_id, version, meta, backend_interface, verbose)
+        header = audmodel.core.utils.create_header(
+            uid,
+            author=other_author,
+            date=None,
+            name=name,
+            parameters=params,
+            subgroup=subgroup,
+            version=version,
+        )
+        api.put_header(short_id, version, header, backend_interface, verbose)
+        return path
+
+    monkeypatch.setattr(api, "put_meta", put_meta_and_publish_concurrently)
+
+    error_msg = (
+        f"A model with ID '{uid}' "
+        "was published by another process in the meantime. "
+        "Its archive, metadata, or alias files "
+        "might have been replaced by the ones of this process."
+    )
+    with pytest.raises(RuntimeError, match=error_msg):
+        audmodel.publish(
+            pytest.MODEL_ROOT,
+            name,
+            params,
+            version,
+            author="this-process",
+            subgroup=subgroup,
+            repository=pytest.REPOSITORIES[0],
+        )
+
+    # Model of other process is untouched and can be loaded
+    assert audmodel.exists(uid)
+    assert audmodel.author(uid) == other_author
+    assert os.path.exists(audmodel.load(uid))
+
+
+def test_publish_dangling_alias(monkeypatch):
+    r"""Test alias left behind by an aborted publication.
+
+    The alias is published before the header.
+    If publication is aborted afterwards,
+    and the published files cannot be removed,
+    e.g. due to a lost connection,
+    an alias pointing to an unregistered model is left behind.
+    Such an alias must not report the model as existing,
+    and must not block publishing the model again.
+
+    Args:
+        monkeypatch: monkeypatch fixture
+
+    """
+
+    def raise_error(*args, **kwargs):
+        r"""Fail to publish header."""
+        raise audbackend.BackendError(ConnectionError())
+
+    def do_not_remove(*args, **kwargs):
+        r"""Fail to remove files during cleanup."""
+
+    name = pytest.NAME
+    params = {"dangling": "alias"}
+    version = "1.0.0"
+    subgroup = f"{SUBGROUP}.dangling"
+    alias = "alias-dangling"
+    uid = audmodel.uid(name, params, version, subgroup=subgroup)
+
+    with monkeypatch.context() as patch:
+        patch.setattr(api, "put_header", raise_error)
+        patch.setattr(audbackend.interface.Maven, "remove_file", do_not_remove)
+        error_msg = "Could not publish model due to an unexpected error."
+        with pytest.raises(RuntimeError, match=error_msg):
+            audmodel.publish(
+                pytest.MODEL_ROOT,
+                name,
+                params,
+                version,
+                alias=alias,
+                subgroup=subgroup,
+                repository=pytest.REPOSITORIES[0],
+            )
+
+    # Archive, meta, and alias are left behind,
+    # but the header is missing
+    repository = pytest.REPOSITORIES[0]
+    files = audeer.list_file_names(
+        audeer.path(repository.host, repository.name),
+        recursive=True,
+    )
+    files = [os.path.basename(file) for file in files]
+    short_id = uid.split("-")[0]
+    assert f"{short_id}-{version}.zip" in files
+    assert f"{short_id}-{version}.{audmodel.core.define.META_EXT}" in files
+    assert f"{alias}-1.0.0.{audmodel.core.define.ALIAS_EXT}" in files
+    assert f"{short_id}-{version}.{audmodel.core.define.HEADER_EXT}" not in files
+
+    # Alias points to unregistered model
+    assert audmodel.resolve_alias(alias) == uid
+    assert not audmodel.exists(uid)
+    assert not audmodel.exists(alias)
+    with pytest.raises(RuntimeError, match=f"A model with ID '{uid}' does not exist."):
+        audmodel.load(alias)
+
+    # Publishing the model again repairs the alias
+    assert (
+        audmodel.publish(
+            pytest.MODEL_ROOT,
+            name,
+            params,
+            version,
+            alias=alias,
+            subgroup=subgroup,
+            repository=repository,
+        )
+        == uid
+    )
+    assert audmodel.exists(alias)
+    assert audmodel.resolve_alias(alias) == uid
+    assert audmodel.aliases(uid) == [alias]
+    assert os.path.exists(audmodel.load(alias))
+
+
+@pytest.mark.parametrize("replaced_file", ["archive", "meta", "aliases", "alias"])
+def test_publish_concurrent_replaced_file(monkeypatch, tmp_path, replaced_file):
+    r"""Test files replaced by another process before publishing the header.
+
+    Another process publishing the same model
+    might replace files after we uploaded them,
+    but before we publish the header.
+    As our header registers the model,
+    the replaced files have to be uploaded again,
+    and a warning has to be shown.
+
+    Args:
+        monkeypatch: monkeypatch fixture
+        tmp_path: tmp_path fixture
+        replaced_file: file replaced by the other process
+
+    """
+    name = pytest.NAME
+    params = {"replaced": replaced_file}
+    version = "1.0.0"
+    subgroup = f"{SUBGROUP}.replaced"
+    alias = f"alias-replaced-{replaced_file}"
+    meta = {"replaced": replaced_file}
+    uid = audmodel.uid(name, params, version, subgroup=subgroup)
+    short_id = uid.split("-")[0]
+    repository = pytest.REPOSITORIES[0]
+    backend_interface = repository.create_backend_interface()
+    define = audmodel.core.define
+
+    paths = {
+        "archive": (
+            backend_interface.join("/", *subgroup.split("."), name, f"{short_id}.zip"),
+            version,
+        ),
+        "meta": (
+            backend_interface.join(
+                "/", define.UID_FOLDER, f"{short_id}.{define.META_EXT}"
+            ),
+            version,
+        ),
+        "aliases": (
+            backend_interface.join(
+                "/", define.UID_FOLDER, f"{short_id}.{define.ALIASES_EXT}"
+            ),
+            version,
+        ),
+        "alias": (
+            backend_interface.join(
+                "/", define.ALIAS_FOLDER, f"{alias}.{define.ALIAS_EXT}"
+            ),
+            "1.0.0",
+        ),
+    }
+    path, file_version = paths[replaced_file]
+    other_file = audeer.touch(tmp_path, "other")
+    with open(other_file, "w") as fp:
+        fp.write("file of other process")
+    other_checksum = audeer.md5(other_file)
+
+    original_exists = api.exists
+    calls = []
+
+    def exists_and_replace_file(uid):
+        r"""Replace file after the check performed before publishing header."""
+        result = original_exists(uid)
+        calls.append(uid)
+        if len(calls) == 2:
+            with backend_interface.backend:
+                backend_interface.put_file(other_file, path, file_version)
+        return result
+
+    monkeypatch.setattr(api, "exists", exists_and_replace_file)
+
+    warning_msg = (
+        f"Another process published a model with ID '{uid}' at the same time, "
+        f"and replaced the following files after they were uploaded: '{path}'. "
+        "The files are now uploaded again, "
+        "so the published model contains the correct files."
+    )
+    with pytest.warns(UserWarning, match=warning_msg):
+        assert (
+            audmodel.publish(
+                pytest.MODEL_ROOT,
+                name,
+                params,
+                version,
+                alias=alias,
+                meta=meta,
+                subgroup=subgroup,
+                repository=repository,
+            )
+            == uid
+        )
+
+    # Replaced file was uploaded again
+    with backend_interface.backend:
+        assert backend_interface.checksum(path, file_version) != other_checksum
+
+    # Published model contains the files of this process
+    assert audmodel.exists(uid)
+    assert audmodel.meta(uid) == meta
+    assert audmodel.aliases(uid) == [alias]
+    assert audmodel.resolve_alias(alias) == uid
+    model_root = audmodel.load(uid)
+    assert audeer.list_file_names(
+        model_root, recursive=True, basenames=True
+    ) == audeer.list_file_names(pytest.MODEL_ROOT, recursive=True, basenames=True)
