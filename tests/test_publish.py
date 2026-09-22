@@ -392,7 +392,17 @@ def assert_nothing_published(uid, alias):
 
 @pytest.mark.parametrize(
     "version",
-    ["1", "1.0", "1.0.0.1", "1.0.0rc1", "latest", "", "1.0.0/1"],
+    [
+        "1",
+        "1.0",
+        "1.0.0.1",
+        "1.0.0rc1",
+        "latest",
+        "",
+        "1.0.0/1",
+        "v1.0.0",
+        "1.0.0+build7",
+    ],
 )
 def test_publish_version_error(version):
     r"""Test error for a version that is not a semantic version.

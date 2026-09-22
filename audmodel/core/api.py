@@ -587,8 +587,14 @@ def publish(
             or it does contain chars other than ``[A-Za-z0-9._-]+``
         ValueError: if ``compression`` is not between 0 and 9
         ValueError: if ``version`` is not a semantic version
-            as defined by :func:`audeer.is_semantic_version`,
-            e.g. ``'1.0.0'``, ``'v1.0.0'``, or ``'1.0.0-prod'``
+            following ``'X.Y.Z'``,
+            where X, Y, Z are integers,
+            optionally followed by a suffix
+            starting with ``'-'``,
+            e.g. ``'1.0.0'`` or ``'1.0.0-prod'``.
+            A leading ``'v'``
+            and a ``'+'`` suffix
+            are not allowed
         KeyboardInterrupt: if publishing is interrupted
             by the user (Ctrl+C) or by SIGTERM
 
@@ -670,15 +676,23 @@ def publish(
     if not 0 <= compression <= 9:
         raise ValueError(f"'compression' has to be between 0 and 9, not {compression}.")
 
-    if not audeer.is_semantic_version(version):
+    # audeer.is_semantic_version() accepts a leading 'v' and a '+' suffix,
+    # but the UID grammar requires the version to start with a digit,
+    # and audbackend does not allow '+' in versions
+    if not (
+        version[:1].isdigit()
+        and "+" not in version
+        and audeer.is_semantic_version(version)
+    ):
         raise ValueError(
             f"'{version}' is not a valid version. "
             "Versions have to be semantic versions, "
             "following 'X.Y.Z', "
             "where X, Y, Z are integers, "
-            "optionally prefixed by 'v' "
-            "or followed by a suffix, "
-            "e.g. '1.0.0', 'v1.0.0', or '1.0.0-prod'."
+            "optionally followed by a suffix "
+            "starting with '-', "
+            "e.g. '1.0.0' or '1.0.0-prod'. "
+            "A leading 'v' and a '+' suffix are not allowed."
         )
 
     if not os.path.isdir(root):
