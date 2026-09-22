@@ -169,31 +169,6 @@ def get_archive(
     return root
 
 
-def get_checksum(
-    path: str,
-    version: str,
-    backend_interface: audbackend.interface.Maven,
-) -> str:
-    r"""Checksum of file on backend.
-
-    Args:
-        path: path of file on backend
-        version: version of file
-        backend_interface: backend interface instance
-
-    Returns:
-        MD5 checksum of file
-
-    Raises:
-        BackendError: if connection to backend
-            cannot be established,
-            or file does not exist
-
-    """
-    with backend_interface.backend:
-        return backend_interface.checksum(path, version)
-
-
 def get_header(
     short_id: str,
     version: str,
