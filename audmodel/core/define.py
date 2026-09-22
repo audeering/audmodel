@@ -31,10 +31,3 @@ r"""Private repository for legacy models."""
 
 LEGACY_REPOSITORY_PUBLIC = "models-public-local"
 r"""Public repository for legacy models."""
-
-# Maximum number of rounds
-# in which audmodel.publish()
-# checks that no other process
-# has replaced the published files,
-# and uploads them again otherwise
-PUBLISH_VERIFICATION_ROUNDS = 3

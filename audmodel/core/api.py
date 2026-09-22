@@ -534,8 +534,6 @@ def publish(
     after they were uploaded
     are uploaded again,
     and a warning is shown.
-    This is repeated a few times,
-    if the files are replaced again.
 
     Args:
         root: folder with model files
@@ -817,59 +815,33 @@ def publish(
                 # Another process might have passed the check as well,
                 # and replaced our header afterwards.
                 # Its header registers the model then,
-                # and we must not replace its files.
-                # Otherwise,
-                # our header registers the model,
-                # and files replaced by the other process
-                # have to be uploaded again.
-                # As the other process might still be uploading,
-                # this is repeated,
-                # until no file was replaced
-                verified = False
-                replaced_paths = []
-                for _ in range(define.PUBLISH_VERIFICATION_ROUNDS):
-                    header_replaced = (
-                        get_checksum(header_path, version, backend_interface)
-                        != header_checksum
-                    )
-                    if header_replaced:
-                        published_in_the_meantime = True
-                        break
-                    replaced = [
-                        (upload, path)
-                        for upload, path, file_version, checksum in published
-                        if get_checksum(path, file_version, backend_interface)
-                        != checksum
-                    ]
-                    if not replaced:
-                        verified = True
-                        break
-                    for upload, path in replaced:
-                        if path not in replaced_paths:
-                            replaced_paths.append(path)
-                        upload()
-
-                if not published_in_the_meantime and replaced_paths:
-                    paths = ", ".join(f"'{path}'" for path in replaced_paths)
-                    if verified:
-                        outcome = (
-                            "The files are now uploaded again, "
-                            "so the published model contains "
-                            "the correct files."
-                        )
-                    else:
-                        outcome = (
-                            "The files were uploaded again, "
-                            "but were replaced again afterwards. "
-                            "Check that the published model contains "
-                            "the correct files."
-                        )
+                # and we must not replace its files
+                published_in_the_meantime = (
+                    get_checksum(header_path, version, backend_interface)
+                    != header_checksum
+                )
+            if not published_in_the_meantime:
+                # Our header registers the model,
+                # so files replaced by another process
+                # have to be uploaded again
+                replaced = [
+                    (upload, path)
+                    for upload, path, file_version, checksum in published
+                    if get_checksum(path, file_version, backend_interface) != checksum
+                ]
+                if replaced:
+                    paths = ", ".join(f"'{path}'" for _, path in replaced)
                     warnings.warn(
                         "Another process published "
                         f"a model with ID '{uid}' at the same time, "
                         "and replaced the following files "
-                        f"after they were uploaded: {paths}. " + outcome
+                        f"after they were uploaded: {paths}. "
+                        "The files are now uploaded again, "
+                        "so the published model contains "
+                        "the correct files."
                     )
+                    for upload, _ in replaced:
+                        upload()
         except (KeyboardInterrupt, Exception) as ex:
             # Otherwise remove already published files
             with backend_interface.backend:
