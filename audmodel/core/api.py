@@ -586,6 +586,9 @@ def publish(
         ValueError: if ``alias`` can be confused with an UID,
             or it does contain chars other than ``[A-Za-z0-9._-]+``
         ValueError: if ``compression`` is not between 0 and 9
+        ValueError: if ``version`` is not a semantic version
+            as defined by :func:`audeer.is_semantic_version`,
+            e.g. ``'1.0.0'``, ``'v1.0.0'``, or ``'1.0.0-prod'``
         KeyboardInterrupt: if publishing is interrupted
             by the user (Ctrl+C) or by SIGTERM
 
@@ -666,6 +669,17 @@ def publish(
 
     if not 0 <= compression <= 9:
         raise ValueError(f"'compression' has to be between 0 and 9, not {compression}.")
+
+    if not audeer.is_semantic_version(version):
+        raise ValueError(
+            f"'{version}' is not a valid version. "
+            "Versions have to be semantic versions, "
+            "following 'X.Y.Z', "
+            "where X, Y, Z are integers, "
+            "optionally prefixed by 'v' "
+            "or followed by a suffix, "
+            "e.g. '1.0.0', 'v1.0.0', or '1.0.0-prod'."
+        )
 
     if not os.path.isdir(root):
         raise FileNotFoundError(
