@@ -14,7 +14,14 @@ UID_LEGACY_PATERN = re.compile(
     r"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
 )
 UID_SHORT_PATTERN = re.compile(r"^[0-9a-f]{8}$")
-UID_VERSION_PATTERN = re.compile(r"^[0-9a-f]{8}-[0-9][A-Za-z0-9.+-]*$")
+# Allowed version characters
+# are the intersection of the characters
+# accepted by audbackend (``[A-Za-z0-9._-]``)
+# and those that keep a UID distinguishable from an alias
+# (version has to start with a digit)
+VERSION_CHARS = r"[0-9][A-Za-z0-9._-]*"
+VERSION_PATTERN = re.compile(rf"^{VERSION_CHARS}$")
+UID_VERSION_PATTERN = re.compile(rf"^[0-9a-f]{{8}}-{VERSION_CHARS}$")
 VALID_ALIAS_PATTERN = re.compile(r"^[A-Za-z0-9._-]+$")
 
 

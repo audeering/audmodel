@@ -401,7 +401,10 @@ def assert_nothing_published(uid, alias):
         "",
         "1.0.0/1",
         "v1.0.0",
+        "-1.0.0",
         "1.0.0+build7",
+        "1.0.0-a/b",
+        "1.0.0-a:b",
     ],
 )
 def test_publish_version_error(version):
@@ -427,7 +430,7 @@ def test_publish_version_error(version):
 
 @pytest.mark.parametrize(
     "version",
-    ["1.0.0", "1.0.0-prod", "1.0.0-1-gdf29c4a"],
+    ["1.0.0", "1.0.0-prod", "1.0.0-a_b", "1.0.0-1-gdf29c4a"],
 )
 def test_publish_version(version):
     r"""Test publishing with valid semantic versions.
@@ -445,7 +448,9 @@ def test_publish_version(version):
         repository=pytest.REPOSITORIES[0],
     )
     assert uid.endswith(f"-{version}")
+    assert audmodel.exists(uid)
     assert version in audmodel.versions(uid)
+    assert audmodel.load(uid, verbose=False)
 
 
 @pytest.mark.parametrize(
