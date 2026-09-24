@@ -1,5 +1,6 @@
 import os
 import platform
+import re
 import signal
 import zipfile
 
@@ -10,6 +11,7 @@ import audeer
 
 import audmodel
 from audmodel.core import api
+from audmodel.core import utils
 
 
 audmodel.config.CACHE_ROOT = pytest.CACHE_ROOT
@@ -386,6 +388,69 @@ def assert_nothing_published(uid, alias):
         )
         files = [os.path.basename(file) for file in files]
         assert not [file for file in files if short_id in file or alias in file]
+
+
+@pytest.mark.parametrize(
+    "version",
+    [
+        "1",
+        "1.0",
+        "1.0.0.1",
+        "1.0.0rc1",
+        "latest",
+        "",
+        "1.0.0/1",
+        "v1.0.0",
+        "-1.0.0",
+        "1.0.0+build7",
+        "1.0.0-a/b",
+        "1.0.0-a:b",
+    ],
+)
+def test_publish_version_error(version):
+    r"""Test error for a version that is not a semantic version.
+
+    Args:
+        version: invalid version string
+
+    """
+    error_msg = f"'{version}' is not a valid version."
+    with pytest.raises(ValueError, match=re.escape(error_msg)):
+        audmodel.publish(
+            pytest.MODEL_ROOT,
+            pytest.NAME,
+            {},
+            version,
+            subgroup=f"{SUBGROUP}.version",
+            repository=pytest.REPOSITORIES[0],
+        )
+    short_id = utils.short_id(pytest.NAME, {}, f"{SUBGROUP}.version")
+    assert not audmodel.exists(short_id)
+
+
+@pytest.mark.parametrize(
+    "version",
+    ["1.0.0", "1.0.0-prod", "1.0.0-a_b", "1.0.0-1-gdf29c4a"],
+)
+def test_publish_version(version):
+    r"""Test publishing with valid semantic versions.
+
+    Args:
+        version: valid version string
+
+    """
+    uid = audmodel.publish(
+        pytest.MODEL_ROOT,
+        pytest.NAME,
+        {"version": version},
+        version,
+        subgroup=f"{SUBGROUP}.version",
+        repository=pytest.REPOSITORIES[0],
+    )
+    assert uid.endswith(f"-{version}")
+    assert audmodel.exists(uid)
+    assert version in audmodel.versions(uid)
+    assert audmodel.load(uid, verbose=False)
 
 
 @pytest.mark.parametrize(

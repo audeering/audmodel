@@ -159,6 +159,7 @@ def test_is_alias():
     # UIDs should not be detected as aliases
     assert not is_alias("d4e9c65b")  # short UID (8 chars)
     assert not is_alias("d4e9c65b-1.0.0")  # UID with version
+    assert not is_alias("d4e9c65b-1.0.0-a_b")  # UID with version suffix
     assert not is_alias("12345678-90ab-cdef-1234-567890abcdef")  # legacy UID (36 chars)
     # Test legacy UID with proper UUID format (8-4-4-4-12), all hex
     assert not is_alias("aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee")
