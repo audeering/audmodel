@@ -64,7 +64,7 @@
             
             
               <div class="version">
-                v1.5.2
+                v1.5.3
               </div>
             
           
@@ -144,6 +144,7 @@
 <span></span><span class="kn">import</span><span class="w"> </span><span class="nn">datetime</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">errno</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">tempfile</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">oyaml</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">yaml</span>
 
@@ -152,6 +153,7 @@
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">audmodel.core.backend</span><span class="w"> </span><span class="kn">import</span> <span class="n">SERIALIZE_ERROR_MESSAGE</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">audmodel.core.backend</span><span class="w"> </span><span class="kn">import</span> <span class="n">archive_path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">audmodel.core.backend</span><span class="w"> </span><span class="kn">import</span> <span class="n">create_archive</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">audmodel.core.backend</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_alias</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">audmodel.core.backend</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_aliases</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">audmodel.core.backend</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_archive</span>
@@ -678,6 +680,28 @@
 <span class="sd">            'data': {'msppodcast': {'version': '2.6.0'}},</span>
 <span class="sd">        }</span>
 
+<span class="sd">    The model archive is created</span>
+<span class="sd">    before any file is published.</span>
+<span class="sd">    The header is published last,</span>
+<span class="sd">    as it registers the model in the repository.</span>
+<span class="sd">    If another process publishes the same model</span>
+<span class="sd">    while this publication is in progress,</span>
+<span class="sd">    the shared files are intentionally not removed,</span>
+<span class="sd">    and a ``RuntimeError`` is raised.</span>
+<span class="sd">    For all other publication failures,</span>
+<span class="sd">    or if publication is interrupted by the user (Ctrl+C)</span>
+<span class="sd">    or by SIGTERM,</span>
+<span class="sd">    all files that have been published so far</span>
+<span class="sd">    are removed from the backend again.</span>
+<span class="sd">    If the process is killed (SIGKILL),</span>
+<span class="sd">    the connection is lost,</span>
+<span class="sd">    or the machine crashes,</span>
+<span class="sd">    the files cannot be removed,</span>
+<span class="sd">    but as the header is missing,</span>
+<span class="sd">    the model is not registered.</span>
+<span class="sd">    Publishing the same model again</span>
+<span class="sd">    replaces the remaining files.</span>
+
 <span class="sd">    Args:</span>
 <span class="sd">        root: folder with model files</span>
 <span class="sd">        name: model name</span>
@@ -727,6 +751,11 @@
 <span class="sd">        audbackend.BackendError: if connection to repository on backend</span>
 <span class="sd">            cannot be established</span>
 <span class="sd">        RuntimeError: if a model with same UID exists already</span>
+<span class="sd">        RuntimeError: if a model with same UID</span>
+<span class="sd">            was published by another process in the meantime.</span>
+<span class="sd">            In this case,</span>
+<span class="sd">            files of the other publication</span>
+<span class="sd">            might have been replaced by the ones of this process</span>
 <span class="sd">        RuntimeError: if an unexpected error occurs during publishing</span>
 <span class="sd">        RuntimeError: if ``meta`` or ``params``</span>
 <span class="sd">            cannot be serialized to a YAML file</span>
@@ -735,6 +764,16 @@
 <span class="sd">        ValueError: if ``alias`` can be confused with an UID,</span>
 <span class="sd">            or it does contain chars other than ``[A-Za-z0-9._-]+``</span>
 <span class="sd">        ValueError: if ``compression`` is not between 0 and 9</span>
+<span class="sd">        ValueError: if ``version`` is not a semantic version ``'X.Y.Z.'``,</span>
+<span class="sd">            where X, Y, Z are integers,</span>
+<span class="sd">            optionally followed by a suffix</span>
+<span class="sd">            starting with ``'-'``,</span>
+<span class="sd">            e.g. ``'1.0.0'`` or ``'1.0.0-prod'``.</span>
+<span class="sd">            Versions may only contain</span>
+<span class="sd">            letters, digits, ``'.'``, ``'_'``, and ``'-'``,</span>
+<span class="sd">            and have to start with a digit</span>
+<span class="sd">        KeyboardInterrupt: if publishing is interrupted</span>
+<span class="sd">            by the user (Ctrl+C) or by SIGTERM</span>
 
 <span class="sd">    Examples:</span>
 <span class="sd">        &gt;&gt;&gt; # Assuming your model files are stored under `model_root`</span>
@@ -814,6 +853,24 @@
     <span class="k">if</span> <span class="ow">not</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">compression</span> <span class="o">&lt;=</span> <span class="mi">9</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"'compression' has to be between 0 and 9, not </span><span class="si">{</span><span class="n">compression</span><span class="si">}</span><span class="s2">."</span><span class="p">)</span>
 
+    <span class="c1"># Ensure we have a semantic version,</span>
+    <span class="c1"># starting with a digit,</span>
+    <span class="c1"># publishable by audbackend,</span>
+    <span class="c1"># and distinguishable from an alias</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span>
+        <span class="n">utils</span><span class="o">.</span><span class="n">VERSION_PATTERN</span><span class="o">.</span><span class="n">fullmatch</span><span class="p">(</span><span class="n">version</span><span class="p">)</span> <span class="ow">and</span> <span class="n">audeer</span><span class="o">.</span><span class="n">is_semantic_version</span><span class="p">(</span><span class="n">version</span><span class="p">)</span>
+    <span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">"'</span><span class="si">{</span><span class="n">version</span><span class="si">}</span><span class="s2">' is not a valid version. "</span>
+            <span class="s2">"Versions have to be semantic versions 'X.Y.Z', "</span>
+            <span class="s2">"where X, Y, Z are integers, "</span>
+            <span class="s2">"optionally followed by a suffix "</span>
+            <span class="s2">"starting with '-', "</span>
+            <span class="s2">"e.g. '1.0.0' or '1.0.0-prod'. "</span>
+            <span class="s2">"Versions may only contain letters, digits, '.', '_', and '-', "</span>
+            <span class="s2">"and have to start with a digit."</span>
+        <span class="p">)</span>
+
     <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">root</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span>
             <span class="n">errno</span><span class="o">.</span><span class="n">ENOENT</span><span class="p">,</span>
@@ -838,89 +895,139 @@
         <span class="n">version</span><span class="o">=</span><span class="n">version</span><span class="p">,</span>
     <span class="p">)</span>
 
-    <span class="k">try</span><span class="p">:</span>
-        <span class="n">put_header</span><span class="p">(</span>
-            <span class="n">short_id</span><span class="p">,</span>
-            <span class="n">version</span><span class="p">,</span>
-            <span class="n">header</span><span class="p">,</span>
-            <span class="n">backend_interface</span><span class="p">,</span>
-            <span class="n">verbose</span><span class="p">,</span>
-        <span class="p">)</span>
-        <span class="n">put_meta</span><span class="p">(</span>
-            <span class="n">short_id</span><span class="p">,</span>
-            <span class="n">version</span><span class="p">,</span>
-            <span class="n">meta</span><span class="p">,</span>
-            <span class="n">backend_interface</span><span class="p">,</span>
-            <span class="n">verbose</span><span class="p">,</span>
-        <span class="p">)</span>
-        <span class="n">put_archive</span><span class="p">(</span>
-            <span class="n">short_id</span><span class="p">,</span>
-            <span class="n">version</span><span class="p">,</span>
-            <span class="n">name</span><span class="p">,</span>
-            <span class="n">subgroup</span><span class="p">,</span>
-            <span class="n">root</span><span class="p">,</span>
-            <span class="n">backend_interface</span><span class="p">,</span>
-            <span class="n">compression</span><span class="p">,</span>
-            <span class="n">verbose</span><span class="p">,</span>
-            <span class="n">tmp_root</span><span class="o">=</span><span class="n">tmp_root</span><span class="p">,</span>
-        <span class="p">)</span>
-        <span class="k">if</span> <span class="n">alias</span><span class="p">:</span>
-            <span class="c1"># Store mapping (alias -&gt; UID)</span>
-            <span class="n">put_alias</span><span class="p">(</span>
-                <span class="n">alias</span><span class="p">,</span>
-                <span class="n">uid</span><span class="p">,</span>
-                <span class="n">backend_interface</span><span class="p">,</span>
+    <span class="k">if</span> <span class="n">tmp_root</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">tmp_root</span> <span class="o">=</span> <span class="n">audeer</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">tmp_root</span><span class="p">)</span>
+
+    <span class="c1"># Convert SIGTERM to KeyboardInterrupt,</span>
+    <span class="c1"># to ensure files are removed again from the backend</span>
+    <span class="c1"># if publication is interrupted</span>
+    <span class="k">with</span> <span class="p">(</span>
+        <span class="n">utils</span><span class="o">.</span><span class="n">sigterm_as_interrupt</span><span class="p">(),</span>
+        <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">(</span><span class="nb">dir</span><span class="o">=</span><span class="n">tmp_root</span><span class="p">)</span> <span class="k">as</span> <span class="n">archive_root</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="c1"># Create the archive before publishing any file,</span>
+        <span class="c1"># as this can take a long time for large models,</span>
+        <span class="c1"># and an interruption should not leave files on the backend</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">src_path</span> <span class="o">=</span> <span class="n">create_archive</span><span class="p">(</span>
+                <span class="n">root</span><span class="p">,</span>
+                <span class="n">archive_root</span><span class="p">,</span>
+                <span class="n">compression</span><span class="p">,</span>
                 <span class="n">verbose</span><span class="p">,</span>
             <span class="p">)</span>
-            <span class="c1"># Update reverse (UID -&gt; aliases) mapping</span>
-            <span class="n">put_aliases</span><span class="p">(</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="c1"># No file has been published yet,</span>
+            <span class="c1"># so no cleanup is needed.</span>
+            <span class="c1"># An interruption is not caught here,</span>
+            <span class="c1"># as it is not an 'Exception'</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">"Could not publish model due to an unexpected error."</span><span class="p">)</span>
+
+        <span class="c1"># The header registers the model,</span>
+        <span class="c1"># so it is published last.</span>
+        <span class="c1"># If publication is aborted</span>
+        <span class="c1"># without removing the published files,</span>
+        <span class="c1"># e.g. due to a lost connection,</span>
+        <span class="c1"># the model is not registered</span>
+        <span class="c1"># and publishing it again replaces the remaining files</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">put_archive</span><span class="p">(</span>
                 <span class="n">short_id</span><span class="p">,</span>
                 <span class="n">version</span><span class="p">,</span>
-                <span class="p">[</span><span class="n">alias</span><span class="p">],</span>
+                <span class="n">name</span><span class="p">,</span>
+                <span class="n">subgroup</span><span class="p">,</span>
+                <span class="n">src_path</span><span class="p">,</span>
                 <span class="n">backend_interface</span><span class="p">,</span>
                 <span class="n">verbose</span><span class="p">,</span>
             <span class="p">)</span>
-    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>
-        <span class="c1"># Otherwise remove already published files</span>
-        <span class="k">with</span> <span class="n">backend_interface</span><span class="o">.</span><span class="n">backend</span><span class="p">:</span>
-            <span class="k">for</span> <span class="n">ext</span> <span class="ow">in</span> <span class="p">[</span><span class="n">define</span><span class="o">.</span><span class="n">HEADER_EXT</span><span class="p">,</span> <span class="n">define</span><span class="o">.</span><span class="n">META_EXT</span><span class="p">,</span> <span class="n">define</span><span class="o">.</span><span class="n">ALIASES_EXT</span><span class="p">]:</span>
+            <span class="n">put_meta</span><span class="p">(</span>
+                <span class="n">short_id</span><span class="p">,</span>
+                <span class="n">version</span><span class="p">,</span>
+                <span class="n">meta</span><span class="p">,</span>
+                <span class="n">backend_interface</span><span class="p">,</span>
+                <span class="n">verbose</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="n">alias</span><span class="p">:</span>
+                <span class="c1"># Update reverse (UID -&gt; aliases) mapping</span>
+                <span class="n">put_aliases</span><span class="p">(</span>
+                    <span class="n">short_id</span><span class="p">,</span>
+                    <span class="n">version</span><span class="p">,</span>
+                    <span class="p">[</span><span class="n">alias</span><span class="p">],</span>
+                    <span class="n">backend_interface</span><span class="p">,</span>
+                    <span class="n">verbose</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="c1"># Store mapping (alias -&gt; UID)</span>
+                <span class="n">put_alias</span><span class="p">(</span>
+                    <span class="n">alias</span><span class="p">,</span>
+                    <span class="n">uid</span><span class="p">,</span>
+                    <span class="n">backend_interface</span><span class="p">,</span>
+                    <span class="n">verbose</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="c1"># Another process might have published</span>
+            <span class="c1"># the same model in the meantime.</span>
+            <span class="c1"># In this case,</span>
+            <span class="c1"># we do not publish our header,</span>
+            <span class="c1"># and do not remove any file,</span>
+            <span class="c1"># as they are shared with the other publication</span>
+            <span class="n">published_in_the_meantime</span> <span class="o">=</span> <span class="n">exists</span><span class="p">(</span><span class="n">uid</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">published_in_the_meantime</span><span class="p">:</span>
+                <span class="n">put_header</span><span class="p">(</span>
+                    <span class="n">short_id</span><span class="p">,</span>
+                    <span class="n">version</span><span class="p">,</span>
+                    <span class="n">header</span><span class="p">,</span>
+                    <span class="n">backend_interface</span><span class="p">,</span>
+                    <span class="n">verbose</span><span class="p">,</span>
+                <span class="p">)</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">KeyboardInterrupt</span><span class="p">,</span> <span class="ne">Exception</span><span class="p">)</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>
+            <span class="c1"># Otherwise remove already published files</span>
+            <span class="k">with</span> <span class="n">backend_interface</span><span class="o">.</span><span class="n">backend</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">ext</span> <span class="ow">in</span> <span class="p">[</span><span class="n">define</span><span class="o">.</span><span class="n">HEADER_EXT</span><span class="p">,</span> <span class="n">define</span><span class="o">.</span><span class="n">META_EXT</span><span class="p">,</span> <span class="n">define</span><span class="o">.</span><span class="n">ALIASES_EXT</span><span class="p">]:</span>
+                    <span class="n">path</span> <span class="o">=</span> <span class="n">backend_interface</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                        <span class="s2">"/"</span><span class="p">,</span>
+                        <span class="n">define</span><span class="o">.</span><span class="n">UID_FOLDER</span><span class="p">,</span>
+                        <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">short_id</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">ext</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+                    <span class="p">)</span>
+                    <span class="k">if</span> <span class="n">backend_interface</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">version</span><span class="p">):</span>
+                        <span class="n">backend_interface</span><span class="o">.</span><span class="n">remove_file</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">version</span><span class="p">)</span>
+
                 <span class="n">path</span> <span class="o">=</span> <span class="n">backend_interface</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
                     <span class="s2">"/"</span><span class="p">,</span>
-                    <span class="n">define</span><span class="o">.</span><span class="n">UID_FOLDER</span><span class="p">,</span>
-                    <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">short_id</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">ext</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+                    <span class="o">*</span><span class="n">subgroup</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"."</span><span class="p">),</span>
+                    <span class="n">name</span><span class="p">,</span>
+                    <span class="n">short_id</span> <span class="o">+</span> <span class="s2">".zip"</span><span class="p">,</span>
                 <span class="p">)</span>
                 <span class="k">if</span> <span class="n">backend_interface</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">version</span><span class="p">):</span>
                     <span class="n">backend_interface</span><span class="o">.</span><span class="n">remove_file</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">version</span><span class="p">)</span>
 
-            <span class="n">path</span> <span class="o">=</span> <span class="n">backend_interface</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-                <span class="s2">"/"</span><span class="p">,</span>
-                <span class="o">*</span><span class="n">subgroup</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"."</span><span class="p">),</span>
-                <span class="n">name</span><span class="p">,</span>
-                <span class="n">short_id</span> <span class="o">+</span> <span class="s2">".zip"</span><span class="p">,</span>
-            <span class="p">)</span>
-            <span class="k">if</span> <span class="n">backend_interface</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">version</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
-                <span class="c1"># we can probably assume that the archive</span>
-                <span class="c1"># does not exist on the backend</span>
-                <span class="c1"># if something goes wrong during 'put_archive()'</span>
-                <span class="c1"># so it's not likely we'll ever end up in this case</span>
-                <span class="n">backend_interface</span><span class="o">.</span><span class="n">remove_file</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">version</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">alias</span><span class="p">:</span>
+                    <span class="n">path</span> <span class="o">=</span> <span class="n">backend_interface</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                        <span class="s2">"/"</span><span class="p">,</span>
+                        <span class="n">define</span><span class="o">.</span><span class="n">ALIAS_FOLDER</span><span class="p">,</span>
+                        <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">alias</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">define</span><span class="o">.</span><span class="n">ALIAS_EXT</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+                    <span class="p">)</span>
+                    <span class="k">if</span> <span class="n">backend_interface</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">"1.0.0"</span><span class="p">):</span>
+                        <span class="n">backend_interface</span><span class="o">.</span><span class="n">remove_file</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">"1.0.0"</span><span class="p">)</span>
 
-            <span class="k">if</span> <span class="n">alias</span><span class="p">:</span>
-                <span class="n">path</span> <span class="o">=</span> <span class="n">backend_interface</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-                    <span class="s2">"/"</span><span class="p">,</span>
-                    <span class="n">define</span><span class="o">.</span><span class="n">ALIAS_FOLDER</span><span class="p">,</span>
-                    <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">alias</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">define</span><span class="o">.</span><span class="n">ALIAS_EXT</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+            <span class="c1"># Reraise our custom error if params or meta cannot be serialized</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ex</span><span class="p">,</span> <span class="ne">RuntimeError</span><span class="p">)</span> <span class="ow">and</span> <span class="n">ex</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span>
+                <span class="n">SERIALIZE_ERROR_MESSAGE</span>
+            <span class="p">):</span>
+                <span class="k">raise</span> <span class="n">ex</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ex</span><span class="p">,</span> <span class="ne">KeyboardInterrupt</span><span class="p">):</span>
+                <span class="c1"># Never hide an interruption behind another error</span>
+                <span class="k">raise</span>
+            <span class="k">else</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                    <span class="s2">"Could not publish model due to an unexpected error."</span>
                 <span class="p">)</span>
-                <span class="k">if</span> <span class="n">backend_interface</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">"1.0.0"</span><span class="p">):</span>
-                    <span class="n">backend_interface</span><span class="o">.</span><span class="n">remove_file</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">"1.0.0"</span><span class="p">)</span>  <span class="c1"># pragma: no cover</span>
 
-        <span class="c1"># Reraise our custom error if params or meta cannot be serialized</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ex</span><span class="p">,</span> <span class="ne">RuntimeError</span><span class="p">)</span> <span class="ow">and</span> <span class="n">ex</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span>
-            <span class="n">SERIALIZE_ERROR_MESSAGE</span>
-        <span class="p">):</span>
-            <span class="k">raise</span> <span class="n">ex</span>
-        <span class="k">else</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
-            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">"Could not publish model due to an unexpected error."</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">published_in_the_meantime</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">"A model with ID '</span><span class="si">{</span><span class="n">uid</span><span class="si">}</span><span class="s2">' "</span>
+            <span class="s2">"was published by another process in the meantime. "</span>
+            <span class="s2">"Its archive, metadata, or alias files "</span>
+            <span class="s2">"might have been replaced by the ones of this process. "</span>
+            <span class="s2">"Make sure the published model is the intended one."</span>
+        <span class="p">)</span>
 
     <span class="k">return</span> <span class="n">uid</span></div>
 
@@ -1491,7 +1598,7 @@
         
         
         
-          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2026/09/08 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
+          Built with <a href="https://www.sphinx-doc.org">Sphinx</a> on 2026/09/24 using the <a href="https://github.com/audeering/sphinx-audeering-theme/">audEERING theme</a>
         
     </p>
   </div>
