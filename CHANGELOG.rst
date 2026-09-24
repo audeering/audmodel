@@ -11,8 +11,8 @@ Version 1.5.3 (2026-09-24)
 --------------------------
 
 * Added: support for Python 3.15
-* Changed: ``audmodel.publish()`` now publishes header,
-  which registers the model,
+* Changed: ``audmodel.publish()`` publishes the header
+  and registers the model UID
   as last step
 * Changed: restrict the ``version`` argument of ``audmodel.publish()``
   to semantic versions
