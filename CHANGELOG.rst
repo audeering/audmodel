@@ -7,6 +7,21 @@ The format is based on `Keep a Changelog`_,
 and this project adheres to `Semantic Versioning`_.
 
 
+Version 1.5.3 (2026-09-24)
+--------------------------
+
+* Added: support for Python 3.15
+* Changed: ``audmodel.publish()`` publishes the header
+  and registers the model UID
+  as last step
+* Changed: restrict the ``version`` argument of ``audmodel.publish()``
+  to semantic versions
+  that are supported by ``audmodel.versions()``
+* Removed: support for Python 3.10
+* Fixed: ``audmodel.publish()`` removes published files,
+  if it is interrupted
+
+
 Version 1.5.2 (2026-09-08)
 --------------------------
 
